@@ -39,7 +39,7 @@ function Dashboard() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-3xl mx-auto p-6 space-y-8 relative z-10">
+      <main className="max-w-[1400px] mx-auto p-6 relative z-10 w-full">
         {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} />}
         {activeTab === 'invest' && <InvestTab />}
         {activeTab === 'wallet' && <WalletTab />}
@@ -78,8 +78,8 @@ function Dashboard() {
 
 function HomeTab({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center justify-between mt-4 md:mt-10 mb-8">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1400px] w-full mx-auto">
+      <div className="flex items-center justify-between mt-4 md:mt-8 mb-6">
         <div>
           <div className="text-[13px] text-gray-500 uppercase tracking-widest font-semibold mb-1">Good evening,</div>
           <h1 className="text-2xl text-white font-['Outfit'] font-light">Akhatasebhudojoseph1 👋</h1>
@@ -87,96 +87,118 @@ function HomeTab({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
         <Bell className="hidden md:block w-5 h-5 text-gray-400 cursor-pointer hover:text-white" />
       </div>
 
-      <div className="bg-[#0a0f1c] border border-white/5 p-8 relative overflow-hidden rounded-sm mb-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a84c]/10 rounded-full blur-[80px] pointer-events-none" />
-        <div className="flex justify-between items-start mb-6 relative z-10">
+      {/* DASHBOARD GRID - Mosaic Layout instead of vertical stack */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 items-stretch">
+        
+        {/* Balance Card: 8 Columns */}
+        <div className="lg:col-span-8 bg-[#0a0f1c] border border-white/5 p-8 relative overflow-hidden rounded-sm flex flex-col justify-between">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a84c]/10 rounded-full blur-[80px] pointer-events-none" />
           <div>
-            <div className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Portfolio Balance</div>
-            <div className="text-5xl font-['Outfit'] font-light text-white tracking-tight">$48,872.<span className="text-gray-500">49</span></div>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-[#00d4aa] rounded-full text-[10px] uppercase tracking-widest font-bold">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#00d4aa] animate-pulse"></div>Live
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-[#00d4aa] mb-8 relative z-10">
-          <ArrowUpRight className="w-4 h-4" />
-          <span className="text-[13px] font-bold tracking-wider">+$1,280.40 today</span>
-        </div>
-        <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/5 relative z-10">
-          <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">ROI Earned</div><div className="text-lg text-white font-light font-['Outfit']">$6,840</div></div>
-          <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active Plans</div><div className="text-lg text-white font-light font-['Outfit']">2</div></div>
-          <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Next Payout</div><div className="text-lg text-[#c9a84c] font-light font-['Outfit']">Today</div></div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        <button onClick={() => setActiveTab('wallet')} className="flex flex-col items-center justify-center p-4 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Wallet className="w-6 h-6 text-[#c9a84c] mb-2 group-hover:scale-110 transition-transform" /><span className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold">Deposit</span></button>
-        <button onClick={() => setActiveTab('wallet')} className="flex flex-col items-center justify-center p-4 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><ArrowDownLeft className="w-6 h-6 text-[#00d4aa] mb-2 group-hover:scale-110 transition-transform" /><span className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold">Withdraw</span></button>
-        <button onClick={() => setActiveTab('invest')} className="flex flex-col items-center justify-center p-4 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><TrendingUp className="w-6 h-6 text-[#e8c96a] mb-2 group-hover:scale-110 transition-transform" /><span className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold">Invest</span></button>
-        <button onClick={() => setActiveTab('rewards')} className="flex flex-col items-center justify-center p-4 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Gift className="w-6 h-6 text-[#b088f5] mb-2 group-hover:scale-110 transition-transform" /><span className="text-[11px] uppercase tracking-widest text-gray-400 font-semibold">Rewards</span></button>
-      </div>
-
-      <div className="flex items-center justify-between p-4 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded-sm mb-8">
-        <div className="flex items-center gap-3"><Clock className="w-5 h-5 text-[#c9a84c]" /><div><div className="text-[11px] text-[#c9a84c] uppercase tracking-widest font-bold mb-0.5">Upcoming Payout</div><div className="text-[13px] text-gray-300">Growth Plan · Processing at midnight</div></div></div>
-        <div className="text-lg text-[#e8c96a] font-['Outfit'] font-bold">+$2524.00</div>
-      </div>
-
-      {/* SpaceX Pre-IPO */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4"><h2 className="text-xl font-light text-white font-['Outfit']">Featured Pre-IPO</h2><span onClick={() => setActiveTab('invest')} className="text-[11px] text-[#c9a84c] uppercase tracking-widest cursor-pointer hover:underline">View</span></div>
-        <div className="p-6 bg-[#0a0f1c] border border-white/5 rounded-sm overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a84c]/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="text-[10px] text-[#c9a84c] uppercase tracking-[0.2em] mb-4 font-bold flex items-center gap-2"><Rocket className="w-3 h-3" /> PRIVATE MARKETS · FEATURED</div>
-          <h3 className="text-3xl text-white font-light font-['Outfit'] mb-4">SpaceX <span className="text-gray-500 text-lg block mt-1">Pre-IPO · Private Markets</span></h3>
-          <p className="text-[13px] text-gray-400 leading-relaxed mb-6">Founded by Elon Musk in 2002, SpaceX designs, manufactures and launches advanced rockets and spacecraft — including Falcon, Dragon and Starship. Members gain pro-rata exposure to secondary shares ahead of an anticipated public listing.</p>
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="p-4 bg-white/5 border border-white/5"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Valuation</div><div className="text-xl text-white font-['Outfit']">$350B</div></div>
-            <div className="p-4 bg-white/5 border border-white/5"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Allocation Left</div><div className="text-xl text-white font-['Outfit']">42%</div></div>
-            <div className="p-4 bg-white/5 border border-white/5"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Minimum</div><div className="text-xl text-white font-['Outfit']">$25,000</div></div>
-            <div className="p-4 bg-white/5 border border-white/5"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Investor Interest</div><div className="text-xl text-[#00d4aa] font-['Outfit']">Very High</div></div>
-          </div>
-          <div className="text-[12px] text-gray-400 mb-6 flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#c9a84c]" />IPO Status: Anticipated 2026 · Filing in preparation</div>
-          <button onClick={() => setActiveTab('invest')} className="w-full bg-[#c9a84c] text-[#070b14] font-bold text-[13px] tracking-widest uppercase py-4 hover:bg-[#b59640] transition-colors rounded-sm">Invest in SpaceX</button>
-        </div>
-      </div>
-
-      {/* Active Investments */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4"><h2 className="text-xl font-light text-white font-['Outfit']">Active Investments</h2><span onClick={() => setActiveTab('invest')} className="text-[11px] text-[#c9a84c] uppercase tracking-widest cursor-pointer hover:underline">See all</span></div>
-        <div className="space-y-4">
-          <div className="p-5 bg-[#0a0f1c] border border-white/5 rounded-sm">
-            <div className="flex justify-between items-start mb-4">
-              <div><h3 className="text-lg text-white font-light font-['Outfit'] mb-1">Growth Plan</h3><div className="text-[12px] text-[#00d4aa] font-bold">+$320.00/day</div></div>
-              <div className="text-right"><div className="text-[12px] text-gray-400">Day 12 of 60</div><div className="text-[11px] text-[#c9a84c]">3.2%/day</div></div>
-            </div>
-            <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-2"><div className="bg-[#00d4aa] h-full" style={{ width: '20%' }}></div></div>
-            <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-widest"><span>20% complete</span><span>48d remaining</span></div>
-          </div>
-          <div className="p-5 bg-[#0a0f1c] border border-white/5 rounded-sm">
-            <div className="flex justify-between items-start mb-4">
-              <div><h3 className="text-lg text-white font-light font-['Outfit'] mb-1">Premium Plan</h3><div className="text-[12px] text-[#00d4aa] font-bold">+$2204.00/day</div></div>
-              <div className="text-right"><div className="text-[12px] text-gray-400">Day 3 of 90</div><div className="text-[11px] text-[#c9a84c]">5.8%/day</div></div>
-            </div>
-            <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-2"><div className="bg-[#c9a84c] h-full" style={{ width: '3%' }}></div></div>
-            <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-widest"><span>3% complete</span><span>87d remaining</span></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Transactions */}
-      <div>
-        <div className="flex items-center justify-between mb-4"><h2 className="text-xl font-light text-white font-['Outfit']">Recent Transactions</h2><span className="text-[11px] text-[#c9a84c] uppercase tracking-widest cursor-pointer hover:underline">See all</span></div>
-        <div className="bg-[#0a0f1c] border border-white/5 rounded-sm divide-y divide-white/5">
-          {[{ title: 'Growth Plan ROI', time: 'Today, 00:00', amount: '+$320.00', status: 'Verified', color: '#00d4aa', icon: TrendingUp }, { title: 'Premium Plan ROI', time: 'Today, 00:00', amount: '+$2,204.00', status: 'Verified', color: '#00d4aa', icon: TrendingUp }, { title: 'Bitcoin Deposit', time: 'Apr 18, 14:32', amount: '+$10,000', status: 'Verified', color: '#00d4aa', icon: Wallet }, { title: 'Premium Plan Activated', time: 'Apr 21, 09:15', amount: '-$38,000', status: 'Active', color: '#c9a84c', icon: TrendingUp }].map((tx, i) => (
-            <div key={i} className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center"><tx.icon className="w-5 h-5" style={{color: tx.color === '#00d4aa' ? (i < 2 ? '#00d4aa' : '#d1d5db') : '#d1d5db'}} /></div>
-                <div><div className="text-[14px] text-white font-medium">{tx.title}</div><div className="text-[11px] text-gray-500 mt-1">{tx.time}</div></div>
+            <div className="flex justify-between items-start mb-6 relative z-10">
+              <div>
+                <div className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Portfolio Balance</div>
+                <div className="text-5xl font-['Outfit'] font-light text-white tracking-tight">$48,872.<span className="text-gray-500">49</span></div>
               </div>
-              <div className="text-right"><div className="text-[14px] font-bold" style={{color: tx.amount.includes('+') ? '#00d4aa' : 'white'}}>{tx.amount}</div><div className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest">{tx.status}</div></div>
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-[#00d4aa] rounded-full text-[10px] uppercase tracking-widest font-bold">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#00d4aa] animate-pulse"></div>Live
+              </div>
             </div>
-          ))}
+            <div className="flex items-center gap-2 text-[#00d4aa] mb-8 relative z-10">
+              <ArrowUpRight className="w-4 h-4" />
+              <span className="text-[13px] font-bold tracking-wider">+$1,280.40 today</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/5 relative z-10">
+            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">ROI Earned</div><div className="text-lg text-white font-light font-['Outfit']">$6,840</div></div>
+            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active Plans</div><div className="text-lg text-white font-light font-['Outfit']">2</div></div>
+            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Next Payout</div><div className="text-lg text-[#c9a84c] font-light font-['Outfit']">Today</div></div>
+          </div>
         </div>
+
+        {/* Quick Actions: 4 Columns (2x2 grid inside) */}
+        <div className="lg:col-span-4 grid grid-cols-2 gap-4">
+          <button onClick={() => setActiveTab('wallet')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Wallet className="w-8 h-8 text-[#c9a84c] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Deposit</span></button>
+          <button onClick={() => setActiveTab('wallet')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><ArrowDownLeft className="w-8 h-8 text-[#00d4aa] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Withdraw</span></button>
+          <button onClick={() => setActiveTab('invest')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><TrendingUp className="w-8 h-8 text-[#e8c96a] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Invest</span></button>
+          <button onClick={() => setActiveTab('rewards')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Gift className="w-8 h-8 text-[#b088f5] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Rewards</span></button>
+        </div>
+
+        {/* Upcoming Payout: 12 Columns */}
+        <div className="lg:col-span-12 flex items-center justify-between p-4 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded-sm">
+          <div className="flex items-center gap-3"><Clock className="w-5 h-5 text-[#c9a84c]" /><div><div className="text-[11px] text-[#c9a84c] uppercase tracking-widest font-bold mb-0.5">Upcoming Payout</div><div className="text-[13px] text-gray-300">Growth Plan · Processing at midnight</div></div></div>
+          <div className="text-lg text-[#e8c96a] font-['Outfit'] font-bold">+$2524.00</div>
+        </div>
+
+        {/* SpaceX Pre-IPO: 5 Columns */}
+        <div className="lg:col-span-5 bg-[#0a0f1c] border border-white/5 rounded-sm p-6 overflow-hidden relative flex flex-col justify-between min-h-[300px]">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#c9a84c]/5 rounded-full blur-3xl pointer-events-none" />
+          <div>
+            <div className="flex items-center justify-between mb-6 relative z-10">
+              <div className="text-[10px] text-[#c9a84c] uppercase tracking-[0.2em] font-bold flex items-center gap-2"><Rocket className="w-3 h-3" /> FEATURED</div>
+              <span onClick={() => setActiveTab('invest')} className="text-[11px] text-[#c9a84c] uppercase tracking-widest cursor-pointer hover:underline">View</span>
+            </div>
+            <h3 className="text-3xl text-white font-light font-['Outfit'] mb-2 relative z-10">SpaceX</h3>
+            <p className="text-[13px] text-gray-400 leading-relaxed mb-6 relative z-10">Private market exposure to secondary shares ahead of anticipated public listing.</p>
+            <div className="grid grid-cols-2 gap-4 mb-6 relative z-10">
+              <div className="p-4 bg-white/5 border border-white/5 rounded-sm"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Valuation</div><div className="text-xl text-white font-['Outfit']">$350B</div></div>
+              <div className="p-4 bg-white/5 border border-white/5 rounded-sm"><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Allocation Left</div><div className="text-xl text-white font-['Outfit']">42%</div></div>
+            </div>
+          </div>
+          <div className="relative z-10">
+            <div className="text-[11px] text-gray-400 mb-4 flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#c9a84c]" />Anticipated 2026 IPO</div>
+            <button onClick={() => setActiveTab('invest')} className="w-full bg-[#c9a84c] text-[#070b14] font-bold text-[13px] tracking-widest uppercase py-4 hover:bg-[#b59640] transition-colors rounded-sm">Invest</button>
+          </div>
+        </div>
+
+        {/* Active Investments: 4 Columns */}
+        <div className="lg:col-span-4 bg-[#0a0f1c] border border-white/5 rounded-sm p-6 flex flex-col justify-between min-h-[300px]">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-light text-white font-['Outfit']">Active Investments</h2>
+              <span onClick={() => setActiveTab('invest')} className="text-[10px] text-[#c9a84c] uppercase tracking-widest cursor-pointer hover:underline">See all</span>
+            </div>
+            <div className="space-y-4">
+              <div className="p-4 bg-white/5 border border-white/5 rounded-sm">
+                <div className="flex justify-between items-start mb-3">
+                  <div><h3 className="text-md text-white font-light font-['Outfit'] mb-1">Growth Plan</h3><div className="text-[11px] text-[#00d4aa] font-bold">+$320.00/day</div></div>
+                  <div className="text-right"><div className="text-[11px] text-gray-400">Day 12 of 60</div></div>
+                </div>
+                <div className="w-full bg-black/20 h-1.5 rounded-full overflow-hidden mb-2"><div className="bg-[#00d4aa] h-full" style={{ width: '20%' }}></div></div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest">20% complete</div>
+              </div>
+              <div className="p-4 bg-white/5 border border-white/5 rounded-sm">
+                <div className="flex justify-between items-start mb-3">
+                  <div><h3 className="text-md text-white font-light font-['Outfit'] mb-1">Premium Plan</h3><div className="text-[11px] text-[#00d4aa] font-bold">+$2204.00/day</div></div>
+                  <div className="text-right"><div className="text-[11px] text-gray-400">Day 3 of 90</div></div>
+                </div>
+                <div className="w-full bg-black/20 h-1.5 rounded-full overflow-hidden mb-2"><div className="bg-[#c9a84c] h-full" style={{ width: '3%' }}></div></div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest">3% complete</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Transactions: 3 Columns */}
+        <div className="lg:col-span-3 bg-[#0a0f1c] border border-white/5 rounded-sm p-6 flex flex-col justify-between min-h-[300px]">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-light text-white font-['Outfit']">History</h2>
+              <span className="text-[10px] text-[#c9a84c] uppercase tracking-widest cursor-pointer hover:underline">See all</span>
+            </div>
+            <div className="divide-y divide-white/5">
+              {[{ title: 'Growth ROI', amount: '+$320', color: '#00d4aa', icon: TrendingUp }, { title: 'Premium ROI', amount: '+$2204', color: '#00d4aa', icon: TrendingUp }, { title: 'Deposit', amount: '+$10k', color: '#00d4aa', icon: Wallet }, { title: 'Invested', amount: '-$38k', color: '#c9a84c', icon: TrendingUp }].map((tx, i) => (
+                <div key={i} className="py-3.5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center"><tx.icon className="w-4 h-4" style={{color: tx.color === '#00d4aa' ? (i < 2 ? '#00d4aa' : '#d1d5db') : '#d1d5db'}} /></div>
+                    <div className="text-[13px] text-white font-medium">{tx.title}</div>
+                  </div>
+                  <div className="text-[13px] font-bold" style={{color: tx.amount.includes('+') ? '#00d4aa' : 'white'}}>{tx.amount}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -190,7 +212,7 @@ function InvestTab() {
   const totalReturn = amount ? (Number(amount) * 0.032 * 60 + Number(amount)).toFixed(2) : '0.00';
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto">
       <div className="mb-8 mt-4 md:mt-10">
         <h1 className="text-3xl text-white font-['Outfit'] font-light mb-2">Investment Plans</h1>
         <p className="text-gray-400 text-[13px]">Select a plan to start earning daily returns.</p>
@@ -259,7 +281,7 @@ function WalletTab() {
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto">
       <div className="mb-8 mt-4 md:mt-10">
         <h1 className="text-3xl text-white font-['Outfit'] font-light mb-6">Wallet</h1>
         
@@ -359,7 +381,7 @@ function WalletTab() {
 
 function ProfileTab() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto">
       <div className="mb-8 mt-4 md:mt-10">
         <h1 className="text-3xl text-white font-['Outfit'] font-light mb-2">Profile & Security</h1>
       </div>
@@ -427,7 +449,7 @@ function ProfileTab() {
 
 function RewardsTab() {
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto">
       <div className="mb-8 mt-4 md:mt-10 text-center py-10 border border-[#b088f5]/30 bg-gradient-to-b from-[#b088f5]/10 to-[#0a0f1c] rounded-sm relative overflow-hidden">
         <div className="absolute top-0 right-1/2 translate-x-1/2 w-64 h-64 bg-[#b088f5]/20 rounded-full blur-[80px] pointer-events-none" />
         <Gift className="w-12 h-12 text-[#b088f5] mx-auto mb-4 relative z-10" />
