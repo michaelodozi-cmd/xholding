@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "../components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -8,10 +10,43 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/dashboard" });
+    setLoading(true);
+    setError("");
+
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (signInError) {
+      setError(signInError.message);
+      return;
+    }
+
+    // Check if admin
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+    
+    if (profile?.role !== 'admin') {
+      const { data: settings } = await supabase.from('platform_settings').select('maintenance_mode').eq('id', 1).single();
+      if (settings?.maintenance_mode) {
+        await supabase.auth.signOut();
+        setError("The platform is currently under maintenance. Please try again later.");
+        return;
+      }
+      navigate({ to: "/dashboard" });
+    } else {
+      navigate({ to: "/admin" });
+    }
   };
 
   return (
@@ -43,9 +78,9 @@ function Login() {
       </div>
 
       {/* Right Form Section */}
-      <div className="w-full md:w-7/12 lg:w-2/3 flex flex-col justify-center items-center p-8 sm:p-12 md:p-24 relative bg-[#070b14]">
+      <div className="flex-1 w-full md:w-7/12 lg:w-2/3 flex flex-col justify-start md:justify-center items-center p-6 sm:p-12 md:p-24 relative bg-[#070b14] min-h-[100dvh] md:min-h-0">
         {/* Mobile Header */}
-        <div className="md:hidden w-full max-w-md flex justify-between items-center mb-12">
+        <div className="md:hidden w-full max-w-[400px] flex justify-between items-center mb-10 mt-6 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-sm">X</div>
           </div>
@@ -59,11 +94,20 @@ function Login() {
             <p className="text-[14px] text-gray-400 font-light leading-relaxed">Enter your email and password to view your portfolio.</p>
           </div>
 
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-sm">
+              {error}
+            </div>
+          )}
+
           <form className="space-y-8" onSubmit={handleSubmit}>
             <div className="space-y-3">
               <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.15em]">Email Address</label>
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c] transition-colors rounded-none"
                 placeholder="you@email.com"
               />
@@ -72,17 +116,29 @@ function Login() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.15em]">Password</label>
-                <a href="#" className="text-[11px] text-[#c9a84c] hover:text-white uppercase tracking-widest transition-colors">Forgot?</a>
+                <Link to="/forgot-password" className="text-[11px] text-[#c9a84c] hover:text-white uppercase tracking-widest transition-colors">Forgot?</Link>
               </div>
-              <input 
-                type="password" 
-                className="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c] transition-colors rounded-none"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full bg-transparent border-b border-white/20 py-3 pr-10 text-[15px] text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c] transition-colors rounded-none"
+                  placeholder="••••••••"
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
-            <Button className="w-full py-6 text-[13px] rounded-none bg-[#c9a84c] hover:bg-[#b59640] text-[#070b14] font-bold uppercase tracking-[0.15em] transition-colors border-none mt-4">
-              Sign In
+            <Button disabled={loading} className="w-full py-6 text-[13px] rounded-none bg-[#c9a84c] hover:bg-[#b59640] text-[#070b14] font-bold uppercase tracking-[0.15em] transition-colors border-none mt-4">
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 

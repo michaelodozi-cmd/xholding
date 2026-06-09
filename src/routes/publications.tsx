@@ -141,7 +141,7 @@ function Publications() {
                 <span className="flex items-center gap-2"><Clock className="w-3 h-3"/> 10 Min Read</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-light text-white font-['Outfit'] leading-tight mb-6 hover:text-[#c9a84c] transition-colors cursor-pointer">
-                <Link to={`/article/pre-ipo-advantage`}>The Pre-IPO Advantage: How to Invest Before Companies Go Public</Link>
+                <Link to="/article/$articleId" params={{ articleId: 'pre-ipo-advantage' }}>The Pre-IPO Advantage: How to Invest Before Companies Go Public</Link>
               </h2>
               <div className="space-y-4 text-[15px] text-gray-400 font-light leading-relaxed mb-8">
                 <p>
@@ -151,7 +151,7 @@ function Publications() {
                   At XHoldings, we believe everyday investors deserve access to these same early-stage opportunities. In this guide, we break down exactly how Pre-IPO investing works, the risks involved, and how our platform secures shares in some of the world's fastest-growing private companies so you can benefit from their massive growth before they become household names.
                 </p>
               </div>
-              <Link to={`/article/pre-ipo-advantage`}>
+              <Link to="/article/$articleId" params={{ articleId: 'pre-ipo-advantage' }}>
                 <Button className="bg-transparent hover:bg-white/5 text-white border border-[#c9a84c]/50 rounded-none px-8 py-6 text-[13px] font-bold tracking-widest uppercase transition-colors flex items-center gap-3">
                   Read Full Guide <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -168,7 +168,7 @@ function Publications() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
             {articles.map((article, index) => (
-              <Link to={`/article/${article.slug}`} key={index} className="group cursor-pointer flex flex-col h-full">
+              <Link to="/article/$articleId" params={{ articleId: article.slug }} key={index} className="group cursor-pointer flex flex-col h-full">
                 <div className="h-56 w-full border border-white/5 overflow-hidden relative mb-6">
                   <div className="absolute inset-0 bg-gradient-to-tr from-[#0a0f1c]/80 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <img 
