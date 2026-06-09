@@ -143,6 +143,10 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
     .reduce((acc, inv) => acc + (inv.amount * inv.daily_roi), 0);
   
   const totalBalance = Number(profile?.balance || 0) + roiEarned + Number(profile?.total_earned_referrals || 0);
+  const totalInvested = investments.reduce((acc, inv) => acc + Number(inv.amount), 0);
+  const totalAssets = totalBalance + totalInvested;
+  const investedPct = totalAssets > 0 ? Math.round((totalInvested / totalAssets) * 100) : 0;
+  const availablePct = 100 - investedPct;
 
   const [marketData, setMarketData] = useState<any[]>([]);
   useEffect(() => {
@@ -176,24 +180,41 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
         <div className="lg:col-span-8 bg-[#0a0f1c] border border-white/5 p-8 relative overflow-hidden rounded-sm flex flex-col justify-between">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a84c]/10 rounded-full blur-[80px] pointer-events-none" />
           <div>
-            <div className="flex justify-between items-start mb-6 relative z-10">
+            <div className="flex justify-between items-start mb-2 relative z-10">
               <div>
-                <div className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Portfolio Balance</div>
-                <div className="text-5xl font-['Outfit'] font-light text-white tracking-tight">${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                <div className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Assets</div>
+                <div className="text-5xl font-['Outfit'] font-light text-white tracking-tight">${totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1 bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-[#00d4aa] rounded-full text-[10px] uppercase tracking-widest font-bold">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#00d4aa] animate-pulse"></div>Live
               </div>
             </div>
-            <div className="flex items-center gap-2 text-[#00d4aa] mb-8 relative z-10">
+            <div className="flex items-center gap-2 text-[#00d4aa] mb-6 relative z-10">
               <ArrowUpRight className="w-4 h-4" />
               <span className="text-[13px] font-bold tracking-wider">+${totalDailyPayout.toLocaleString(undefined, {minimumFractionDigits: 2})} today</span>
             </div>
+
+            {/* Asset breakdown bar */}
+            <div className="relative z-10 mb-6">
+              <div className="flex justify-between text-[10px] text-gray-500 uppercase tracking-widest mb-2">
+                <span>Asset Allocation</span>
+                <span>{investedPct}% Invested · {availablePct}% Available</span>
+              </div>
+              <div className="h-2 rounded-full bg-white/5 overflow-hidden flex">
+                <div className="h-full bg-gradient-to-r from-[#c9a84c] to-[#e8c96a] transition-all duration-700" style={{ width: `${investedPct}%` }} />
+                <div className="h-full bg-[#00d4aa]/40 transition-all duration-700" style={{ width: `${availablePct}%` }} />
+              </div>
+              <div className="flex gap-4 mt-2">
+                <span className="flex items-center gap-1.5 text-[10px] text-gray-500"><span className="w-2 h-2 rounded-full bg-[#c9a84c] inline-block"/>${totalInvested.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} Invested</span>
+                <span className="flex items-center gap-1.5 text-[10px] text-gray-500"><span className="w-2 h-2 rounded-full bg-[#00d4aa]/60 inline-block"/>${totalBalance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})} Available</span>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/5 relative z-10">
-            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">ROI Earned</div><div className="text-lg text-white font-light font-['Outfit']">${roiEarned.toLocaleString(undefined, {minimumFractionDigits: 2})}</div></div>
+          <div className="grid grid-cols-4 gap-4 pt-6 border-t border-white/5 relative z-10">
+            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Portfolio</div><div className="text-lg text-white font-light font-['Outfit']">${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></div>
+            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Invested</div><div className="text-lg text-[#c9a84c] font-light font-['Outfit']">${totalInvested.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></div>
+            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">ROI Earned</div><div className="text-lg text-[#00d4aa] font-light font-['Outfit']">+${roiEarned.toLocaleString(undefined, {minimumFractionDigits: 2})}</div></div>
             <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active Plans</div><div className="text-lg text-white font-light font-['Outfit']">{activePlans}</div></div>
-            <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Next Payout</div><div className="text-lg text-[#c9a84c] font-light font-['Outfit']">Today</div></div>
           </div>
         </div>
 
@@ -212,6 +233,89 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
             <div className="text-lg text-[#e8c96a] font-['Outfit'] font-bold">+${totalDailyPayout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
           </div>
         )}
+
+        {/* ─── Financial Summary Strip ─── */}
+        <div className="lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Total Invested */}
+          <div className="relative overflow-hidden bg-[#0a0f1c] border border-white/5 rounded-sm p-6 flex flex-col gap-4 group hover:border-[#c9a84c]/30 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#c9a84c]/8 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-sm bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center">
+                <Coins className="w-5 h-5 text-[#c9a84c]" />
+              </div>
+              <span className="text-[9px] text-[#c9a84c] uppercase tracking-[0.2em] font-bold bg-[#c9a84c]/10 px-2 py-1 rounded-full">
+                {investments.filter(i => i.status === 'active').length} Active
+              </span>
+            </div>
+            <div>
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-1">Total Invested</div>
+              <div className="text-3xl text-white font-['Outfit'] font-light">
+                ${investments.reduce((acc, inv) => acc + Number(inv.amount), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-[11px] text-gray-500 mt-1">Across all investment plans</div>
+            </div>
+            <div className="pt-3 border-t border-white/5">
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Daily Return</div>
+              <div className="text-[15px] text-[#c9a84c] font-['Outfit'] font-semibold">
+                +${totalDailyPayout.toLocaleString(undefined, { minimumFractionDigits: 2 })}/day
+              </div>
+            </div>
+          </div>
+
+          {/* Profit Earned */}
+          <div className="relative overflow-hidden bg-[#0a0f1c] border border-white/5 rounded-sm p-6 flex flex-col gap-4 group hover:border-[#00d4aa]/30 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#00d4aa]/8 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-sm bg-[#00d4aa]/10 border border-[#00d4aa]/20 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-[#00d4aa]" />
+              </div>
+              <span className="text-[9px] text-[#00d4aa] uppercase tracking-[0.2em] font-bold bg-[#00d4aa]/10 px-2 py-1 rounded-full">
+                3.2% Daily ROI
+              </span>
+            </div>
+            <div>
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-1">Profit Earned</div>
+              <div className="text-3xl text-[#00d4aa] font-['Outfit'] font-light">
+                +${roiEarned.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-[11px] text-gray-500 mt-1">Cumulative ROI from active plans</div>
+            </div>
+            <div className="pt-3 border-t border-white/5">
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Referral Earnings</div>
+              <div className="text-[15px] text-[#00d4aa] font-['Outfit'] font-semibold">
+                +${Number(profile?.total_earned_referrals || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </div>
+            </div>
+          </div>
+
+          {/* Withdrawable Balance */}
+          <div className="relative overflow-hidden bg-[#0a0f1c] border border-white/5 rounded-sm p-6 flex flex-col gap-4 group hover:border-white/10 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center">
+                <ArrowDownLeft className="w-5 h-5 text-gray-300" />
+              </div>
+              <span className="text-[9px] text-gray-400 uppercase tracking-[0.2em] font-bold bg-white/5 px-2 py-1 rounded-full">
+                Available Now
+              </span>
+            </div>
+            <div>
+              <div className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold mb-1">Withdrawable Balance</div>
+              <div className="text-3xl text-white font-['Outfit'] font-light">
+                ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-[11px] text-gray-500 mt-1">Portfolio balance + ROI + referrals</div>
+            </div>
+            <div className="pt-3 border-t border-white/5">
+              <button
+                onClick={() => setActiveTab('wallet')}
+                className="w-full py-2 text-[11px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-gray-300 rounded-sm transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowDownLeft className="w-3.5 h-3.5" /> Withdraw Funds
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Live Market Data: 5 Columns */}
         <div className="lg:col-span-5 bg-[#0a0f1c] border border-white/5 rounded-sm p-6 overflow-hidden relative flex flex-col justify-between min-h-[300px]">
