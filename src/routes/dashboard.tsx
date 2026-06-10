@@ -101,7 +101,7 @@ function Dashboard() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-[1400px] mx-auto p-6 relative z-10 w-full">
+      <main className="max-w-[1400px] mx-auto px-4 py-4 md:p-6 relative z-10 w-full">
 
         {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} profile={profile} />}
         {activeTab === 'invest' && <InvestTab profile={profile} />}
@@ -111,32 +111,37 @@ function Dashboard() {
         {activeTab === 'profile' && <ProfileTab profile={profile} />}
       </main>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#0a0f1c]/90 backdrop-blur-lg border-t border-white/5 px-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 flex justify-around items-center z-50 shadow-lg shadow-black/40">
-        <button onClick={() => setActiveTab('home')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'home' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
-          <Home className="w-5 h-5" />
-          <span className="text-[10px] font-medium tracking-wide">Home</span>
-          {activeTab === 'home' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
+      {/* Mobile Bottom Navigation Bar - 6 items */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#0a0f1c]/95 backdrop-blur-lg border-t border-white/5 px-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 flex justify-around items-center z-50 shadow-lg shadow-black/40">
+        <button onClick={() => setActiveTab('home')} className={`flex-1 flex flex-col items-center gap-0.5 transition-all duration-300 relative py-1 ${activeTab === 'home' ? 'text-[#c9a84c] scale-105' : 'text-gray-500'}`}>
+          <Home className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-medium tracking-wide">Home</span>
+          {activeTab === 'home' && <span className="absolute -bottom-0.5 w-3 h-0.5 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('invest')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'invest' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
-          <TrendingUp className="w-5 h-5" />
-          <span className="text-[10px] font-medium tracking-wide">Invest</span>
-          {activeTab === 'invest' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
+        <button onClick={() => setActiveTab('invest')} className={`flex-1 flex flex-col items-center gap-0.5 transition-all duration-300 relative py-1 ${activeTab === 'invest' ? 'text-[#c9a84c] scale-105' : 'text-gray-500'}`}>
+          <TrendingUp className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-medium tracking-wide">Invest</span>
+          {activeTab === 'invest' && <span className="absolute -bottom-0.5 w-3 h-0.5 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('wallet')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'wallet' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
-          <Wallet className="w-5 h-5" />
-          <span className="text-[10px] font-medium tracking-wide">Wallet</span>
-          {activeTab === 'wallet' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
+        <button onClick={() => setActiveTab('copytrade')} className={`flex-1 flex flex-col items-center gap-0.5 transition-all duration-300 relative py-1 ${activeTab === 'copytrade' ? 'text-[#c9a84c] scale-105' : 'text-gray-500'}`}>
+          <Users className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-medium tracking-wide">Copy</span>
+          {activeTab === 'copytrade' && <span className="absolute -bottom-0.5 w-3 h-0.5 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('rewards')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'rewards' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
-          <Gift className="w-5 h-5" />
-          <span className="text-[10px] font-medium tracking-wide">Rewards</span>
-          {activeTab === 'rewards' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
+        <button onClick={() => setActiveTab('wallet')} className={`flex-1 flex flex-col items-center gap-0.5 transition-all duration-300 relative py-1 ${activeTab === 'wallet' ? 'text-[#c9a84c] scale-105' : 'text-gray-500'}`}>
+          <Wallet className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-medium tracking-wide">Wallet</span>
+          {activeTab === 'wallet' && <span className="absolute -bottom-0.5 w-3 h-0.5 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('profile')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'profile' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
-          <User className="w-5 h-5" />
-          <span className="text-[10px] font-medium tracking-wide">Profile</span>
-          {activeTab === 'profile' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
+        <button onClick={() => setActiveTab('rewards')} className={`flex-1 flex flex-col items-center gap-0.5 transition-all duration-300 relative py-1 ${activeTab === 'rewards' ? 'text-[#c9a84c] scale-105' : 'text-gray-500'}`}>
+          <Gift className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-medium tracking-wide">Rewards</span>
+          {activeTab === 'rewards' && <span className="absolute -bottom-0.5 w-3 h-0.5 rounded-full bg-[#c9a84c]" />}
+        </button>
+        <button onClick={() => setActiveTab('profile')} className={`flex-1 flex flex-col items-center gap-0.5 transition-all duration-300 relative py-1 ${activeTab === 'profile' ? 'text-[#c9a84c] scale-105' : 'text-gray-500'}`}>
+          <User className="w-[18px] h-[18px]" />
+          <span className="text-[9px] font-medium tracking-wide">Profile</span>
+          {activeTab === 'profile' && <span className="absolute -bottom-0.5 w-3 h-0.5 rounded-full bg-[#c9a84c]" />}
         </button>
       </div>
     </div>
@@ -212,13 +217,13 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-8 items-stretch">
         
         {/* Balance Card: 8 Columns */}
-        <div className="lg:col-span-8 bg-[#0a0f1c] border border-white/5 p-8 relative overflow-hidden rounded-sm flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-[#0a0f1c] border border-white/5 p-5 md:p-8 relative overflow-hidden rounded-sm flex flex-col justify-between">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#c9a84c]/10 rounded-full blur-[80px] pointer-events-none" />
           <div>
             <div className="flex justify-between items-start mb-2 relative z-10">
               <div>
                 <div className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Assets</div>
-                <div className="text-5xl font-['Outfit'] font-light text-white tracking-tight">${totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                <div className="text-3xl sm:text-4xl md:text-5xl font-['Outfit'] font-light text-white tracking-tight">${totalAssets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1 bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-[#00d4aa] rounded-full text-[10px] uppercase tracking-widest font-bold">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#00d4aa] animate-pulse"></div>Live
