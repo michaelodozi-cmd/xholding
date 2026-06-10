@@ -256,15 +256,15 @@ function Landing() {
             <div className="w-12 h-12 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-xl mb-6">
               X
             </div>
-            <h2 className="text-3xl font-light text-white font-['Outfit'] mb-8">Ready to grow your portfolio?</h2>
-            <div className="flex justify-center gap-4">
-              <Link to={REGISTER}>
-                <Button className="bg-[#c9a84c] hover:bg-[#b59640] text-[#070b14] rounded-none px-8 py-6 text-[13px] font-bold tracking-widest uppercase transition-all">
+            <h2 className="text-3xl font-light text-white font-['Outfit'] mb-8 text-center">Ready to grow your portfolio?</h2>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-sm mx-auto sm:max-w-none">
+              <Link to={REGISTER} className="w-full sm:w-auto">
+                <Button className="w-full bg-[#c9a84c] hover:bg-[#b59640] text-[#070b14] rounded-none px-8 py-6 text-[13px] font-bold tracking-widest uppercase transition-all">
                   Create Account
                 </Button>
               </Link>
-              <Link to={LOGIN}>
-                <Button className="bg-transparent hover:bg-white/5 text-white border border-white/20 rounded-none px-8 py-6 text-[13px] font-bold tracking-widest uppercase transition-all">
+              <Link to={LOGIN} className="w-full sm:w-auto">
+                <Button className="w-full bg-transparent hover:bg-white/5 text-white border border-white/20 rounded-none px-8 py-6 text-[13px] font-bold tracking-widest uppercase transition-all">
                   Sign In
                 </Button>
               </Link>
