@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Button } from "../components/ui/button";
-import { ArrowRight, ChevronRight, BarChart3, Shield, BookOpen, Lock, Wallet, Rocket, Coins, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronRight, BarChart3, Shield, BookOpen, Lock, Wallet, Rocket, Coins, TrendingUp, Menu, X } from "lucide-react";
 
 const LOGIN = "/login";
 const REGISTER = "/register";
@@ -10,16 +11,18 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] selection:bg-[#c9a84c]/30">
       {/* Ultra-Minimal Institutional Navbar */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#070b14]/90 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 h-24 flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer">
-            <div className="w-10 h-10 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-lg">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-12 h-20 md:h-24 flex items-center justify-between">
+          <div className="flex items-center gap-3 md:gap-4 cursor-pointer">
+            <div className="w-8 h-8 md:w-10 md:h-10 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-base md:text-lg">
               X
             </div>
-            <span className="font-light text-2xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
+            <span className="font-light text-xl md:text-2xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
           </div>
           <div className="hidden lg:flex items-center gap-10 text-[13px] font-medium text-gray-300 tracking-wider uppercase">
             <a href="#markets" className="hover:text-[#e8c96a] transition-colors">Markets</a>
@@ -27,8 +30,8 @@ function Landing() {
             <a href="#about" className="hover:text-[#e8c96a] transition-colors">About</a>
             <Link to="/publications" className="hover:text-[#e8c96a] transition-colors">Publications</Link>
           </div>
-          <div className="flex items-center gap-6">
-            <Link to={LOGIN} className="text-[13px] font-medium text-white hover:text-[#e8c96a] transition-colors hidden sm:block uppercase tracking-wider">
+          <div className="hidden lg:flex items-center gap-6">
+            <Link to={LOGIN} className="text-[13px] font-medium text-white hover:text-[#e8c96a] transition-colors uppercase tracking-wider">
               Sign In
             </Link>
             <Link to={REGISTER}>
@@ -37,7 +40,34 @@ function Landing() {
               </Button>
             </Link>
           </div>
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden text-white p-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden absolute top-full left-0 w-full bg-[#070b14]/95 backdrop-blur-md border-b border-white/5 flex flex-col p-4 shadow-xl">
+            <a href="#markets" onClick={() => setIsMobileMenuOpen(false)} className="text-[13px] font-medium text-gray-300 tracking-wider uppercase py-4 border-b border-white/5 hover:text-[#e8c96a] transition-colors">Markets</a>
+            <a href="#ipos" onClick={() => setIsMobileMenuOpen(false)} className="text-[13px] font-medium text-gray-300 tracking-wider uppercase py-4 border-b border-white/5 hover:text-[#e8c96a] transition-colors">IPOs</a>
+            <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="text-[13px] font-medium text-gray-300 tracking-wider uppercase py-4 border-b border-white/5 hover:text-[#e8c96a] transition-colors">About</a>
+            <Link to="/publications" onClick={() => setIsMobileMenuOpen(false)} className="text-[13px] font-medium text-gray-300 tracking-wider uppercase py-4 border-b border-white/5 hover:text-[#e8c96a] transition-colors">Publications</Link>
+            <div className="flex flex-col gap-4 pt-6 pb-2">
+              <Link to={LOGIN} onClick={() => setIsMobileMenuOpen(false)} className="text-[13px] text-center font-medium text-white hover:text-[#e8c96a] transition-colors uppercase tracking-wider border border-white/10 py-3 rounded-none">
+                Sign In
+              </Link>
+              <Link to={REGISTER} onClick={() => setIsMobileMenuOpen(false)}>
+                <Button className="w-full bg-[#c9a84c] hover:bg-[#b59640] text-[#070b14] rounded-none py-6 text-[13px] font-bold transition-all tracking-wider uppercase">
+                  Become a Member
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}

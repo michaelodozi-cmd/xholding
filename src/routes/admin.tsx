@@ -865,8 +865,7 @@ function TransactionCard({ tx }: { tx: any }) {
 
   const handleApprove = async () => {
     if (tx.type === 'deposit') {
-      if (!usdValue || isNaN(Number(usdValue))) return;
-      updateStatus(tx.id, 'approved', Number(usdValue));
+      updateStatus(tx.id, 'approved', tx.amount);
     } else {
       if (sentTxid) {
         await supabase.from('transactions').update({ txid: sentTxid }).eq('id', tx.id);
@@ -1003,14 +1002,13 @@ function TransactionCard({ tx }: { tx: any }) {
               )}
 
               {tx.type === 'deposit' && (
-                <div className="mb-5">
-                  <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 block">USD Amount to Credit ($)</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg">$</span>
-                    <input type="number" value={usdValue} onChange={e => setUsdValue(e.target.value)} placeholder="0.00"
-                      className="w-full bg-[#070b14] border border-[#c9a84c]/30 focus:border-[#c9a84c]/70 p-3 pl-8 rounded-sm text-base focus:outline-none text-white font-mono transition-colors" />
-                  </div>
-                  <p className="text-[11px] text-gray-600 mt-1.5">This amount will be instantly credited to the user's balance.</p>
+                <div className="mb-5 bg-[#00d4aa]/10 border border-[#00d4aa]/20 p-4 rounded-sm">
+                  <p className="text-[14px] text-[#00d4aa] font-medium text-center">
+                    Have you confirmed that payment has been received in your account?
+                  </p>
+                  <p className="text-[11px] text-gray-400 text-center mt-2">
+                    Clicking Confirm Approval will instantly credit ${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} to the user's balance.
+                  </p>
                 </div>
               )}
 
@@ -1037,7 +1035,7 @@ function TransactionCard({ tx }: { tx: any }) {
                 <DialogClose asChild>
                   <button className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-gray-300 rounded-sm transition-colors">Cancel</button>
                 </DialogClose>
-                <button onClick={handleApprove} disabled={tx.type === 'deposit' && (!usdValue || isNaN(Number(usdValue)))}
+                <button onClick={handleApprove}
                   className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-[#00d4aa] hover:bg-[#00b38f] text-[#070b14] rounded-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                   ✓ Confirm Approval
                 </button>
