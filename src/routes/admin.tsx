@@ -750,49 +750,57 @@ function UsersTab() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl text-white font-light font-['Outfit']">User Management</h1>
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-gray-500" />
-          <input type="text" placeholder="Search email or ID..." className="bg-[#0a0f1c] border border-white/10 text-white pl-10 pr-4 py-2 rounded-sm text-sm focus:outline-none focus:border-white/30" />
+      {/* Header — stacks on mobile */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl text-white font-light font-['Outfit']">User Management</h1>
+        <div className="relative w-full sm:w-auto">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search email or ID..."
+            className="w-full sm:w-64 bg-[#0a0f1c] border border-white/10 text-white pl-10 pr-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-white/30"
+          />
         </div>
       </div>
-      
+
+      {/* Table — horizontally scrollable on mobile */}
       <div className="bg-[#0a0f1c] border border-white/5 rounded-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-white/5 text-[11px] text-gray-500 uppercase tracking-widest">
-              <th className="p-4 font-semibold">User</th>
-              <th className="p-4 font-semibold">Balance</th>
-              <th className="p-4 font-semibold">Role</th>
-              <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {loading ? (
-              <tr><td colSpan={5} className="p-8 text-center text-gray-500">Loading...</td></tr>
-            ) : users.length === 0 ? (
-              <tr><td colSpan={5} className="p-8 text-center text-gray-500">No users found.</td></tr>
-            ) : (
-              users.map(user => (
-                <UserRow 
-                  key={user.id} 
-                  id={user.id}
-                  name={user.name} 
-                  email={user.email} 
-                  balance={`$${Number(user.balance || 0).toLocaleString()}`} 
-                  status={user.status || 'Active'} 
-                  role={user.role}
-                  onMakeAdmin={() => makeAdmin(user.id)}
-                  onEdit={(newBalance: number) => handleEdit(user.id, newBalance)}
-                  onBan={() => handleBan(user.id, user.status || 'Active')}
-                  onDelete={() => handleDelete(user.id)}
-                />
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="min-w-[640px] w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-white/5 text-[11px] text-gray-500 uppercase tracking-widest">
+                <th className="p-3 sm:p-4 font-semibold">User</th>
+                <th className="p-3 sm:p-4 font-semibold">Balance</th>
+                <th className="p-3 sm:p-4 font-semibold">Role</th>
+                <th className="p-3 sm:p-4 font-semibold">Status</th>
+                <th className="p-3 sm:p-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {loading ? (
+                <tr><td colSpan={5} className="p-8 text-center text-gray-500">Loading...</td></tr>
+              ) : users.length === 0 ? (
+                <tr><td colSpan={5} className="p-8 text-center text-gray-500">No users found.</td></tr>
+              ) : (
+                users.map(user => (
+                  <UserRow
+                    key={user.id}
+                    id={user.id}
+                    name={user.name}
+                    email={user.email}
+                    balance={`$${Number(user.balance || 0).toLocaleString()}`}
+                    status={user.status || 'Active'}
+                    role={user.role}
+                    onMakeAdmin={() => makeAdmin(user.id)}
+                    onEdit={(newBalance: number) => handleEdit(user.id, newBalance)}
+                    onBan={() => handleBan(user.id, user.status || 'Active')}
+                    onDelete={() => handleDelete(user.id)}
+                  />
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -813,41 +821,43 @@ function UserRow({ id, name, email, balance, status, role, onMakeAdmin, onEdit, 
 
   return (
     <tr className="hover:bg-white/[0.02] transition-colors">
-      <td className="p-4">
-        <div className="text-[14px] text-white font-medium">{name}</div>
-        <div className="text-[12px] text-gray-500">{email}</div>
+      <td className="p-3 sm:p-4 max-w-[160px]">
+        <div className="text-[13px] text-white font-medium truncate">{name || '—'}</div>
+        <div className="text-[11px] text-gray-500 truncate">{email}</div>
       </td>
-      <td className="p-4 text-[14px] font-mono">{balance}</td>
-      <td className="p-4">
-        <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold ${role === 'admin' ? 'bg-purple-500/10 text-purple-400' : 'bg-gray-500/10 text-gray-400'}`}>
+      <td className="p-3 sm:p-4 text-[13px] font-mono whitespace-nowrap">{balance}</td>
+      <td className="p-3 sm:p-4">
+        <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${role === 'admin' ? 'bg-purple-500/10 text-purple-400' : 'bg-gray-500/10 text-gray-400'}`}>
           {role}
         </span>
       </td>
-      <td className="p-4">
-        <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold ${status === 'Active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : status === 'Suspended' ? 'bg-red-500/10 text-red-500' : 'bg-[#c9a84c]/10 text-[#c9a84c]'}`}>
+      <td className="p-3 sm:p-4">
+        <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${status === 'Active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : status === 'Suspended' ? 'bg-red-500/10 text-red-500' : 'bg-[#c9a84c]/10 text-[#c9a84c]'}`}>
           {status}
         </span>
       </td>
-      <td className="p-4 text-right flex justify-end gap-2">
-        {role !== 'admin' && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="px-3 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-sm text-[11px] font-bold uppercase transition-colors mr-2">
-                Make Admin
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Make {name} an Admin?</AlertDialogTitle>
-                <AlertDialogDescription className="text-gray-400">This will grant them full access to the admin dashboard.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={onMakeAdmin} className="bg-purple-500 text-white hover:bg-purple-600">Yes, Make Admin</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+      <td className="p-3 sm:p-4 text-right">
+        <div className="flex justify-end gap-1.5 flex-wrap">
+
+          {role !== 'admin' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="px-3 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-sm text-[11px] font-bold uppercase transition-colors mr-2">
+                  Make Admin
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Make {name} an Admin?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-400">This will grant them full access to the admin dashboard.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={onMakeAdmin} className="bg-purple-500 text-white hover:bg-purple-600">Yes, Make Admin</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
 
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogTrigger asChild>
@@ -907,6 +917,7 @@ function UserRow({ id, name, email, balance, status, role, onMakeAdmin, onEdit, 
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        </div>
       </td>
     </tr>
   );
