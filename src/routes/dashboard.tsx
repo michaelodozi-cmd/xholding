@@ -117,7 +117,7 @@ function Dashboard() {
             <div className="w-8 h-8 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-sm">X</div>
             <span className="font-light text-xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
           </Link>
-          <NotificationBell transactions={userTransactions} />
+          <NotificationBell transactions={userTransactions} align="left" />
         </div>
         <div className="flex flex-col gap-2 flex-grow">
           <button onClick={() => setActiveTab('home')} className={`flex items-center gap-3 px-4 py-3 rounded-sm font-medium transition-colors ${activeTab === 'home' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><Home className="w-5 h-5"/> Home</button>
@@ -1231,7 +1231,7 @@ type NotifItem = {
   status: 'approved' | 'rejected' | 'pending';
 };
 
-function NotificationBell({ transactions }: { transactions: any[] }) {
+function NotificationBell({ transactions, align = 'right' }: { transactions: any[], align?: 'left' | 'right' }) {
   const [open, setOpen] = useState(false);
   const [notifs, setNotifs] = useState<NotifItem[]>([]);
   const [permGranted, setPermGranted] = useState(
@@ -1279,8 +1279,12 @@ function NotificationBell({ transactions }: { transactions: any[] }) {
     });
   }, [transactions]);
 
+  const [seeded, setSeeded] = useState(false);
+
   // Seed with most recent transactions on first load
   useEffect(() => {
+    if (seeded || transactions.length === 0) return;
+
     const initial: NotifItem[] = transactions
       .filter(tx => tx.status !== 'pending')
       .sort((a, b) => b.timestamp - a.timestamp)
@@ -1298,8 +1302,8 @@ function NotificationBell({ transactions }: { transactions: any[] }) {
       .filter(n => n.title !== '');
     setNotifs(initial);
     initial.forEach(n => { prevStatuses.current[n.id.split('-')[0]] = n.status; });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setSeeded(true);
+  }, [transactions, seeded]);
 
   const unread = notifs.filter(n => !n.read).length;
 
@@ -1338,7 +1342,7 @@ function NotificationBell({ transactions }: { transactions: any[] }) {
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
           {/* Dropdown Panel */}
-          <div className="absolute right-0 top-10 z-50 w-[320px] max-w-[calc(100vw-2rem)] bg-[#0a0f1c] border border-white/10 rounded-sm shadow-2xl shadow-black/60 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className={`absolute top-10 z-50 w-[320px] max-w-[calc(100vw-2rem)] bg-[#0a0f1c] border border-white/10 rounded-sm shadow-2xl shadow-black/60 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${align === 'left' ? 'left-0' : 'right-0'}`}>
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
               <div className="flex items-center gap-2">
