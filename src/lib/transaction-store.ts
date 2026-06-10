@@ -13,6 +13,7 @@ export type Transaction = {
   txid: string;
   status: TransactionStatus;
   timestamp: number;
+  screenshotUrl?: string | null;
 };
 
 export function useTransactionStore() {
@@ -54,7 +55,8 @@ export function useTransactionStore() {
         asset: tx.asset,
         txid: tx.txid,
         status: tx.status as TransactionStatus,
-        timestamp: Number(tx.timestamp)
+        timestamp: Number(tx.timestamp),
+        screenshotUrl: tx.screenshot_url ?? null
       }));
       setTransactions(formatted);
     }
@@ -73,7 +75,8 @@ export function useTransactionStore() {
       asset: tx.asset,
       txid: tx.txid,
       status: 'pending',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      screenshot_url: (tx as any).screenshotUrl || null
     };
 
     // Optimistic
@@ -86,7 +89,8 @@ export function useTransactionStore() {
       asset: newTx.asset,
       txid: newTx.txid,
       status: newTx.status as TransactionStatus,
-      timestamp: newTx.timestamp
+      timestamp: newTx.timestamp,
+      screenshotUrl: newTx.screenshot_url
     }, ...prev]);
 
     const { error } = await supabase.from('transactions').insert([newTx]);

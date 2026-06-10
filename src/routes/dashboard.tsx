@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, Gift, User, Bell, Rocket, 
   Clock, CheckCircle2, Home, Copy, Shield, Smartphone, Monitor, ChevronRight,
-  Activity, Coins, ArrowRight, ShieldCheck, Check
+  Activity, Coins, ArrowRight, ShieldCheck, Check, ImageIcon, Users
 } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
@@ -69,6 +69,7 @@ function Dashboard() {
         <div className="flex flex-col gap-2 flex-grow">
           <button onClick={() => setActiveTab('home')} className={`flex items-center gap-3 px-4 py-3 rounded-sm font-medium transition-colors ${activeTab === 'home' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><Home className="w-5 h-5"/> Home</button>
           <button onClick={() => setActiveTab('invest')} className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'invest' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><TrendingUp className="w-5 h-5"/> Invest</button>
+          <button onClick={() => setActiveTab('copytrade')} className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'copytrade' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><Users className="w-5 h-5"/> Copy Trading</button>
           <button onClick={() => setActiveTab('wallet')} className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'wallet' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><Wallet className="w-5 h-5"/> Wallet</button>
           <button onClick={() => setActiveTab('rewards')} className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'rewards' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><Gift className="w-5 h-5"/> Rewards</button>
           <button onClick={() => setActiveTab('profile')} className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'profile' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><User className="w-5 h-5"/> Profile</button>
@@ -81,11 +82,22 @@ function Dashboard() {
       </aside>
 
       {/* Top Header Mobile */}
-      <header className="flex md:hidden items-center justify-between p-6 bg-[#0a0f1c] border-b border-white/5">
-        <div className="flex items-center gap-2">
+      <header className="sticky top-0 flex md:hidden items-center justify-between px-6 py-4 bg-[#0a0f1c]/95 backdrop-blur-md border-b border-white/5 z-40">
+        <div className="flex items-center gap-3">
           <div className="w-8 h-8 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-sm">X</div>
+          <span className="font-light text-lg tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
         </div>
-        <Bell className="w-5 h-5 text-gray-400" />
+        <div className="flex items-center gap-3">
+          <button className="relative p-1 hover:text-white text-gray-400 transition-colors">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#c9a84c]" />
+          </button>
+          {profile?.role === 'admin' && (
+            <Link to="/admin" className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-red-400 border border-red-500/20 bg-red-500/10 rounded-sm">
+              Admin
+            </Link>
+          )}
+        </div>
       </header>
 
       {/* Main Content Area */}
@@ -93,33 +105,56 @@ function Dashboard() {
 
         {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} profile={profile} />}
         {activeTab === 'invest' && <InvestTab profile={profile} />}
+        {activeTab === 'copytrade' && <CopyTradeTab />}
         {activeTab === 'wallet' && <WalletTab profile={profile} settings={settings} />}
         {activeTab === 'rewards' && <RewardsTab profile={profile} />}
         {activeTab === 'profile' && <ProfileTab profile={profile} />}
       </main>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#0a0f1c] border-t border-white/5 px-6 py-4 flex justify-between items-center z-50">
-        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'home' ? 'text-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#0a0f1c]/90 backdrop-blur-lg border-t border-white/5 px-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 flex justify-around items-center z-50 shadow-lg shadow-black/40">
+        <button onClick={() => setActiveTab('home')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'home' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
           <Home className="w-5 h-5" />
-          <span className="text-[10px] font-semibold">Home</span>
+          <span className="text-[10px] font-medium tracking-wide">Home</span>
+          {activeTab === 'home' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('invest')} className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'invest' ? 'text-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>
+        <button onClick={() => setActiveTab('invest')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'invest' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
           <TrendingUp className="w-5 h-5" />
-          <span className="text-[10px] font-semibold">Invest</span>
+          <span className="text-[10px] font-medium tracking-wide">Invest</span>
+          {activeTab === 'invest' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('wallet')} className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'wallet' ? 'text-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>
+        <button onClick={() => setActiveTab('wallet')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'wallet' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
           <Wallet className="w-5 h-5" />
-          <span className="text-[10px] font-semibold">Wallet</span>
+          <span className="text-[10px] font-medium tracking-wide">Wallet</span>
+          {activeTab === 'wallet' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('rewards')} className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'rewards' ? 'text-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>
+        <button onClick={() => setActiveTab('rewards')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'rewards' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
           <Gift className="w-5 h-5" />
-          <span className="text-[10px] font-semibold">Rewards</span>
+          <span className="text-[10px] font-medium tracking-wide">Rewards</span>
+          {activeTab === 'rewards' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
         </button>
-        <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'profile' ? 'text-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>
+        <button onClick={() => setActiveTab('profile')} className={`flex-1 flex flex-col items-center gap-1 transition-all duration-300 relative py-1 ${activeTab === 'profile' ? 'text-[#c9a84c] scale-105' : 'text-gray-500 hover:text-gray-300'}`}>
           <User className="w-5 h-5" />
-          <span className="text-[10px] font-semibold">Profile</span>
+          <span className="text-[10px] font-medium tracking-wide">Profile</span>
+          {activeTab === 'profile' && <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#c9a84c]" />}
         </button>
+      </div>
+    </div>
+  );
+}
+
+function CopyTradeTab() {
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <div className="w-20 h-20 bg-[#c9a84c]/10 rounded-full flex items-center justify-center mb-6 border border-[#c9a84c]/20">
+        <Users className="w-10 h-10 text-[#c9a84c]" />
+      </div>
+      <h1 className="text-3xl text-white font-['Outfit'] mb-4">Copy Trading</h1>
+      <p className="text-gray-400 max-w-md mx-auto mb-8 leading-relaxed">
+        Automatically mirror the trades of our top-performing algorithmic portfolios and expert traders.
+      </p>
+      <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#00d4aa]/10 border border-[#00d4aa]/20 rounded-full text-[11px] text-[#00d4aa] font-bold uppercase tracking-widest">
+        <Rocket className="w-3 h-3" /> Coming Soon
       </div>
     </div>
   );
@@ -134,7 +169,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
   const userTransactions = [...transactions].sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
   
   const roiEarned = investments.reduce((acc, inv) => {
-    const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
+    const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
     return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
   }, 0);
   const activePlans = investments.filter(inv => inv.status === 'active').length;
@@ -174,7 +209,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
       </div>
 
       {/* DASHBOARD GRID - Mosaic Layout instead of vertical stack */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 mb-8 items-stretch">
         
         {/* Balance Card: 8 Columns */}
         <div className="lg:col-span-8 bg-[#0a0f1c] border border-white/5 p-8 relative overflow-hidden rounded-sm flex flex-col justify-between">
@@ -210,7 +245,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-4 pt-6 border-t border-white/5 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-white/5 relative z-10">
             <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Portfolio</div><div className="text-lg text-white font-light font-['Outfit']">${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></div>
             <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Invested</div><div className="text-lg text-[#c9a84c] font-light font-['Outfit']">${totalInvested.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div></div>
             <div><div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">ROI Earned</div><div className="text-lg text-[#00d4aa] font-light font-['Outfit']">+${roiEarned.toLocaleString(undefined, {minimumFractionDigits: 2})}</div></div>
@@ -360,14 +395,14 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
               {investments.length === 0 ? (
                 <div className="text-[13px] text-gray-500">No active investments.</div>
               ) : (
-                investments.slice(0, 3).map((inv: any) => {
-                  const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
+                investments.filter(i => i.status === 'active').slice(0, 3).map((inv: any) => {
+                  const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
                   const progress = Math.min(100, (daysPassed / inv.duration_days) * 100);
                   return (
                     <div key={inv.id} className="p-4 bg-white/5 border border-white/5 rounded-sm">
                       <div className="flex justify-between items-start mb-3">
                         <div><h3 className="text-md text-white font-light font-['Outfit'] mb-1">{inv.plan_name}</h3><div className="text-[11px] text-[#00d4aa] font-bold">+${(inv.amount * inv.daily_roi).toFixed(2)}/day</div></div>
-                        <div className="text-right"><div className="text-[11px] text-gray-400">Day {daysPassed} of {inv.duration_days}</div></div>
+                        <div className="text-right"><div className="text-[11px] text-gray-400">Day {daysPassed.toFixed(1)} of {inv.duration_days}</div></div>
                       </div>
                       <div className="w-full bg-black/20 h-1.5 rounded-full overflow-hidden mb-2"><div className="bg-[#00d4aa] h-full" style={{ width: `${progress}%` }}></div></div>
                       <div className="text-[10px] text-gray-500 uppercase tracking-widest">{progress.toFixed(0)}% complete</div>
@@ -420,7 +455,7 @@ function InvestTab({ profile }: { profile?: any }) {
   const [alertState, setAlertState] = useState({ open: false, title: '', message: '' });
 
   const roiEarned = investments.reduce((acc, inv) => {
-    const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
+    const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
     return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
   }, 0);
   const totalBalance = Number(profile?.balance || 0) + roiEarned + Number(profile?.total_earned_referrals || 0);
@@ -580,12 +615,22 @@ function CryptoSelector({ focusColor, value, onChange }: { focusColor: string, v
   );
 }
 
+// Map from our crypto symbol to CoinGecko ID
+const COINGECKO_IDS: Record<string, string> = {
+  BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', XRP: 'ripple',
+  USDT: 'tether', USDC: 'usd-coin', BNB: 'binancecoin', ADA: 'cardano',
+  DOGE: 'dogecoin', LTC: 'litecoin', DOT: 'polkadot', MATIC: 'matic-network',
+  AVAX: 'avalanche-2', LINK: 'chainlink', UNI: 'uniswap', TRX: 'tron',
+};
+
 function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   const [mode, setMode] = useState('deposit');
   const [copied, setCopied] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState('btc');
   const [amount, setAmount] = useState('');
   const [txid, setTxid] = useState('');
+  const [cryptoPrices, setCryptoPrices] = useState<Record<string, number>>({});
+  const [pricesLoading, setPricesLoading] = useState(true);
 
   const { addTransaction, transactions } = useTransactionStore();
   const { cryptos } = useCryptoStore();
@@ -594,8 +639,37 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   const userTransactions = [...transactions].sort((a,b) => b.timestamp - a.timestamp);
   const selectedCryptoData = cryptos.find(c => c.id === selectedAsset) || cryptos[0];
 
+  // Fetch live prices from CoinGecko
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        setPricesLoading(true);
+        const ids = Object.values(COINGECKO_IDS).join(',');
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+        const data = await res.json();
+        const prices: Record<string, number> = {};
+        Object.entries(COINGECKO_IDS).forEach(([symbol, id]) => {
+          if (data[id]?.usd) prices[symbol] = data[id].usd;
+        });
+        setCryptoPrices(prices);
+      } catch (e) {
+        console.error('Price fetch failed:', e);
+      } finally {
+        setPricesLoading(false);
+      }
+    };
+    fetchPrices();
+    const interval = setInterval(fetchPrices, 60000); // refresh every 60s
+    return () => clearInterval(interval);
+  }, []);
+
+  const selectedSymbol = selectedCryptoData?.symbol?.toUpperCase() || '';
+  const selectedPrice = cryptoPrices[selectedSymbol] || null;
+  const amountNum = parseFloat(amount) || 0;
+  const usdValue = selectedPrice ? amountNum * selectedPrice : null;
+
   const roiEarned = investments.reduce((acc, inv) => {
-    const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
+    const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
     return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
   }, 0);
   const totalBalance = Number(profile?.balance || 0) + roiEarned + Number(profile?.total_earned_referrals || 0);
@@ -606,6 +680,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [depositLoading, setDepositLoading] = useState(false);
   const [withdrawLoading, setWithdrawLoading] = useState(false);
@@ -618,21 +693,53 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   };
 
   const handleDepositSubmit = async () => {
-    if (!amount || !txid) {
-      showModal("Missing Information", "Please enter both the crypto amount sent and the Transaction ID (TXID) to submit your deposit proof.", 'error');
+    if (!amount || !screenshotFile) {
+      showModal("Missing Information", "Please enter the amount and upload a screenshot as proof of payment.", 'error');
       return;
     }
     setDepositLoading(true);
+    let screenshotUrl = '';
+
+    try {
+      const fileExt = screenshotFile.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const { data, error } = await supabase.storage
+        .from('deposit-proofs')
+        .upload(fileName, screenshotFile);
+
+      if (error) throw error;
+      
+      const { data: publicData } = supabase.storage
+        .from('deposit-proofs')
+        .getPublicUrl(fileName);
+        
+      screenshotUrl = publicData.publicUrl;
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      showModal("Upload Failed", "There was an error uploading your screenshot. Please try again.", 'error');
+      setDepositLoading(false);
+      return;
+    }
+
+    // Convert crypto amount to USD using live price
+    const sym = selectedCryptoData?.symbol?.toUpperCase() || '';
+    const livePrice = cryptoPrices[sym];
+    const cryptoAmt = parseFloat(amount);
+    const usdAmount = livePrice ? cryptoAmt * livePrice : cryptoAmt;
+
     await addTransaction({
       type: 'deposit',
-      amount: parseFloat(amount),
+      amount: usdAmount,
       asset: selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase(),
-      txid
-    });
+      txid,
+      screenshotUrl
+    } as any);
     setDepositLoading(false);
     setAmount('');
     setTxid('');
-    showModal("Deposit Submitted!", `Your ${selectedCryptoData?.symbol || 'crypto'} deposit has been submitted. Our team will verify and credit your balance within 24 hours.`, 'deposit');
+    setScreenshotFile(null);
+    const usdNote = livePrice ? ` (~$${usdAmount.toLocaleString(undefined, {maximumFractionDigits: 2})})` : '';
+    showModal("Deposit Submitted!", `Your ${cryptoAmt} ${sym}${usdNote} deposit has been submitted. Our team will verify and credit your balance within 24 hours.`, 'deposit');
   };
 
   const handleWithdrawSubmit = async () => {
@@ -752,10 +859,10 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       <div className="mb-8 mt-4 md:mt-10">
         <h1 className="text-3xl text-white font-['Outfit'] font-light mb-6">Wallet</h1>
         
-        <div className="flex border-b border-white/10">
-          <button onClick={() => setMode('deposit')} className={`pb-4 px-6 text-[13px] uppercase tracking-widest font-semibold transition-all ${mode === 'deposit' ? 'text-[#c9a84c] border-b-2 border-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>Deposit</button>
-          <button onClick={() => setMode('withdraw')} className={`pb-4 px-6 text-[13px] uppercase tracking-widest font-semibold transition-all ${mode === 'withdraw' ? 'text-[#c9a84c] border-b-2 border-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>Withdraw</button>
-          <button onClick={() => setMode('history')} className={`pb-4 px-6 text-[13px] uppercase tracking-widest font-semibold transition-all ${mode === 'history' ? 'text-[#c9a84c] border-b-2 border-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>History</button>
+        <div className="flex border-b border-white/10 overflow-x-auto scrollbar-none -mx-6 px-6 sm:mx-0 sm:px-0">
+          <button onClick={() => setMode('deposit')} className={`pb-4 px-6 text-[13px] uppercase tracking-widest font-semibold transition-all shrink-0 ${mode === 'deposit' ? 'text-[#c9a84c] border-b-2 border-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>Deposit</button>
+          <button onClick={() => setMode('withdraw')} className={`pb-4 px-6 text-[13px] uppercase tracking-widest font-semibold transition-all shrink-0 ${mode === 'withdraw' ? 'text-[#c9a84c] border-b-2 border-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>Withdraw</button>
+          <button onClick={() => setMode('history')} className={`pb-4 px-6 text-[13px] uppercase tracking-widest font-semibold transition-all shrink-0 ${mode === 'history' ? 'text-[#c9a84c] border-b-2 border-[#c9a84c]' : 'text-gray-500 hover:text-white'}`}>History</button>
         </div>
       </div>
 
@@ -774,23 +881,73 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
                 <label className="text-[11px] text-gray-400 uppercase tracking-widest block">{selectedCryptoData?.symbol || 'BTC'} Wallet Address</label>
                 <span className="text-[10px] text-[#c9a84c] font-semibold bg-[#c9a84c]/10 px-2 py-0.5 rounded-sm">Network: {selectedCryptoData?.network || 'N/A'}</span>
               </div>
-              <div className="flex gap-2">
-                <input readOnly value={selectedCryptoData?.address || "Address not configured"} className="w-full bg-transparent border border-white/10 text-white p-3 rounded-sm text-sm font-mono focus:outline-none" />
-                <button onClick={() => handleCopy(selectedCryptoData?.address || '')} className="px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-sm flex items-center gap-2 text-[12px] uppercase tracking-widest font-semibold transition-colors">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input readOnly value={selectedCryptoData?.address || "Address not configured"} className="w-full bg-transparent border border-white/10 text-white p-3 rounded-sm text-sm font-mono focus:outline-none select-all overflow-hidden text-ellipsis" />
+                <button onClick={() => handleCopy(selectedCryptoData?.address || '')} className="px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-sm flex items-center justify-center gap-2 text-[12px] uppercase tracking-widest font-semibold transition-colors shrink-0">
                   {copied ? <Check className="w-4 h-4 text-[#00d4aa]" /> : <Copy className="w-4 h-4" />}
                   {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Amount Sent (Crypto Value)</label>
-                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 0.5" className="w-full bg-[#070b14] border border-white/10 text-white p-3 rounded-sm focus:outline-none focus:border-[#c9a84c]/50" />
+                <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">
+                  Amount Sent ({selectedSymbol || 'Crypto'})
+                </label>
+                <div className="relative">
+                  <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 0.5" className="w-full bg-[#070b14] border border-white/10 text-white p-3 rounded-sm focus:outline-none focus:border-[#c9a84c]/50 pr-16" />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-500 font-bold">{selectedSymbol}</span>
+                </div>
+                {amountNum > 0 && (
+                  <div className="mt-1.5 flex items-center gap-1">
+                    {pricesLoading ? (
+                      <span className="text-[11px] text-gray-600">Fetching price...</span>
+                    ) : usdValue ? (
+                      <span className="text-[12px] text-[#00d4aa] font-semibold">≈ ${usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} USD</span>
+                    ) : (
+                      <span className="text-[11px] text-gray-500">Price unavailable</span>
+                    )}
+                    {selectedPrice && !pricesLoading && (
+                      <span className="text-[10px] text-gray-600 ml-1">· 1 {selectedSymbol} = ${selectedPrice.toLocaleString()}</span>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
-                <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Transaction ID (TXID)</label>
+                <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Transaction ID (TXID) <span className="text-gray-500 lowercase">(Optional)</span></label>
                 <input type="text" value={txid} onChange={(e) => setTxid(e.target.value)} placeholder="0x1a2b3c..." className="w-full bg-[#070b14] border border-white/10 text-white p-3 rounded-sm focus:outline-none focus:border-[#c9a84c]/50" />
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Upload Screenshot (Evidence of Payment)</label>
+              <div className="relative w-full border-2 border-dashed border-white/10 hover:border-[#c9a84c]/50 rounded-sm p-6 text-center transition-colors cursor-pointer bg-[#070b14]">
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => setScreenshotFile(e.target.files?.[0] || null)}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
+                  {screenshotFile ? (
+                    <>
+                      <div className="w-10 h-10 bg-[#c9a84c]/10 rounded-full flex items-center justify-center mb-2">
+                        <Check className="w-5 h-5 text-[#c9a84c]" />
+                      </div>
+                      <span className="text-sm font-medium text-white">{screenshotFile.name}</span>
+                      <span className="text-[11px] text-gray-500 uppercase tracking-widest">Click to change file</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center mb-2">
+                        <ImageIcon className="w-5 h-5 text-gray-400" />
+                      </div>
+                      <span className="text-sm font-medium text-white">Select screenshot image</span>
+                      <span className="text-[11px] text-gray-500 uppercase tracking-widest">PNG, JPG up to 5MB</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 

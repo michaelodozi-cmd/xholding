@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { 
   Users, DollarSign, Wallet, ShieldAlert, CheckCircle, XCircle, 
-  Trash2, Ban, Edit, Settings, Activity, Search, Power, Clock
+  Trash2, Ban, Edit, Settings, Activity, Search, Power, Clock,
+  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon
 } from "lucide-react";
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
@@ -35,6 +36,40 @@ export const Route = createFileRoute("/admin")({
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate({ from: '/admin' });
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate({ to: '/login' });
+        return;
+      }
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (!profile || profile.role !== 'admin') {
+        navigate({ to: '/dashboard' });
+      } else {
+        setIsChecking(false);
+      }
+    };
+    checkAdmin();
+  }, [navigate]);
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-[#070b14] flex flex-col items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#c9a84c] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="text-gray-500 uppercase tracking-widest text-[11px] font-bold">Verifying Access...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] flex">
@@ -49,6 +84,7 @@ function AdminDashboard() {
           <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} icon={Users} label="Manage Users" />
           <TabButton active={activeTab === 'transactions'} onClick={() => setActiveTab('transactions')} icon={DollarSign} label="Transactions" />
           <TabButton active={activeTab === 'wallets'} onClick={() => setActiveTab('wallets')} icon={Wallet} label="Platform Wallets" />
+          <TabButton active={activeTab === 'plans'} onClick={() => setActiveTab('plans')} icon={TrendingUp} label="Investment Plans" />
           <TabButton active={activeTab === 'security'} onClick={() => setActiveTab('security')} icon={ShieldAlert} label="Security logs" />
         </div>
         <div className="mt-auto border-t border-white/5 pt-6">
@@ -68,8 +104,419 @@ function AdminDashboard() {
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'transactions' && <TransactionsTab />}
         {activeTab === 'wallets' && <WalletsTab />}
+        {activeTab === 'plans' && <PlansTab />}
         {activeTab === 'security' && <SecurityTab />}
       </main>
+    </div>
+  );
+}
+
+// ─── Investment Plans Tab ─────────────────────────────────────────────────────
+
+type Plan = {
+  id: string;
+  name: string;
+  daily_roi: number;
+  duration_days: number;
+  min_amount: number;
+  max_amount: number | null;
+  is_active: boolean;
+  image_url: string | null;
+  description: string | null;
+  created_at: string;
+};
+
+const EMPTY_PLAN: Omit<Plan, 'id' | 'created_at'> = {
+  name: '',
+  daily_roi: 1,
+  duration_days: 30,
+  min_amount: 100,
+  max_amount: null,
+  is_active: true,
+  image_url: null,
+  description: '',
+};
+
+function PlansTab() {
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [form, setForm] = useState({ ...EMPTY_PLAN });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchPlans = async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from('investment_plans')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (data) setPlans(data as Plan[]);
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchPlans(); }, []);
+
+  const openAdd = () => {
+    setEditingPlan(null);
+    setForm({ ...EMPTY_PLAN });
+    setImageFile(null);
+    setImagePreview(null);
+    setError('');
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (plan: Plan) => {
+    setEditingPlan(plan);
+    setForm({
+      name: plan.name,
+      daily_roi: plan.daily_roi,
+      duration_days: plan.duration_days,
+      min_amount: plan.min_amount,
+      max_amount: plan.max_amount,
+      is_active: plan.is_active,
+      image_url: plan.image_url,
+      description: plan.description,
+    });
+    setImageFile(null);
+    setImagePreview(plan.image_url);
+    setError('');
+    setIsModalOpen(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const ext = file.name.split('.').pop();
+    const path = `plan-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('plan-images').upload(path, file, { upsert: true });
+    if (error) { setError('Image upload failed: ' + error.message); return null; }
+    const { data } = supabase.storage.from('plan-images').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) { setError('Plan name is required.'); return; }
+    if (form.daily_roi <= 0) { setError('Daily ROI must be greater than 0.'); return; }
+    setSaving(true);
+    setError('');
+
+    let imageUrl = form.image_url;
+    if (imageFile) {
+      setUploading(true);
+      imageUrl = await uploadImage(imageFile);
+      setUploading(false);
+      if (!imageUrl) { setSaving(false); return; }
+    }
+
+    const payload = {
+      name: form.name.trim(),
+      daily_roi: Number(form.daily_roi),
+      duration_days: Number(form.duration_days),
+      min_amount: Number(form.min_amount),
+      max_amount: form.max_amount ? Number(form.max_amount) : null,
+      is_active: form.is_active,
+      image_url: imageUrl,
+      description: form.description?.trim() || null,
+    };
+
+    if (editingPlan) {
+      await supabase.from('investment_plans').update(payload).eq('id', editingPlan.id);
+    } else {
+      await supabase.from('investment_plans').insert(payload);
+    }
+
+    setSaving(false);
+    setIsModalOpen(false);
+    fetchPlans();
+  };
+
+  const handleDelete = async (id: string) => {
+    await supabase.from('investment_plans').delete().eq('id', id);
+    fetchPlans();
+  };
+
+  const toggleActive = async (plan: Plan) => {
+    await supabase.from('investment_plans').update({ is_active: !plan.is_active }).eq('id', plan.id);
+    fetchPlans();
+  };
+
+  return (
+    <div className="animate-in fade-in duration-500">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl text-white font-light font-['Outfit']">Investment Plans</h1>
+          <p className="text-[13px] text-gray-500 mt-1">Manage plans users can invest in, set ROI and upload plan images.</p>
+        </div>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-6 py-3 bg-[#c9a84c] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945] transition-colors"
+        >
+          <Plus className="w-4 h-4" /> New Plan
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-500">Loading plans...</div>
+      ) : plans.length === 0 ? (
+        <div className="text-center py-16 border border-white/5 bg-[#0a0f1c] rounded-sm">
+          <TrendingUp className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-500">No investment plans yet.</p>
+          <button onClick={openAdd} className="mt-4 px-6 py-2 bg-[#c9a84c] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945]">
+            Create First Plan
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {plans.map(plan => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              onEdit={() => openEdit(plan)}
+              onDelete={() => handleDelete(plan.id)}
+              onToggle={() => toggleActive(plan)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-['Outfit'] text-xl">
+              {editingPlan ? 'Edit Plan' : 'New Investment Plan'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 text-[12px]">
+              Fill in the plan details. All fields except image and description are required.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {/* Image Upload */}
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Plan Image</label>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 bg-[#070b14] border border-white/10 rounded-sm overflow-hidden flex items-center justify-center shrink-0">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <ImageIcon className="w-7 h-7 text-gray-600" />
+                  )}
+                </div>
+                <label className="flex-1 cursor-pointer">
+                  <div className="border border-dashed border-white/20 hover:border-[#c9a84c]/50 rounded-sm p-3 text-center transition-colors">
+                    <p className="text-[12px] text-gray-400">Click to upload image</p>
+                    <p className="text-[10px] text-gray-600 mt-1">PNG, JPG, WEBP – max 5MB</p>
+                  </div>
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                </label>
+              </div>
+            </div>
+
+            {/* Name */}
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Plan Name *</label>
+              <input
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="e.g. Gold Tier"
+                className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Description</label>
+              <textarea
+                value={form.description || ''}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                placeholder="Short plan description..."
+                rows={2}
+                className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white resize-none"
+              />
+            </div>
+
+            {/* ROI + Duration */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Daily ROI (%) *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={form.daily_roi}
+                  onChange={e => setForm(f => ({ ...f, daily_roi: Number(e.target.value) }))}
+                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Duration (Days) *</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.duration_days}
+                  onChange={e => setForm(f => ({ ...f, duration_days: Number(e.target.value) }))}
+                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Min + Max */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Min Amount ($) *</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.min_amount}
+                  onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))}
+                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Max Amount ($)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.max_amount ?? ''}
+                  placeholder="No limit"
+                  onChange={e => setForm(f => ({ ...f, max_amount: e.target.value ? Number(e.target.value) : null }))}
+                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Active Toggle */}
+            <div className="flex items-center justify-between p-3 bg-[#070b14] border border-white/10 rounded-sm">
+              <div>
+                <div className="text-[13px] text-white font-medium">Active</div>
+                <div className="text-[11px] text-gray-500">Visible to users on the platform</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
+                className={`transition-colors ${form.is_active ? 'text-[#00d4aa]' : 'text-gray-600'}`}
+              >
+                {form.is_active
+                  ? <ToggleRight className="w-8 h-8" />
+                  : <ToggleLeft className="w-8 h-8" />
+                }
+              </button>
+            </div>
+
+            {error && <p className="text-red-400 text-[12px] bg-red-500/10 border border-red-500/20 p-3 rounded-sm">{error}</p>}
+          </div>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm text-[12px] uppercase tracking-widest">Cancel</button>
+            </DialogClose>
+            <button
+              onClick={handleSave}
+              disabled={saving || uploading}
+              className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest"
+            >
+              {uploading ? 'Uploading...' : saving ? 'Saving...' : editingPlan ? 'Update Plan' : 'Create Plan'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: () => void; onDelete: () => void; onToggle: () => void }) {
+  const totalRoi = (plan.daily_roi * plan.duration_days).toFixed(1);
+
+  return (
+    <div className={`bg-[#0a0f1c] border ${plan.is_active ? 'border-[#c9a84c]/30' : 'border-white/5'} rounded-sm overflow-hidden group relative`}>
+      {/* Image */}
+      <div className="h-36 bg-[#070b14] overflow-hidden relative">
+        {plan.image_url ? (
+          <img src={plan.image_url} alt={plan.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <TrendingUp className="w-10 h-10 text-gray-700" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1c] to-transparent" />
+        {/* Active badge */}
+        <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-widest ${plan.is_active ? 'bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}>
+          {plan.is_active ? 'Active' : 'Inactive'}
+        </div>
+      </div>
+
+      <div className="p-5">
+        <h3 className="text-white font-['Outfit'] font-semibold text-lg leading-none mb-1">{plan.name}</h3>
+        {plan.description && <p className="text-gray-500 text-[12px] mb-4 line-clamp-2">{plan.description}</p>}
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="bg-[#070b14] border border-white/5 p-2.5 rounded-sm text-center">
+            <div className="text-[#c9a84c] font-mono font-bold text-lg">{plan.daily_roi}%</div>
+            <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Daily ROI</div>
+          </div>
+          <div className="bg-[#070b14] border border-white/5 p-2.5 rounded-sm text-center">
+            <div className="text-white font-mono font-bold text-lg">{plan.duration_days}d</div>
+            <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Duration</div>
+          </div>
+          <div className="bg-[#070b14] border border-[#00d4aa]/20 p-2.5 rounded-sm text-center">
+            <div className="text-[#00d4aa] font-mono font-bold text-lg">{totalRoi}%</div>
+            <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Total ROI</div>
+          </div>
+        </div>
+
+        <div className="text-[11px] text-gray-500 mb-4">
+          Min: <span className="text-white">${plan.min_amount.toLocaleString()}</span>
+          {plan.max_amount && <> · Max: <span className="text-white">${plan.max_amount.toLocaleString()}</span></>}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+          <button
+            onClick={onEdit}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-sm text-[11px] uppercase tracking-widest font-bold transition-colors"
+          >
+            <Edit className="w-3.5 h-3.5" /> Edit
+          </button>
+          <button
+            onClick={onToggle}
+            title={plan.is_active ? 'Deactivate' : 'Activate'}
+            className={`p-2 rounded-sm transition-colors ${plan.is_active ? 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400' : 'bg-[#00d4aa]/10 hover:bg-[#00d4aa]/20 text-[#00d4aa]'}`}
+          >
+            <Power className="w-4 h-4" />
+          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded-sm transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete "{plan.name}"?</AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-400">
+                  This will permanently remove this investment plan. Existing investments won't be affected.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} className="bg-red-600 text-white hover:bg-red-700">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
     </div>
   );
 }
@@ -93,11 +540,26 @@ function OverviewTab() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const { data } = await supabase.from('profiles').select('balance');
-      if (data) {
-        setUsersCount(data.length);
-        const aum = data.reduce((acc, p) => acc + Number(p.balance || 0), 0);
-        setTotalAUM(aum);
+      // Fetch balances
+      const { data: profiles } = await supabase.from('profiles').select('id, balance, role');
+      // Fetch active investments
+      const { data: investments } = await supabase.from('investments').select('amount, status');
+
+      if (profiles) {
+        setUsersCount(profiles.length);
+        
+        const userBalances = profiles
+          .filter(p => p.role !== 'admin')
+          .reduce((acc, p) => acc + Number(p.balance || 0), 0);
+          
+        let investedAmount = 0;
+        if (investments) {
+          investedAmount = investments
+            .filter(inv => inv.status === 'active')
+            .reduce((acc, inv) => acc + Number(inv.amount || 0), 0);
+        }
+
+        setTotalAUM(userBalances + investedAmount);
       }
     };
     fetchStats();
@@ -106,14 +568,17 @@ function OverviewTab() {
   const pendingDeposits = transactions.filter(t => t.type === 'deposit' && t.status === 'pending');
   const pendingAmount = pendingDeposits.reduce((acc, t) => acc + Number(t.amount || 0), 0);
 
+  const approvedDeposits = transactions.filter(t => t.type === 'deposit' && t.status === 'approved');
+  const totalDepositedAmount = approvedDeposits.reduce((acc, t) => acc + Number(t.amount || 0), 0);
+
   return (
     <div className="animate-in fade-in duration-500">
       <h1 className="text-3xl text-white font-light font-['Outfit'] mb-8">System Overview</h1>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <StatCard title="Total Users" value={usersCount.toString()} change="Registered accounts" />
         <StatCard title="Total AUM" value={`$${totalAUM >= 1000000 ? (totalAUM/1000000).toFixed(1) + 'M' : totalAUM >= 1000 ? (totalAUM/1000).toFixed(1) + 'k' : totalAUM}`} change="Managed by platform" color="text-[#00d4aa]" />
+        <StatCard title="Total Deposits" value={`$${totalDepositedAmount >= 1000000 ? (totalDepositedAmount/1000000).toFixed(1) + 'M' : totalDepositedAmount >= 1000 ? (totalDepositedAmount/1000).toFixed(1) + 'k' : totalDepositedAmount}`} change={`${approvedDeposits.length} approved deposits`} color="text-[#00d4aa]" />
         <StatCard title="Pending Deposits" value={pendingDeposits.length.toString()} change={`$${pendingAmount.toLocaleString()} pending`} color="text-[#c9a84c]" />
-        <StatCard title="Active Bans" value="0" change="System healthy" color="text-red-400" />
       </div>
       
       <div className="grid grid-cols-2 gap-6">
@@ -171,7 +636,11 @@ function UsersTab() {
 
   const fetchUsers = async () => {
     const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: true });
+    if (error) {
+      console.error('Error fetching users:', error);
+    }
     if (data) {
+      console.log('Fetched users:', data);
       setUsers(data);
     }
     setLoading(false);
@@ -392,6 +861,7 @@ function TransactionCard({ tx }: { tx: any }) {
   const [usdValue, setUsdValue] = useState('');
   const [sentTxid, setSentTxid] = useState('');
   const [copied, setCopied] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const handleApprove = async () => {
     if (tx.type === 'deposit') {
@@ -416,15 +886,61 @@ function TransactionCard({ tx }: { tx: any }) {
   const timeStr = timeAgo < 60 ? `${timeAgo} mins ago` : `${Math.floor(timeAgo/60)} hours ago`;
 
   return (
-    <div className="bg-[#0a0f1c] border border-[#c9a84c]/30 p-6 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="relative">
+    {/* Screenshot Lightbox */}
+    {lightboxOpen && tx.screenshotUrl && (
+      <div
+        className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4"
+        onClick={() => setLightboxOpen(false)}
+      >
+        <button
+          className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <XIcon className="w-5 h-5" />
+        </button>
+        <img
+          src={tx.screenshotUrl}
+          alt="Deposit proof"
+          className="max-w-full max-h-[90vh] object-contain rounded-sm shadow-2xl"
+          onClick={e => e.stopPropagation()}
+        />
+      </div>
+    )}
+
+    <div className="bg-[#0a0f1c] border border-[#c9a84c]/30 rounded-sm overflow-hidden">
+      {/* Screenshot strip - visible only for deposits with a screenshot */}
+      {tx.screenshotUrl && tx.type === 'deposit' && (
+        <div
+          className="relative h-32 bg-[#070b14] overflow-hidden cursor-pointer group"
+          onClick={() => setLightboxOpen(true)}
+        >
+          <img
+            src={tx.screenshotUrl}
+            alt="Deposit proof screenshot"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-2 left-3 flex items-center gap-1.5 text-[10px] text-white/70 font-bold uppercase tracking-widest">
+            <Eye className="w-3 h-3" /> Deposit Proof - Click to enlarge
+          </div>
+        </div>
+      )}
+
+      <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
       <div>
         <div className="text-[10px] text-[#c9a84c] uppercase tracking-widest font-bold mb-2">{tx.type} Pending</div>
         <div className="flex items-center gap-4 mb-2">
           <span className="text-2xl text-white font-light">{tx.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 6})}</span>
           <span className="text-[11px] font-bold tracking-widest bg-white/10 px-2 py-1 uppercase rounded-sm text-gray-300">{tx.asset}</span>
         </div>
-        <div className="text-[13px] text-gray-400 mb-1">From: <span className="text-white font-medium">{tx.userId}</span> ({tx.userEmail})</div>
-        <div className="text-[13px] text-gray-400">TXID: <span className="font-mono text-white">{tx.txid}</span></div>
+        <div className="text-[13px] text-gray-400 mb-1">From: <span className="text-white font-medium">{tx.userEmail}</span></div>
+        <div className="text-[13px] text-gray-400">TXID: <span className="font-mono text-white text-[12px]">{tx.txid || 'N/A'}</span></div>
+        {!tx.screenshotUrl && tx.type === 'deposit' && (
+          <div className="mt-2 text-[11px] text-orange-400/70 flex items-center gap-1">
+            <ImageIcon className="w-3 h-3" /> No screenshot submitted
+          </div>
+        )}
         <div className="text-[11px] text-gray-500 mt-3 flex items-center gap-2"><Clock className="w-3 h-3" /> Submitted {timeStr}</div>
       </div>
       <div className="flex flex-col gap-3">
@@ -465,6 +981,26 @@ function TransactionCard({ tx }: { tx: any }) {
                   <span className="text-[12px] text-gray-400">{timeStr}</span>
                 </div>
               </div>
+
+              {/* Screenshot preview inside modal */}
+              {tx.screenshotUrl && tx.type === 'deposit' && (
+                <div className="mb-5">
+                  <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 block flex items-center gap-1.5"><Eye className="w-3 h-3" /> Deposit Screenshot</label>
+                  <div
+                    className="relative rounded-sm overflow-hidden cursor-pointer group border border-white/10"
+                    onClick={() => setLightboxOpen(true)}
+                  >
+                    <img
+                      src={tx.screenshotUrl}
+                      alt="Deposit proof"
+                      className="w-full max-h-40 object-cover group-hover:opacity-90 transition-opacity"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                      <Eye className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {tx.type === 'deposit' && (
                 <div className="mb-5">
@@ -532,6 +1068,8 @@ function TransactionCard({ tx }: { tx: any }) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+      </div>
+    </div>
     </div>
   );
 }
