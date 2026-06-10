@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { 
   Users, DollarSign, Wallet, ShieldAlert, CheckCircle, XCircle, 
   Trash2, Ban, Edit, Settings, Activity, Search, Power, Clock,
-  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon
+  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu
 } from "lucide-react";
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
@@ -38,6 +38,7 @@ function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate({ from: '/admin' });
   const [isChecking, setIsChecking] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -77,20 +78,36 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] flex">
+    <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] flex flex-col lg:flex-row">
+      {/* Mobile Header */}
+      <div className="lg:hidden sticky top-0 z-40 bg-[#0a0f1c] border-b border-white/5 p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-red-600/20 border border-red-500/50 flex items-center justify-center font-bold text-red-500 font-['Outfit'] text-sm">A</div>
+          <span className="font-light text-lg tracking-[0.15em] text-white font-['Outfit'] uppercase">SuperAdmin</span>
+        </div>
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-white">
+          {isMobileMenuOpen ? <XIcon className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Sidebar Overlay for Mobile */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 fixed top-0 left-0 h-screen bg-[#0a0f1c] border-r border-white/5 p-6 z-50 flex flex-col">
-        <Link to="/" className="flex items-center gap-3 mb-12">
+      <aside className={`fixed lg:sticky top-0 left-0 h-screen bg-[#0a0f1c] border-r border-white/5 p-6 z-50 flex flex-col transition-transform duration-300 w-64 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <Link to="/" className="hidden lg:flex items-center gap-3 mb-12">
           <div className="w-8 h-8 bg-red-600/20 border border-red-500/50 flex items-center justify-center font-bold text-red-500 font-['Outfit'] text-sm">A</div>
           <span className="font-light text-xl tracking-[0.15em] text-white font-['Outfit'] uppercase">SuperAdmin</span>
         </Link>
-        <div className="flex flex-col gap-2 flex-grow">
-          <TabButton active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={Activity} label="Overview" />
-          <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} icon={Users} label="Manage Users" />
-          <TabButton active={activeTab === 'transactions'} onClick={() => setActiveTab('transactions')} icon={DollarSign} label="Transactions" />
-          <TabButton active={activeTab === 'wallets'} onClick={() => setActiveTab('wallets')} icon={Wallet} label="Platform Wallets" />
-          <TabButton active={activeTab === 'plans'} onClick={() => setActiveTab('plans')} icon={TrendingUp} label="Investment Plans" />
-          <TabButton active={activeTab === 'security'} onClick={() => setActiveTab('security')} icon={ShieldAlert} label="Security logs" />
+        <div className="flex flex-col gap-2 flex-grow mt-4 lg:mt-0">
+          <TabButton active={activeTab === 'overview'} onClick={() => {setActiveTab('overview'); setIsMobileMenuOpen(false);}} icon={Activity} label="Overview" />
+          <TabButton active={activeTab === 'users'} onClick={() => {setActiveTab('users'); setIsMobileMenuOpen(false);}} icon={Users} label="Manage Users" />
+          <TabButton active={activeTab === 'transactions'} onClick={() => {setActiveTab('transactions'); setIsMobileMenuOpen(false);}} icon={DollarSign} label="Transactions" />
+          <TabButton active={activeTab === 'wallets'} onClick={() => {setActiveTab('wallets'); setIsMobileMenuOpen(false);}} icon={Wallet} label="Platform Wallets" />
+          <TabButton active={activeTab === 'plans'} onClick={() => {setActiveTab('plans'); setIsMobileMenuOpen(false);}} icon={TrendingUp} label="Investment Plans" />
+          <TabButton active={activeTab === 'security'} onClick={() => {setActiveTab('security'); setIsMobileMenuOpen(false);}} icon={ShieldAlert} label="Security logs" />
         </div>
         <div className="mt-auto border-t border-white/5 pt-6">
           <div className="flex items-center justify-between">
@@ -109,7 +126,7 @@ function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 flex-1 p-8 md:p-12 max-w-[1400px]">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-12 w-full max-w-[1400px]">
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'transactions' && <TransactionsTab />}
