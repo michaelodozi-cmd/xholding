@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, Gift, User, Bell, Rocket, 
   Clock, CheckCircle2, Home, Copy, Shield, Smartphone, Monitor, ChevronRight,
@@ -11,6 +11,13 @@ import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
 import { useInvestmentStore } from "../lib/investment-store";
 import { useNotificationStore } from "../lib/notification-store";
+import {
+  requestNotificationPermission,
+  notifyDepositApproved,
+  notifyDepositRejected,
+  notifyWithdrawalApproved,
+  notifyWithdrawalRejected,
+} from "../lib/push-notifications";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,6 +65,35 @@ function Dashboard() {
     fetchProfile();
   }, [navigate]);
 
+  const { transactions } = useTransactionStore();
+  // Track previous statuses so we only fire once per change
+  const prevStatuses = useRef<Record<string, string>>({});
+
+  // Request OS notification permission on first load
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
+
+  // Watch for transaction status changes and fire push notifications
+  useEffect(() => {
+    transactions.forEach(tx => {
+      const prev = prevStatuses.current[tx.id];
+      const curr = tx.status;
+      if (prev && prev !== curr) {
+        const amt = Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+        const asset = tx.asset || '';
+        if (tx.type === 'deposit') {
+          if (curr === 'approved') notifyDepositApproved(amt, asset);
+          if (curr === 'rejected') notifyDepositRejected(amt, asset);
+        } else if (tx.type === 'withdrawal') {
+          if (curr === 'approved') notifyWithdrawalApproved(amt, asset);
+          if (curr === 'rejected') notifyWithdrawalRejected(amt, asset);
+        }
+      }
+      prevStatuses.current[tx.id] = curr;
+    });
+  }, [transactions]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
@@ -96,10 +132,7 @@ function Dashboard() {
           <span className="font-light text-lg tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
         </div>
         <div className="flex items-center gap-3">
-          <button className="relative p-1 hover:text-white text-gray-400 transition-colors">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#c9a84c]" />
-          </button>
+          <NotificationBell transactions={transactions} />
           {profile?.role === 'admin' && (
             <Link to="/admin" className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-red-400 border border-red-500/20 bg-red-500/10 rounded-sm">
               Admin
@@ -1173,3 +1206,174 @@ function RewardsTab({ profile }: { profile?: any }) {
     </div>
   )
 }
+
+// ─── Notification Bell Component ─────────────────────────────────────────────
+
+type NotifItem = {
+  id: string;
+  title: string;
+  body: string;
+  time: number;
+  read: boolean;
+  type: 'deposit' | 'withdrawal' | 'info';
+  status: 'approved' | 'rejected' | 'pending';
+};
+
+function NotificationBell({ transactions }: { transactions: any[] }) {
+  const [open, setOpen] = useState(false);
+  const [notifs, setNotifs] = useState<NotifItem[]>([]);
+  const [permGranted, setPermGranted] = useState(
+    typeof window !== 'undefined' && 'Notification' in window
+      ? Notification.permission === 'granted'
+      : false
+  );
+  const prevStatuses = useRef<Record<string, string>>({});
+
+  // Build notification list from transaction changes
+  useEffect(() => {
+    transactions.forEach(tx => {
+      const prev = prevStatuses.current[tx.id];
+      const curr = tx.status;
+      if (prev !== undefined && prev !== curr) {
+        const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tx.asset || ''}`;
+        let title = '';
+        let body = '';
+        if (tx.type === 'deposit' && curr === 'approved') {
+          title = '✅ Deposit Approved';
+          body = `Your deposit of ${amt} has been credited.`;
+        } else if (tx.type === 'deposit' && curr === 'rejected') {
+          title = '❌ Deposit Rejected';
+          body = `Your deposit of ${amt} was not approved.`;
+        } else if (tx.type === 'withdrawal' && curr === 'approved') {
+          title = '💸 Withdrawal Sent';
+          body = `Your withdrawal of ${amt} has been sent.`;
+        } else if (tx.type === 'withdrawal' && curr === 'rejected') {
+          title = '❌ Withdrawal Rejected';
+          body = `Your withdrawal of ${amt} was rejected.`;
+        }
+        if (title) {
+          setNotifs(prev => [{
+            id: `${tx.id}-${curr}`,
+            title,
+            body,
+            time: Date.now(),
+            read: false,
+            type: tx.type,
+            status: curr,
+          }, ...prev].slice(0, 20));
+        }
+      }
+      prevStatuses.current[tx.id] = curr;
+    });
+  }, [transactions]);
+
+  // Seed with most recent transactions on first load
+  useEffect(() => {
+    const initial: NotifItem[] = transactions
+      .filter(tx => tx.status !== 'pending')
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 5)
+      .map(tx => {
+        const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${tx.asset || ''}`;
+        let title = '';
+        let body = '';
+        if (tx.type === 'deposit' && tx.status === 'approved') { title = '✅ Deposit Approved'; body = `Deposit of ${amt} credited.`; }
+        else if (tx.type === 'deposit' && tx.status === 'rejected') { title = '❌ Deposit Rejected'; body = `Deposit of ${amt} rejected.`; }
+        else if (tx.type === 'withdrawal' && tx.status === 'approved') { title = '💸 Withdrawal Sent'; body = `Withdrawal of ${amt} processed.`; }
+        else if (tx.type === 'withdrawal' && tx.status === 'rejected') { title = '❌ Withdrawal Rejected'; body = `Withdrawal of ${amt} rejected.`; }
+        return { id: tx.id, title, body, time: tx.timestamp, read: true, type: tx.type, status: tx.status };
+      })
+      .filter(n => n.title !== '');
+    setNotifs(initial);
+    initial.forEach(n => { prevStatuses.current[n.id.split('-')[0]] = n.status; });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const unread = notifs.filter(n => !n.read).length;
+
+  const markAllRead = () => setNotifs(prev => prev.map(n => ({ ...n, read: true })));
+
+  const handleEnable = async () => {
+    const granted = await requestNotificationPermission();
+    setPermGranted(granted);
+  };
+
+  const formatTime = (ts: number) => {
+    const m = Math.floor((Date.now() - ts) / 60000);
+    if (m < 1) return 'Just now';
+    if (m < 60) return `${m}m ago`;
+    if (m < 1440) return `${Math.floor(m / 60)}h ago`;
+    return `${Math.floor(m / 1440)}d ago`;
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => { setOpen(o => !o); if (!open) markAllRead(); }}
+        className="relative p-1.5 hover:text-white text-gray-400 transition-colors rounded-sm hover:bg-white/5"
+      >
+        <Bell className="w-5 h-5" />
+        {unread > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-[#c9a84c] text-[#070b14] text-[9px] font-bold px-0.5">
+            {unread > 9 ? '9+' : unread}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+
+          {/* Dropdown Panel */}
+          <div className="absolute right-0 top-10 z-50 w-[320px] max-w-[calc(100vw-2rem)] bg-[#0a0f1c] border border-white/10 rounded-sm shadow-2xl shadow-black/60 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-[#c9a84c]" />
+                <span className="text-[13px] text-white font-semibold uppercase tracking-widest">Notifications</span>
+              </div>
+              {notifs.length > 0 && (
+                <button onClick={markAllRead} className="text-[10px] text-gray-500 hover:text-[#c9a84c] uppercase tracking-widest transition-colors">
+                  Mark all read
+                </button>
+              )}
+            </div>
+
+            {/* Enable push prompt */}
+            {!permGranted && (
+              <div className="px-4 py-3 bg-[#c9a84c]/10 border-b border-[#c9a84c]/20 flex items-center justify-between gap-3">
+                <p className="text-[11px] text-[#c9a84c] leading-snug">Enable push notifications to get alerts even when the app is in the background.</p>
+                <button onClick={handleEnable} className="shrink-0 px-3 py-1.5 bg-[#c9a84c] text-[#070b14] text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945] transition-colors">
+                  Enable
+                </button>
+              </div>
+            )}
+
+            {/* Notification list */}
+            <div className="max-h-[340px] overflow-y-auto divide-y divide-white/5">
+              {notifs.length === 0 ? (
+                <div className="text-center py-10 text-gray-500 text-[13px]">
+                  <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                  No notifications yet
+                </div>
+              ) : (
+                notifs.map(n => (
+                  <div key={n.id} className={`px-4 py-3 flex gap-3 transition-colors ${n.read ? 'opacity-70' : 'bg-white/[0.02]'}`}>
+                    <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${n.status === 'approved' ? 'bg-[#00d4aa]' : n.status === 'rejected' ? 'bg-red-500' : 'bg-[#c9a84c]'}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] text-white font-medium">{n.title}</div>
+                      <div className="text-[11px] text-gray-400 mt-0.5 leading-snug">{n.body}</div>
+                      <div className="text-[10px] text-gray-600 mt-1 uppercase tracking-wide">{formatTime(n.time)}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
