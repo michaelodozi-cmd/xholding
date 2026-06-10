@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, Gift, User, Bell, Rocket, 
   Clock, CheckCircle2, Home, Copy, Shield, Smartphone, Monitor, ChevronRight,
-  Activity, Coins, ArrowRight, ShieldCheck, Check, ImageIcon, Users
+  Activity, Coins, ArrowRight, ShieldCheck, Check, ImageIcon, Users, LogOut
 } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
@@ -58,6 +58,11 @@ function Dashboard() {
     fetchProfile();
   }, [navigate]);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
   return (
     <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] selection:bg-[#c9a84c]/30 pb-24 md:pb-0 md:pl-64">
       {/* Desktop Sidebar (hidden on mobile) */}
@@ -78,6 +83,9 @@ function Dashboard() {
               <span className="font-bold uppercase tracking-widest text-[11px]">SuperAdmin</span>
             </Link>
           )}
+          <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 rounded-sm transition-colors mt-auto text-gray-500 hover:text-white hover:bg-red-500/10 hover:text-red-400 group">
+            <LogOut className="w-5 h-5 group-hover:text-red-400"/> Logout
+          </button>
         </div>
       </aside>
 
@@ -1108,6 +1116,13 @@ function ProfileTab({ profile }: { profile?: any }) {
               <button className="text-[11px] text-red-400 uppercase tracking-widest font-semibold hover:underline">Revoke</button>
             </div>
           </div>
+        </div>
+
+        {/* Mobile-only Logout in Profile */}
+        <div className="md:hidden col-span-1 mt-4">
+          <button onClick={async () => { await supabase.auth.signOut(); window.location.href = '/login'; }} className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 hover:text-red-400 font-bold uppercase tracking-widest text-[12px] transition-colors rounded-sm">
+            <LogOut className="w-4 h-4" /> Sign Out
+          </button>
         </div>
       </div>
     </div>

@@ -62,6 +62,11 @@ function AdminDashboard() {
     checkAdmin();
   }, [navigate]);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
   if (isChecking) {
     return (
       <div className="min-h-screen bg-[#070b14] flex flex-col items-center justify-center">
@@ -88,12 +93,17 @@ function AdminDashboard() {
           <TabButton active={activeTab === 'security'} onClick={() => setActiveTab('security')} icon={ShieldAlert} label="Security logs" />
         </div>
         <div className="mt-auto border-t border-white/5 pt-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold">SA</div>
-            <div>
-              <div className="text-[13px] font-medium text-white">System Admin</div>
-              <div className="text-[10px] text-gray-500 uppercase tracking-widest">Level 5 Access</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold">SA</div>
+              <div>
+                <div className="text-[13px] font-medium text-white">System Admin</div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-widest">Level 5 Access</div>
+              </div>
             </div>
+            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-sm transition-colors" title="Logout">
+              <Power className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>
