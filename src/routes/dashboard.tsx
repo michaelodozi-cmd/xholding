@@ -98,6 +98,11 @@ function Dashboard() {
     });
   }, [transactions]);
 
+  // Filter transactions to only those belonging to the logged-in user
+  const userTransactions = profile?.email 
+    ? transactions.filter(t => t.userEmail === profile.email) 
+    : [];
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
@@ -107,10 +112,13 @@ function Dashboard() {
     <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] selection:bg-[#c9a84c]/30 pb-24 md:pb-0 md:pl-64">
       {/* Desktop Sidebar (hidden on mobile) */}
       <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen bg-[#0a0f1c] border-r border-white/5 p-6 z-50">
-        <Link to="/" className="flex items-center gap-3 mb-12">
-          <div className="w-8 h-8 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-sm">X</div>
-          <span className="font-light text-xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
-        </Link>
+        <div className="flex items-center justify-between mb-12">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-8 h-8 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-sm">X</div>
+            <span className="font-light text-xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
+          </Link>
+          <NotificationBell transactions={userTransactions} />
+        </div>
         <div className="flex flex-col gap-2 flex-grow">
           <button onClick={() => setActiveTab('home')} className={`flex items-center gap-3 px-4 py-3 rounded-sm font-medium transition-colors ${activeTab === 'home' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><Home className="w-5 h-5"/> Home</button>
           <button onClick={() => setActiveTab('invest')} className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors ${activeTab === 'invest' ? 'bg-white/5 text-[#c9a84c]' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}><TrendingUp className="w-5 h-5"/> Invest</button>
@@ -136,7 +144,7 @@ function Dashboard() {
           <span className="font-light text-lg tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
         </div>
         <div className="flex items-center gap-3">
-          <NotificationBell transactions={transactions} />
+          <NotificationBell transactions={userTransactions} />
           {profile?.role === 'admin' && (
             <Link to="/admin" className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-red-400 border border-red-500/20 bg-red-500/10 rounded-sm">
               Admin
