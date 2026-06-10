@@ -567,25 +567,20 @@ function OverviewTab() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      // Fetch balances
       const { data: profiles } = await supabase.from('profiles').select('id, balance, role');
-      // Fetch active investments
       const { data: investments } = await supabase.from('investments').select('amount, status');
 
       if (profiles) {
-        setUsersCount(profiles.length);
-        
+        setUsersCount(profiles.filter(p => p.role !== 'admin').length);
         const userBalances = profiles
           .filter(p => p.role !== 'admin')
           .reduce((acc, p) => acc + Number(p.balance || 0), 0);
-          
         let investedAmount = 0;
         if (investments) {
           investedAmount = investments
             .filter(inv => inv.status === 'active')
             .reduce((acc, inv) => acc + Number(inv.amount || 0), 0);
         }
-
         setTotalAUM(userBalances + investedAmount);
       }
     };
@@ -594,43 +589,101 @@ function OverviewTab() {
 
   const pendingDeposits = transactions.filter(t => t.type === 'deposit' && t.status === 'pending');
   const pendingAmount = pendingDeposits.reduce((acc, t) => acc + Number(t.amount || 0), 0);
-
   const approvedDeposits = transactions.filter(t => t.type === 'deposit' && t.status === 'approved');
   const totalDepositedAmount = approvedDeposits.reduce((acc, t) => acc + Number(t.amount || 0), 0);
 
+  const recentActivity = [...transactions]
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 10);
+
+  const formatTime = (timestamp: number) => {
+    const mins = Math.floor((Date.now() - timestamp) / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    if (mins < 1440) return `${Math.floor(mins / 60)}h ago`;
+    return `${Math.floor(mins / 1440)}d ago`;
+  };
+
+  const getActivityLabel = (tx: any) => {
+    const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const user = tx.userEmail || 'Unknown user';
+    const asset = tx.asset || '';
+    if (tx.type === 'deposit') return `Deposit of ${amt} ${asset} from ${user}`;
+    if (tx.type === 'withdrawal') return `Withdrawal of ${amt} ${asset} by ${user}`;
+    return `${tx.type} of ${amt} by ${user}`;
+  };
+
+  const getDotColor = (status: string) => {
+    if (status === 'approved') return 'bg-[#00d4aa]';
+    if (status === 'pending') return 'bg-[#c9a84c]';
+    return 'bg-red-500';
+  };
+
+  const getBadgeStyle = (status: string) => {
+    if (status === 'approved') return 'bg-[#00d4aa]/10 text-[#00d4aa]';
+    if (status === 'pending') return 'bg-[#c9a84c]/10 text-[#c9a84c]';
+    return 'bg-red-500/10 text-red-400';
+  };
+
   return (
     <div className="animate-in fade-in duration-500">
-      <h1 className="text-3xl text-white font-light font-['Outfit'] mb-8">System Overview</h1>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <h1 className="text-2xl sm:text-3xl text-white font-light font-['Outfit'] mb-6 sm:mb-8">System Overview</h1>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         <StatCard title="Total Users" value={usersCount.toString()} change="Registered accounts" />
-        <StatCard title="Total AUM" value={`$${totalAUM >= 1000000 ? (totalAUM/1000000).toFixed(1) + 'M' : totalAUM >= 1000 ? (totalAUM/1000).toFixed(1) + 'k' : totalAUM}`} change="Managed by platform" color="text-[#00d4aa]" />
-        <StatCard title="Total Deposits" value={`$${totalDepositedAmount >= 1000000 ? (totalDepositedAmount/1000000).toFixed(1) + 'M' : totalDepositedAmount >= 1000 ? (totalDepositedAmount/1000).toFixed(1) + 'k' : totalDepositedAmount}`} change={`${approvedDeposits.length} approved deposits`} color="text-[#00d4aa]" />
-        <StatCard title="Pending Deposits" value={pendingDeposits.length.toString()} change={`$${pendingAmount.toLocaleString()} pending`} color="text-[#c9a84c]" />
+        <StatCard
+          title="Total AUM"
+          value={`$${totalAUM >= 1000000 ? (totalAUM / 1000000).toFixed(1) + 'M' : totalAUM >= 1000 ? (totalAUM / 1000).toFixed(1) + 'k' : totalAUM.toFixed(0)}`}
+          change="Managed by platform" color="text-[#00d4aa]"
+        />
+        <StatCard
+          title="Total Deposits"
+          value={`$${totalDepositedAmount >= 1000000 ? (totalDepositedAmount / 1000000).toFixed(1) + 'M' : totalDepositedAmount >= 1000 ? (totalDepositedAmount / 1000).toFixed(1) + 'k' : totalDepositedAmount.toFixed(0)}`}
+          change={`${approvedDeposits.length} approved`} color="text-[#00d4aa]"
+        />
+        <StatCard title="Pending" value={pendingDeposits.length.toString()} change={`$${pendingAmount.toLocaleString()} pending`} color="text-[#c9a84c]" />
       </div>
-      
-      <div className="grid grid-cols-2 gap-6">
-        <div className="bg-[#0a0f1c] border border-white/5 rounded-sm p-6">
-          <h3 className="text-[14px] text-white font-medium mb-6">Recent Activity</h3>
-          <div className="space-y-4">
-            <ActivityItem text="User alice@example.com verified KYC" time="10 mins ago" />
-            <ActivityItem text="New deposit $5,000 pending approval" time="2 hours ago" />
-            <ActivityItem text="User john@example.com requested withdrawal" time="5 hours ago" />
-            <ActivityItem text="Admin modified ETH receiving wallet" time="1 day ago" />
-          </div>
+
+      {/* Recent Activity */}
+      <div className="bg-[#0a0f1c] border border-white/5 rounded-sm p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-[14px] text-white font-semibold uppercase tracking-widest">Recent Activity</h3>
+          <span className="text-[11px] text-gray-500 uppercase tracking-widest">{recentActivity.length} events</span>
         </div>
+
+        {recentActivity.length === 0 ? (
+          <div className="text-center py-12 text-gray-500 text-[13px]">
+            <Activity className="w-8 h-8 mx-auto mb-3 opacity-30" />
+            No activity yet.
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {recentActivity.map(tx => (
+              <div key={tx.id} className="flex items-start gap-3 sm:gap-4 border-b border-white/5 py-3.5 last:border-0 last:pb-0 first:pt-0">
+                <div className={`mt-[5px] w-2 h-2 rounded-full shrink-0 ${getDotColor(tx.status)}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-[13px] text-gray-200 break-words">{getActivityLabel(tx)}</span>
+                    <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${getBadgeStyle(tx.status)}`}>
+                      {tx.status}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-gray-500 mt-0.5 uppercase tracking-wider">{tx.type}</div>
+                </div>
+                <div className="text-[11px] text-gray-500 whitespace-nowrap shrink-0 mt-0.5">
+                  {formatTime(tx.timestamp)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function ActivityItem({ text, time }: any) {
-  return (
-    <div className="flex justify-between items-start border-b border-white/5 pb-4 last:border-0 last:pb-0">
-      <div className="text-[13px] text-gray-300">{text}</div>
-      <div className="text-[11px] text-gray-500 whitespace-nowrap ml-4">{time}</div>
-    </div>
-  );
-}
+
 
 function StatCard({ title, value, change, color = "text-white" }: any) {
   return (
