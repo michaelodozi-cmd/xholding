@@ -943,16 +943,56 @@ function TransactionCard({ tx }: { tx: any }) {
   const [copied, setCopied] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
+  // Helper: fire a background push to the user's phone
+  const sendPushToUser = async (title: string, body: string, tag: string) => {
+    try {
+      // Get the user_id from the transaction's user email
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', tx.userEmail)
+        .single();
+      if (!profile) return;
+
+      await supabase.functions.invoke('send-push-notification', {
+        body: { user_id: profile.id, title, body, tag },
+      });
+    } catch (err) {
+      console.error('[Admin Push]', err);
+    }
+  };
+
   const handleApprove = async () => {
+    const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${tx.asset || ''}`;
     if (tx.type === 'deposit') {
       updateStatus(tx.id, 'approved', tx.amount);
+      await sendPushToUser(
+        '✅ Deposit Approved — XHoldings',
+        `Your deposit of ${amt} has been credited to your account.`,
+        'deposit-approved'
+      );
     } else {
       if (sentTxid) {
         await supabase.from('transactions').update({ txid: sentTxid }).eq('id', tx.id);
       }
       updateStatus(tx.id, 'approved');
+      await sendPushToUser(
+        '💸 Withdrawal Sent — XHoldings',
+        `Your withdrawal of ${amt} has been processed and sent.`,
+        'withdrawal-approved'
+      );
     }
     setIsApproveOpen(false);
+  };
+
+  const handleReject = async () => {
+    const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${tx.asset || ''}`;
+    updateStatus(tx.id, 'rejected');
+    await sendPushToUser(
+      `❌ ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Rejected — XHoldings`,
+      `Your ${tx.type} of ${amt} was not approved. Please contact support.`,
+      `${tx.type}-rejected`
+    );
   };
 
   const handleCopy = (text: string) => {
@@ -960,6 +1000,7 @@ function TransactionCard({ tx }: { tx: any }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
 
   const timeAgo = Math.floor((Date.now() - tx.timestamp) / 60000);
   const timeStr = timeAgo < 60 ? `${timeAgo} mins ago` : `${Math.floor(timeAgo/60)} hours ago`;

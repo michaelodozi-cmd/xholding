@@ -18,6 +18,7 @@ import {
   notifyWithdrawalApproved,
   notifyWithdrawalRejected,
 } from "../lib/push-notifications";
+import { registerPushSubscription } from "../lib/web-push-subscription";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,6 +61,9 @@ function Dashboard() {
 
         if (data) setProfile(data);
         if (appSettings) setSettings(appSettings);
+
+        // Register background push subscription after profile loads
+        registerPushSubscription();
       }
     };
     fetchProfile();
