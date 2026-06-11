@@ -9,6 +9,7 @@ import {
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
 import BalanceOpsTab from "../components/admin/BalanceOpsTab";
+import UserPlansTab from "../components/admin/UserPlansTab";
 import {
   AlertDialog,
   AlertDialogAction,
