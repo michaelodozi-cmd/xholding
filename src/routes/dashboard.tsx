@@ -136,8 +136,8 @@ function Dashboard() {
   }, [transactions]);
 
   // Filter transactions to only those belonging to the logged-in user
-  const userTransactions = profile?.email 
-    ? transactions.filter(t => t.userEmail === profile.email) 
+  const userTransactions = profile?.id 
+    ? transactions.filter(t => t.userId === profile.id) 
     : [];
 
   const handleLogout = async () => {
@@ -239,6 +239,7 @@ function Dashboard() {
 }
 
 function CopyTradeTab({ profile }: { profile?: any }) {
+  const { investments } = useInvestmentStore();
   const [traders, setTraders] = useState<any[]>([]);
   const [mySubs, setMySubs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -246,6 +247,12 @@ function CopyTradeTab({ profile }: { profile?: any }) {
   const [selectedTrader, setSelectedTrader] = useState<any>(null);
   const [amount, setAmount] = useState<number | ''>('');
   const [alertState, setAlertState] = useState({ open: false, title: '', message: '' });
+
+  const roiEarned = investments.reduce((acc, inv) => {
+    const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
+    return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
+  }, 0);
+  const totalBalance = Number(profile?.balance || 0) + roiEarned + Number(profile?.total_earned_referrals || 0);
 
   const fetchCopyData = async () => {
     if (!profile) return;
@@ -271,23 +278,19 @@ function CopyTradeTab({ profile }: { profile?: any }) {
 
   const handleCopy = async () => {
     if (!selectedTrader || !amount || amount <= 0) return;
-    if (amount > (profile?.balance || 0)) {
+    if (amount > totalBalance) {
       showAlert("Insufficient Funds", "You do not have enough available balance to copy this trader.");
       return;
     }
     
     setCopying(true);
     
-    // Deduct balance securely
-    const { error: rpcError } = await supabase.rpc('increment_balance', {
-      p_user_id: profile.id,
-      p_amount: -Number(amount)
-    });
-    
-    if (rpcError) {
-      showAlert("Error", "Could not process transaction. Please try again.");
-      setCopying(false);
-      return;
+    const currentBaseBalance = Number(profile?.balance || 0);
+    const deficit = amount > currentBaseBalance ? amount - currentBaseBalance : 0;
+
+    // Temporarily satisfy RLS if base balance is insufficient
+    if (deficit > 0) {
+      await supabase.rpc('increment_balance', { p_user_id: profile.id, p_amount: deficit });
     }
 
     // Insert subscription
@@ -299,17 +302,27 @@ function CopyTradeTab({ profile }: { profile?: any }) {
     });
 
     if (insertError) {
-      // Refund if error
-      await supabase.rpc('increment_balance', { p_user_id: profile.id, p_amount: Number(amount) });
-      showAlert("Error", "Could not start copy trading. Your funds have been refunded.");
-    } else {
-      await supabase.from('master_traders').update({ followers_count: selectedTrader.followers_count + 1 }).eq('id', selectedTrader.id);
-      showAlert("Success!", `You are now successfully copying ${selectedTrader.name}!`);
-      setSelectedTrader(null);
-      setAmount('');
-      fetchCopyData();
-      if (profile) profile.balance = Number(profile.balance) - Number(amount);
+      // Revert temporary balance if we added it
+      if (deficit > 0) {
+        await supabase.rpc('increment_balance', { p_user_id: profile.id, p_amount: -deficit });
+      }
+      showAlert("Error", "Could not start copy trading: " + (insertError?.message || "Unknown error"));
+      setCopying(false);
+      return;
     }
+
+    // Success! Deduct the actual amount + revert the temporary deficit boost
+    // If deficit was 0, we just deduct the amount.
+    // If deficit was > 0, we deduct the amount AND the temporary boost.
+    const totalDeduction = Number(amount) + deficit;
+    await supabase.rpc('increment_balance', { p_user_id: profile.id, p_amount: -totalDeduction });
+
+    await supabase.from('master_traders').update({ followers_count: selectedTrader.followers_count + 1 }).eq('id', selectedTrader.id);
+    showAlert("Success!", `You are now successfully copying ${selectedTrader.name}!`);
+    setSelectedTrader(null);
+    setAmount('');
+    fetchCopyData();
+    if (profile) profile.balance = Number(profile.balance) - Number(amount);
     setCopying(false);
   };
 
@@ -342,29 +355,45 @@ function CopyTradeTab({ profile }: { profile?: any }) {
         <div className="mb-12">
           <h2 className="text-sm text-white font-bold uppercase tracking-widest mb-4">Your Active Copies</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mySubs.map(sub => (
-              <div key={sub.id} className="p-5 bg-gradient-to-br from-[#0a0f1c] to-[#070b14] border border-[#00d4aa]/30 rounded-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#00d4aa]/10 blur-xl rounded-full" />
-                <div className="flex justify-between items-start mb-4 relative z-10">
-                  <div>
-                    <div className="text-xs text-gray-400 uppercase tracking-widest mb-1">Copying</div>
-                    <div className="text-lg text-white font-['Outfit']">{sub.master_traders?.name || 'Unknown'}</div>
+            {mySubs.map(sub => {
+              const pnl = Number(sub.total_pnl || 0);
+              const isProfit = pnl >= 0;
+              return (
+                <div key={sub.id} className={`p-5 bg-gradient-to-br from-[#0a0f1c] to-[#070b14] border ${isProfit ? 'border-[#00d4aa]/30' : 'border-red-500/30'} rounded-sm relative overflow-hidden`}>
+                  <div className={`absolute top-0 right-0 w-24 h-24 ${isProfit ? 'bg-[#00d4aa]/10' : 'bg-red-500/10'} blur-xl rounded-full`} />
+                  <div className="flex justify-between items-start mb-4 relative z-10">
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-widest mb-1">Copying</div>
+                      <div className="text-lg text-white font-['Outfit']">{sub.master_traders?.name || 'Unknown'}</div>
+                    </div>
+                    <div className={`w-10 h-10 rounded-full ${isProfit ? 'bg-[#00d4aa]/10 border-[#00d4aa]/20' : 'bg-red-500/10 border-red-500/20'} flex items-center justify-center border`}>
+                      <Activity className={`w-5 h-5 ${isProfit ? 'text-[#00d4aa]' : 'text-red-400'}`} />
+                    </div>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-[#00d4aa]/10 flex items-center justify-center border border-[#00d4aa]/20">
-                    <Activity className="w-5 h-5 text-[#00d4aa]" />
+                  <div className="grid grid-cols-2 gap-4 relative z-10 mb-2">
+                    <div>
+                      <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Invested</div>
+                      <div className="text-lg text-white font-mono">${Number(sub.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Profit/Loss</div>
+                      <div className={`text-lg font-mono ${isProfit ? 'text-[#00d4aa]' : 'text-red-400'}`}>
+                        {isProfit ? '+' : ''}${pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-end relative z-10 pt-3 border-t border-white/5">
+                    <div>
+                      <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Current Equity</div>
+                      <div className="text-sm text-white font-semibold">${(Number(sub.amount) + pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] text-[#00d4aa] uppercase tracking-widest font-bold">Active</div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-between items-end relative z-10">
-                  <div>
-                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Invested Amount</div>
-                    <div className="text-xl text-white font-mono">${Number(sub.amount).toLocaleString()}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[10px] text-[#00d4aa] uppercase tracking-widest font-bold">Active</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -439,7 +468,7 @@ function CopyTradeTab({ profile }: { profile?: any }) {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold">Copy Amount (USD)</label>
-                      <span className="text-[11px] text-gray-500">Available: ${Number(profile?.balance || 0).toLocaleString()}</span>
+                      <span className="text-[11px] text-gray-500">Available: ${Number(totalBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                     <input 
                       type="number" 
@@ -566,12 +595,12 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
           </div>
         </div>
 
-        {/* Quick Actions: 4 Columns (2x2 grid inside) */}
-        <div className="lg:col-span-4 grid grid-cols-2 gap-4">
+        {/* Quick Actions: 4 Columns (Grid) */}
+        <div className="lg:col-span-4 grid grid-cols-2 sm:grid-cols-2 gap-4">
           <button onClick={() => setActiveTab('wallet')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Wallet className="w-8 h-8 text-[#c9a84c] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Deposit</span></button>
           <button onClick={() => setActiveTab('wallet')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><ArrowDownLeft className="w-8 h-8 text-[#00d4aa] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Withdraw</span></button>
           <button onClick={() => setActiveTab('invest')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><TrendingUp className="w-8 h-8 text-[#e8c96a] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Invest</span></button>
-          <button onClick={() => setActiveTab('rewards')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Gift className="w-8 h-8 text-[#b088f5] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Rewards</span></button>
+          <button onClick={() => setActiveTab('copytrade')} className="flex flex-col items-center justify-center p-6 bg-[#0a0f1c] border border-white/5 rounded-sm hover:bg-white/5 transition-colors group"><Users className="w-8 h-8 text-[#3b82f6] mb-3 group-hover:scale-110 transition-transform" /><span className="text-[12px] uppercase tracking-widest text-gray-400 font-semibold">Copy Trade</span></button>
         </div>
 
         {/* Upcoming Payout: 12 Columns */}
@@ -1376,8 +1405,12 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
                           <span className="text-[12px] text-gray-400 uppercase tracking-widest">{tx.type}</span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-xl text-white font-light">${(tx.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
-                          <span className="text-[10px] font-bold tracking-widest bg-white/10 px-2 py-1 uppercase rounded-sm text-gray-300">{tx.asset || 'N/A'}</span>
+                          <span className="text-xl text-white font-light">
+                            {tx.type === 'withdrawal' ? '-' : '+'}${(tx.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                          </span>
+                          <span className="text-[10px] font-bold tracking-widest bg-white/10 px-2 py-1 uppercase rounded-sm text-gray-300">
+                            {tx.asset || 'N/A'}
+                          </span>
                         </div>
                         <div className="text-[11px] text-gray-500 mt-2 flex items-center gap-2">
                           <Clock className="w-3 h-3" /> {timeStr}

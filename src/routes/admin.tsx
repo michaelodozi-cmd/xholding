@@ -723,13 +723,28 @@ function UsersTab() {
   }, []);
 
   const fetchUsers = async () => {
-    const { data, error } = await supabase.from('profiles').select('*').order('role', { ascending: true });
+    const { data: profiles, error } = await supabase.from('profiles').select('*').order('role', { ascending: true });
+    const { data: investments } = await supabase.from('investments').select('user_id, amount, daily_roi, created_at').eq('status', 'active');
+    
     if (error) {
       console.error('Error fetching users:', error);
     }
-    if (data) {
-      console.log('Fetched users:', data);
-      setUsers(data);
+    if (profiles) {
+      const usersWithTotal = profiles.map(profile => {
+        const userInvs = (investments || []).filter(inv => inv.user_id === profile.id);
+        const roiEarned = userInvs.reduce((acc, inv) => {
+          const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
+          return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
+        }, 0);
+        
+        const totalBalance = Number(profile.balance || 0) + roiEarned + Number(profile.total_earned_referrals || 0);
+        
+        return {
+          ...profile,
+          totalBalance
+        };
+      });
+      setUsers(usersWithTotal);
     }
     setLoading(false);
   };
@@ -796,7 +811,9 @@ function UsersTab() {
                     id={user.id}
                     name={user.name}
                     email={user.email}
-                    balance={`$${Number(user.balance || 0).toLocaleString()}`}
+                    balance={`$${Number(user.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+                    totalBalance={`$${Number(user.totalBalance || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`}
+                    rawBalance={Number(user.balance || 0)}
                     status={user.status || 'Active'}
                     role={user.role}
                     onMakeAdmin={() => makeAdmin(user.id)}
@@ -814,17 +831,17 @@ function UsersTab() {
   );
 }
 
-function UserRow({ id, name, email, balance, status, role, onMakeAdmin, onEdit, onBan, onDelete }: any) {
+function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, role, onMakeAdmin, onEdit, onBan, onDelete }: any) {
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editBalance, setEditBalance] = useState(balance.replace(/[^0-9.]/g, ''));
+  const [editBalance, setEditBalance] = useState(String(rawBalance));
   const [plansOpen, setPlansOpen] = useState(false);
   const [userPlans, setUserPlans] = useState<any[]>([]);
   const [userSubs, setUserSubs] = useState<any[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(false);
 
   useEffect(() => {
-    setEditBalance(balance.replace(/[^0-9.]/g, ''));
-  }, [balance]);
+    setEditBalance(String(rawBalance));
+  }, [rawBalance]);
 
   useEffect(() => {
     if (plansOpen) {
@@ -880,7 +897,10 @@ function UserRow({ id, name, email, balance, status, role, onMakeAdmin, onEdit, 
         <div className="text-[13px] text-white font-medium truncate">{name || '—'}</div>
         <div className="text-[11px] text-gray-500 truncate">{email}</div>
       </td>
-      <td className="p-3 sm:p-4 text-[13px] font-mono whitespace-nowrap">{balance}</td>
+      <td className="p-3 sm:p-4 text-[13px] font-mono whitespace-nowrap">
+        <div className="text-white font-semibold">{totalBalance}</div>
+        <div className="text-[10px] text-gray-500 mt-0.5" title="Base Wallet Balance">Wallet: {balance}</div>
+      </td>
       <td className="p-3 sm:p-4">
         <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${role === 'admin' ? 'bg-purple-500/10 text-purple-400' : 'bg-gray-500/10 text-gray-400'}`}>
           {role}
@@ -1848,7 +1868,7 @@ function CopyTradingTab() {
       if (Math.abs(roiDiff) > 0) {
         const { data: followers } = await supabase
           .from('copy_trading_subscriptions')
-          .select('id, user_id, amount')
+          .select('id, user_id, amount, total_pnl')
           .eq('master_trader_id', simTrader.id)
           .eq('status', 'active');
           
@@ -1856,6 +1876,10 @@ function CopyTradingTab() {
           for (const follower of followers) {
             // Profit is the % change in ROI applied to their invested amount
             const followerProfit = (roiDiff / 100) * Number(follower.amount);
+            
+            // Update the subscription's total_pnl
+            const newTotalPnl = Number(follower.total_pnl || 0) + followerProfit;
+            await supabase.from('copy_trading_subscriptions').update({ total_pnl: newTotalPnl }).eq('id', follower.id);
             
             // Fetch current user balance
             const { data: profile } = await supabase
@@ -1874,9 +1898,10 @@ function CopyTradingTab() {
               await supabase.from('transactions').insert({
                 user_id: follower.user_id,
                 userEmail: profile.email,
-                type: followerProfit >= 0 ? 'copy_trading_profit' : 'copy_trading_loss',
+                type: followerProfit >= 0 ? 'deposit' : 'withdrawal',
                 amount: Math.abs(followerProfit),
-                asset: 'USD',
+                asset: followerProfit >= 0 ? 'PROFIT' : 'LOSS',
+                txid: 'Automated copy trading return from ' + simTrader.name,
                 status: 'approved',
                 timestamp: Date.now()
               });
@@ -1926,7 +1951,13 @@ function CopyTradingTab() {
     <div className="animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl text-white font-light font-['Outfit']">Copy Trading</h1>
+          <h1 className="text-3xl text-white font-light font-['Outfit'] flex items-center gap-3">
+            Copy Trading
+            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-[#00d4aa] rounded-full text-[10px] uppercase tracking-widest font-bold">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#00d4aa] animate-pulse"></div>
+              Auto-Bot Active
+            </span>
+          </h1>
           <p className="text-[13px] text-gray-500 mt-1">Manage master traders, simulate trades, and view followers.</p>
         </div>
         <button
@@ -2151,7 +2182,9 @@ function TraderCard({ trader, onEdit, onDelete, onToggle, onSimulate, onFollower
           <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">ROI</div>
         </div>
         <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
-          <div className={`font-mono font-bold text-sm ${trader.total_pnl >= 0 ? 'text-[#00d4aa]' : 'text-red-400'}`}>${trader.total_pnl.toLocaleString()}</div>
+          <div className={`font-mono font-bold text-sm ${trader.total_pnl >= 0 ? 'text-[#00d4aa]' : 'text-red-400'}`}>
+            ${trader.total_pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </div>
           <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Total PnL</div>
         </div>
       </div>
