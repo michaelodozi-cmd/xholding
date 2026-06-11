@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { 
   Users, DollarSign, Wallet, ShieldAlert, CheckCircle, XCircle, 
   Trash2, Ban, Edit, Settings, Activity, Search, Power, Clock,
-  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu
+  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu, Copy
 } from "lucide-react";
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
@@ -107,6 +107,7 @@ function AdminDashboard() {
           <TabButton active={activeTab === 'transactions'} onClick={() => {setActiveTab('transactions'); setIsMobileMenuOpen(false);}} icon={DollarSign} label="Transactions" />
           <TabButton active={activeTab === 'wallets'} onClick={() => {setActiveTab('wallets'); setIsMobileMenuOpen(false);}} icon={Wallet} label="Platform Wallets" />
           <TabButton active={activeTab === 'plans'} onClick={() => {setActiveTab('plans'); setIsMobileMenuOpen(false);}} icon={TrendingUp} label="Investment Plans" />
+          <TabButton active={activeTab === 'copy_trading'} onClick={() => {setActiveTab('copy_trading'); setIsMobileMenuOpen(false);}} icon={Copy} label="Copy Trading" />
           <TabButton active={activeTab === 'security'} onClick={() => {setActiveTab('security'); setIsMobileMenuOpen(false);}} icon={ShieldAlert} label="Security logs" />
         </div>
         <div className="mt-auto border-t border-white/5 pt-6">
@@ -132,6 +133,7 @@ function AdminDashboard() {
         {activeTab === 'transactions' && <TransactionsTab />}
         {activeTab === 'wallets' && <WalletsTab />}
         {activeTab === 'plans' && <PlansTab />}
+        {activeTab === 'copy_trading' && <CopyTradingTab />}
         {activeTab === 'security' && <SecurityTab />}
       </main>
     </div>
@@ -634,12 +636,12 @@ function OverviewTab() {
         <StatCard title="Total Users" value={usersCount.toString()} change="Registered accounts" />
         <StatCard
           title="Total AUM"
-          value={`$${totalAUM >= 1000000 ? (totalAUM / 1000000).toFixed(1) + 'M' : totalAUM >= 1000 ? (totalAUM / 1000).toFixed(1) + 'k' : totalAUM.toFixed(0)}`}
+          value={`$${totalAUM.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           change="Managed by platform" color="text-[#00d4aa]"
         />
         <StatCard
           title="Total Deposits"
-          value={`$${totalDepositedAmount >= 1000000 ? (totalDepositedAmount / 1000000).toFixed(1) + 'M' : totalDepositedAmount >= 1000 ? (totalDepositedAmount / 1000).toFixed(1) + 'k' : totalDepositedAmount.toFixed(0)}`}
+          value={`$${totalDepositedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           change={`${approvedDeposits.length} approved`} color="text-[#00d4aa]"
         />
         <StatCard title="Pending" value={pendingDeposits.length.toString()} change={`$${pendingAmount.toLocaleString()} pending`} color="text-[#c9a84c]" />
@@ -809,14 +811,61 @@ function UsersTab() {
 function UserRow({ id, name, email, balance, status, role, onMakeAdmin, onEdit, onBan, onDelete }: any) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editBalance, setEditBalance] = useState(balance.replace(/[^0-9.]/g, ''));
+  const [plansOpen, setPlansOpen] = useState(false);
+  const [userPlans, setUserPlans] = useState<any[]>([]);
+  const [userSubs, setUserSubs] = useState<any[]>([]);
+  const [loadingPlans, setLoadingPlans] = useState(false);
 
   useEffect(() => {
     setEditBalance(balance.replace(/[^0-9.]/g, ''));
   }, [balance]);
 
+  useEffect(() => {
+    if (plansOpen) {
+      const fetchPlans = async () => {
+        setLoadingPlans(true);
+        // Fetch standard investments
+        const { data: p } = await supabase.from('investments').select('*, investment_plans(name)').eq('user_id', id).order('created_at', { ascending: false });
+        setUserPlans(p || []);
+        
+        // Fetch copy trading subscriptions
+        const { data: s } = await supabase.from('copy_trading_subscriptions').select('*, master_traders(name)').eq('user_id', id).order('created_at', { ascending: false });
+        setUserSubs(s || []);
+        
+        setLoadingPlans(false);
+      };
+      fetchPlans();
+    }
+  }, [plansOpen, id]);
+
   const submitEdit = () => {
     onEdit(Number(editBalance));
     setIsEditOpen(false);
+  };
+
+  const handleWithdrawPlan = async (plan: any) => {
+    if (plan.status !== 'active') return;
+    await supabase.from('investments').update({ status: 'completed' }).eq('id', plan.id);
+    const { data: profile } = await supabase.from('profiles').select('balance').eq('id', id).single();
+    if (profile) {
+      const newBal = Number(profile.balance || 0) + Number(plan.amount);
+      await supabase.from('profiles').update({ balance: newBal }).eq('id', id);
+      onEdit(newBal); // Optimistic UI update in parent table
+    }
+    // Refresh modal lists
+    setUserPlans(userPlans.map(p => p.id === plan.id ? { ...p, status: 'completed' } : p));
+  };
+
+  const handleWithdrawSub = async (sub: any) => {
+    if (sub.status !== 'active') return;
+    await supabase.from('copy_trading_subscriptions').update({ status: 'withdrawn' }).eq('id', sub.id);
+    const { data: profile } = await supabase.from('profiles').select('balance').eq('id', id).single();
+    if (profile) {
+      const newBal = Number(profile.balance || 0) + Number(sub.amount);
+      await supabase.from('profiles').update({ balance: newBal }).eq('id', id);
+      onEdit(newBal); 
+    }
+    setUserSubs(userSubs.map(s => s.id === sub.id ? { ...s, status: 'withdrawn' } : s));
   };
 
   return (
@@ -858,6 +907,72 @@ function UserRow({ id, name, email, balance, status, role, onMakeAdmin, onEdit, 
               </AlertDialogContent>
             </AlertDialog>
           )}
+
+        {/* View Plans Modal */}
+        <Dialog open={plansOpen} onOpenChange={setPlansOpen}>
+          <DialogTrigger asChild>
+            <button className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-sm transition-colors" title="View User Plans"><TrendingUp className="w-4 h-4" /></button>
+          </DialogTrigger>
+          <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Investments & Copy Trading for {name}</DialogTitle>
+              <DialogDescription className="text-gray-400">View active plans and force withdrawals.</DialogDescription>
+            </DialogHeader>
+            <div className="py-2">
+              {loadingPlans ? (
+                <div className="text-center py-8 text-gray-500">Loading plans...</div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Standard Plans */}
+                  <div>
+                    <h3 className="text-[12px] font-bold text-white uppercase tracking-widest mb-3">Investment Plans</h3>
+                    {userPlans.length === 0 ? <p className="text-gray-500 text-sm">No standard investments.</p> : (
+                      <div className="space-y-2">
+                        {userPlans.map(p => (
+                          <div key={p.id} className="flex items-center justify-between bg-[#070b14] border border-white/5 p-3 rounded-sm">
+                            <div>
+                              <div className="text-sm font-semibold text-white">{p.investment_plans?.name || 'Unknown Plan'}</div>
+                              <div className="text-xs text-gray-500 font-mono">${Number(p.amount).toLocaleString()}</div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${p.status === 'active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : 'bg-gray-500/10 text-gray-400'}`}>{p.status}</span>
+                              {p.status === 'active' && (
+                                <button onClick={() => handleWithdrawPlan(p)} className="px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-sm hover:bg-red-500/20 font-bold uppercase tracking-widest">Withdraw</button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Copy Trading */}
+                  <div>
+                    <h3 className="text-[12px] font-bold text-white uppercase tracking-widest mb-3">Copy Trading</h3>
+                    {userSubs.length === 0 ? <p className="text-gray-500 text-sm">No copy trading subscriptions.</p> : (
+                      <div className="space-y-2">
+                        {userSubs.map(s => (
+                          <div key={s.id} className="flex items-center justify-between bg-[#070b14] border border-white/5 p-3 rounded-sm">
+                            <div>
+                              <div className="text-sm font-semibold text-white">Copy: {s.master_traders?.name || 'Unknown Trader'}</div>
+                              <div className="text-xs text-gray-500 font-mono">${Number(s.amount).toLocaleString()}</div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${s.status === 'active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : 'bg-gray-500/10 text-gray-400'}`}>{s.status}</span>
+                              {s.status === 'active' && (
+                                <button onClick={() => handleWithdrawSub(s)} className="px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-sm hover:bg-red-500/20 font-bold uppercase tracking-widest">Withdraw</button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogTrigger asChild>
@@ -1479,6 +1594,577 @@ function SecurityTab() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Copy Trading Tab ─────────────────────────────────────────────────────────
+
+type MasterTrader = {
+  id: string;
+  name: string;
+  description: string | null;
+  avatar_url: string | null;
+  win_rate: number;
+  total_pnl: number;
+  roi: number;
+  followers_count: number;
+  is_active: boolean;
+  daily_trades_min: number;
+  daily_trades_max: number;
+  created_at: string;
+};
+
+const EMPTY_TRADER: Omit<MasterTrader, 'id' | 'created_at'> = {
+  name: '',
+  description: '',
+  avatar_url: null,
+  win_rate: 85,
+  total_pnl: 0,
+  roi: 0,
+  followers_count: 0,
+  is_active: true,
+  daily_trades_min: 2,
+  daily_trades_max: 5,
+};
+
+function CopyTradingTab() {
+  const [traders, setTraders] = useState<MasterTrader[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTrader, setEditingTrader] = useState<MasterTrader | null>(null);
+  const [form, setForm] = useState({ ...EMPTY_TRADER });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  // Simulate trades state
+  const [isSimulateOpen, setIsSimulateOpen] = useState(false);
+  const [simTrader, setSimTrader] = useState<MasterTrader | null>(null);
+  const [simDays, setSimDays] = useState(1);
+  const [simulating, setSimulating] = useState(false);
+  const [simResult, setSimResult] = useState<{ trades: number; pnl: number; winRate: number } | null>(null);
+
+  // Followers state
+  const [isFollowersOpen, setIsFollowersOpen] = useState(false);
+  const [selectedTraderFollowers, setSelectedTraderFollowers] = useState<any[]>([]);
+  const [loadingFollowers, setLoadingFollowers] = useState(false);
+
+  const fetchTraders = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('master_traders')
+      .select('*')
+      .order('created_at', { ascending: true });
+    
+    if (error) {
+      console.error("Master traders table might not exist yet:", error);
+      // Fallback for UI mockup when DB isn't ready
+      setTraders([
+        {
+          id: 'mock-1', name: 'Crypto King', description: 'High frequency scalping on majors', avatar_url: null,
+          win_rate: 92.5, total_pnl: 15400, roi: 340, followers_count: 124, is_active: true,
+          daily_trades_min: 5, daily_trades_max: 15, created_at: new Date().toISOString()
+        },
+        {
+          id: 'mock-2', name: 'Alpha Signals', description: 'Long-term swing trading, strictly fundamental', avatar_url: null,
+          win_rate: 76.2, total_pnl: 8520, roi: 125, followers_count: 89, is_active: true,
+          daily_trades_min: 1, daily_trades_max: 3, created_at: new Date().toISOString()
+        }
+      ]);
+    } else if (data) {
+      setTraders(data as MasterTrader[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchTraders(); }, []);
+
+  const openAdd = () => {
+    setEditingTrader(null);
+    setForm({ ...EMPTY_TRADER });
+    setImageFile(null);
+    setImagePreview(null);
+    setError('');
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (trader: MasterTrader) => {
+    setEditingTrader(trader);
+    setForm({
+      name: trader.name,
+      description: trader.description,
+      avatar_url: trader.avatar_url,
+      win_rate: trader.win_rate,
+      total_pnl: trader.total_pnl,
+      roi: trader.roi,
+      followers_count: trader.followers_count,
+      is_active: trader.is_active,
+      daily_trades_min: trader.daily_trades_min,
+      daily_trades_max: trader.daily_trades_max,
+    });
+    setImageFile(null);
+    setImagePreview(trader.avatar_url);
+    setError('');
+    setIsModalOpen(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const ext = file.name.split('.').pop();
+    const path = `trader-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+    if (error) { setError('Image upload failed: ' + error.message); return null; }
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) { setError('Trader name is required.'); return; }
+    setSaving(true);
+    setError('');
+
+    let avatarUrl = form.avatar_url;
+    if (imageFile) {
+      setUploading(true);
+      avatarUrl = await uploadImage(imageFile);
+      setUploading(false);
+      if (!avatarUrl) { setSaving(false); return; }
+    }
+
+    const payload = {
+      name: form.name.trim(),
+      description: form.description?.trim() || null,
+      avatar_url: avatarUrl,
+      win_rate: Number(form.win_rate),
+      total_pnl: Number(form.total_pnl),
+      roi: Number(form.roi),
+      followers_count: Number(form.followers_count),
+      is_active: form.is_active,
+      daily_trades_min: Number(form.daily_trades_min),
+      daily_trades_max: Number(form.daily_trades_max),
+    };
+
+    let resultError;
+    if (editingTrader && !editingTrader.id.startsWith('mock')) {
+      const { error } = await supabase.from('master_traders').update(payload).eq('id', editingTrader.id);
+      resultError = error;
+    } else if (!editingTrader || editingTrader.id.startsWith('mock')) {
+      const { error } = await supabase.from('master_traders').insert(payload);
+      resultError = error;
+    }
+
+    if (resultError) {
+      setError('Error saving trader: ' + resultError.message + ' (Check database schema)');
+      setSaving(false);
+      return;
+    }
+
+    setSaving(false);
+    setIsModalOpen(false);
+    fetchTraders();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (id.startsWith('mock')) {
+      setTraders(traders.filter(t => t.id !== id));
+      return;
+    }
+    await supabase.from('master_traders').delete().eq('id', id);
+    fetchTraders();
+  };
+
+  const toggleActive = async (trader: MasterTrader) => {
+    if (trader.id.startsWith('mock')) {
+      setTraders(traders.map(t => t.id === trader.id ? { ...t, is_active: !t.is_active } : t));
+      return;
+    }
+    await supabase.from('master_traders').update({ is_active: !trader.is_active }).eq('id', trader.id);
+    fetchTraders();
+  };
+
+  const openSimulate = (trader: MasterTrader) => {
+    setSimTrader(trader);
+    setSimDays(1);
+    setSimResult(null);
+    setIsSimulateOpen(true);
+  };
+
+  const runSimulation = async () => {
+    if (!simTrader) return;
+    setSimulating(true);
+
+    let totalTrades = 0;
+    let newPnl = simTrader.total_pnl;
+    let wins = Math.round((simTrader.win_rate / 100) * 100); 
+    let totalHistoricalTrades = wins > 0 ? 100 : 0; 
+
+    for (let i = 0; i < simDays; i++) {
+      const tradesToday = Math.floor(Math.random() * (simTrader.daily_trades_max - simTrader.daily_trades_min + 1)) + simTrader.daily_trades_min;
+      totalTrades += tradesToday;
+      
+      for (let j = 0; j < tradesToday; j++) {
+        const isWin = Math.random() * 100 <= simTrader.win_rate;
+        totalHistoricalTrades++;
+        if (isWin) {
+          wins++;
+          newPnl += Math.random() * 50 + 10;
+        } else {
+          newPnl -= Math.random() * 40 + 10;
+        }
+      }
+    }
+
+    const newWinRate = totalHistoricalTrades > 0 ? (wins / totalHistoricalTrades) * 100 : simTrader.win_rate;
+    const pnlDiff = newPnl - simTrader.total_pnl;
+    const newRoi = simTrader.roi + (pnlDiff / 100);
+
+    const payload = {
+      total_pnl: newPnl,
+      win_rate: newWinRate,
+      roi: newRoi,
+    };
+
+    if (!simTrader.id.startsWith('mock')) {
+      await supabase.from('master_traders').update(payload).eq('id', simTrader.id);
+
+      // Distribute profits to followers
+      const roiDiff = newRoi - simTrader.roi;
+      if (Math.abs(roiDiff) > 0) {
+        const { data: followers } = await supabase
+          .from('copy_trading_subscriptions')
+          .select('id, user_id, amount')
+          .eq('master_trader_id', simTrader.id)
+          .eq('status', 'active');
+          
+        if (followers && followers.length > 0) {
+          for (const follower of followers) {
+            // Profit is the % change in ROI applied to their invested amount
+            const followerProfit = (roiDiff / 100) * Number(follower.amount);
+            
+            // Fetch current user balance
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('balance, email')
+              .eq('id', follower.user_id)
+              .single();
+              
+            if (profile) {
+              const newBalance = Number(profile.balance || 0) + followerProfit;
+              
+              // Update user balance directly
+              await supabase.from('profiles').update({ balance: newBalance }).eq('id', follower.user_id);
+              
+              // Log the transaction
+              await supabase.from('transactions').insert({
+                user_id: follower.user_id,
+                userEmail: profile.email,
+                type: followerProfit >= 0 ? 'copy_trading_profit' : 'copy_trading_loss',
+                amount: Math.abs(followerProfit),
+                asset: 'USD',
+                status: 'approved',
+                timestamp: Date.now()
+              });
+            }
+          }
+        }
+      }
+    } else {
+      setTraders(traders.map(t => t.id === simTrader.id ? { ...t, ...payload } : t));
+    }
+
+    setSimResult({
+      trades: totalTrades,
+      pnl: pnlDiff,
+      winRate: newWinRate,
+    });
+    
+    if (!simTrader.id.startsWith('mock')) fetchTraders();
+    setSimulating(false);
+  };
+
+  const openFollowers = async (trader: MasterTrader) => {
+    setIsFollowersOpen(true);
+    setLoadingFollowers(true);
+    if (!trader.id.startsWith('mock')) {
+      const { data, error } = await supabase
+        .from('copy_trading_subscriptions')
+        .select('*, profiles(email)')
+        .eq('master_trader_id', trader.id);
+      
+      if (!error && data) {
+        setSelectedTraderFollowers(data);
+      } else {
+        setSelectedTraderFollowers([]);
+      }
+    } else {
+      setSelectedTraderFollowers([
+        { id: '1', profiles: { email: 'user123@example.com' }, amount: 500, status: 'active' },
+        { id: '2', profiles: { email: 'investor44@example.com' }, amount: 1200, status: 'active' },
+        { id: '3', profiles: { email: 'crypto.whale@example.com' }, amount: 5000, status: 'active' }
+      ]);
+    }
+    setLoadingFollowers(false);
+  };
+
+  return (
+    <div className="animate-in fade-in duration-500">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl text-white font-light font-['Outfit']">Copy Trading</h1>
+          <p className="text-[13px] text-gray-500 mt-1">Manage master traders, simulate trades, and view followers.</p>
+        </div>
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 px-6 py-3 bg-[#c9a84c] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945] transition-colors"
+        >
+          <Plus className="w-4 h-4" /> New Trader
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-500">Loading traders...</div>
+      ) : traders.length === 0 ? (
+        <div className="text-center py-16 border border-white/5 bg-[#0a0f1c] rounded-sm">
+          <Copy className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+          <p className="text-gray-500">No master traders available.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {traders.map(trader => (
+            <TraderCard
+              key={trader.id}
+              trader={trader}
+              onEdit={() => openEdit(trader)}
+              onDelete={() => handleDelete(trader.id)}
+              onToggle={() => toggleActive(trader)}
+              onSimulate={() => openSimulate(trader)}
+              onFollowers={() => openFollowers(trader)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-['Outfit'] text-xl">
+              {editingTrader ? 'Edit Master Trader' : 'New Master Trader'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 text-[12px]">
+              Set up the copy trading profile.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Avatar</label>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-[#070b14] border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Users className="w-6 h-6 text-gray-600" />
+                  )}
+                </div>
+                <label className="flex-1 cursor-pointer">
+                  <div className="border border-dashed border-white/20 hover:border-[#c9a84c]/50 rounded-sm p-3 text-center transition-colors">
+                    <p className="text-[12px] text-gray-400">Click to upload avatar</p>
+                  </div>
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Trader Name *</label>
+              <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Satoshi Ninja" className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white" />
+            </div>
+
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Strategy Description</label>
+              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white resize-none" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Win Rate (%)</label>
+                <input type="number" step="0.1" value={form.win_rate} onChange={e => setForm(f => ({ ...f, win_rate: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">ROI (%)</label>
+                <input type="number" step="0.1" value={form.roi} onChange={e => setForm(f => ({ ...f, roi: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Total PnL ($)</label>
+                <input type="number" value={form.total_pnl} onChange={e => setForm(f => ({ ...f, total_pnl: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Followers (Fake)</label>
+                <input type="number" value={form.followers_count} onChange={e => setForm(f => ({ ...f, followers_count: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Min Daily Trades</label>
+                <input type="number" value={form.daily_trades_min} onChange={e => setForm(f => ({ ...f, daily_trades_min: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Max Daily Trades</label>
+                <input type="number" value={form.daily_trades_max} onChange={e => setForm(f => ({ ...f, daily_trades_max: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-[#070b14] border border-white/10 rounded-sm">
+              <div className="text-[13px] text-white font-medium">Active Status</div>
+              <button type="button" onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))} className={form.is_active ? 'text-[#00d4aa]' : 'text-gray-600'}>
+                {form.is_active ? <ToggleRight className="w-8 h-8" /> : <ToggleLeft className="w-8 h-8" />}
+              </button>
+            </div>
+
+            {error && <p className="text-red-400 text-[12px] bg-red-500/10 border border-red-500/20 p-3 rounded-sm">{error}</p>}
+          </div>
+
+          <DialogFooter>
+            <DialogClose asChild><button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm text-[12px] uppercase tracking-widest">Cancel</button></DialogClose>
+            <button onClick={handleSave} disabled={saving || uploading} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest">
+              {uploading ? 'Uploading...' : saving ? 'Saving...' : 'Save Trader'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Simulate Trades Modal */}
+      <Dialog open={isSimulateOpen} onOpenChange={setIsSimulateOpen}>
+        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>Simulate Trades for {simTrader?.name}</DialogTitle>
+            <DialogDescription className="text-gray-400">Generate fake trading activity to update PnL and stats.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Days to simulate</label>
+              <input type="number" min="1" max="30" value={simDays} onChange={e => setSimDays(Number(e.target.value))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+            </div>
+            
+            {simResult && (
+              <div className="bg-[#070b14] p-4 rounded-sm border border-white/5 space-y-2">
+                <h4 className="text-[12px] uppercase tracking-widest text-[#c9a84c] font-bold mb-2">Simulation Results</h4>
+                <div className="flex justify-between text-sm"><span className="text-gray-400">Trades Executed:</span> <span>{simResult.trades}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-gray-400">PnL Change:</span> <span className={simResult.pnl >= 0 ? 'text-[#00d4aa]' : 'text-red-400'}>{simResult.pnl >= 0 ? '+' : ''}${simResult.pnl.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-gray-400">New Win Rate:</span> <span>{simResult.winRate.toFixed(2)}%</span></div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <DialogClose asChild><button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm text-[12px] uppercase tracking-widest">Close</button></DialogClose>
+            <button onClick={runSimulation} disabled={simulating} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest">
+              {simulating ? 'Running...' : 'Run Simulation'}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Followers Modal */}
+      <Dialog open={isFollowersOpen} onOpenChange={setIsFollowersOpen}>
+        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Followers</DialogTitle>
+            <DialogDescription className="text-gray-400">Users actively copying this trader.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {loadingFollowers ? (
+              <div className="text-center py-8 text-gray-500">Loading...</div>
+            ) : selectedTraderFollowers.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No active followers.</div>
+            ) : (
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-white/5 text-[11px] text-gray-500 uppercase tracking-widest">
+                    <th className="pb-2 font-semibold">User</th>
+                    <th className="pb-2 font-semibold">Copy Amount</th>
+                    <th className="pb-2 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {selectedTraderFollowers.map((f: any, i: number) => (
+                    <tr key={i}>
+                      <td className="py-3 text-[13px]">{f.profiles?.email || 'Unknown User'}</td>
+                      <td className="py-3 text-[13px] font-mono">${f.amount}</td>
+                      <td className="py-3"><span className="bg-[#00d4aa]/10 text-[#00d4aa] px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-widest font-bold">{f.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function TraderCard({ trader, onEdit, onDelete, onToggle, onSimulate, onFollowers }: { trader: MasterTrader; onEdit: () => void; onDelete: () => void; onToggle: () => void; onSimulate: () => void; onFollowers: () => void; }) {
+  return (
+    <div className={`bg-[#0a0f1c] border ${trader.is_active ? 'border-[#c9a84c]/30' : 'border-white/5'} rounded-sm p-5 relative`}>
+      <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-widest ${trader.is_active ? 'bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}>
+        {trader.is_active ? 'Active' : 'Inactive'}
+      </div>
+
+      <div className="flex items-center gap-4 mb-4">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-[#070b14] border border-white/10 flex items-center justify-center shrink-0">
+          {trader.avatar_url ? <img src={trader.avatar_url} alt={trader.name} className="w-full h-full object-cover" /> : <Users className="w-6 h-6 text-gray-600" />}
+        </div>
+        <div>
+          <h3 className="text-white font-['Outfit'] font-semibold text-lg leading-none">{trader.name}</h3>
+          <div className="text-[12px] text-gray-500 mt-1">{trader.followers_count} Followers</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
+          <div className="text-white font-mono font-bold text-sm">{trader.win_rate.toFixed(1)}%</div>
+          <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Win Rate</div>
+        </div>
+        <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
+          <div className="text-[#00d4aa] font-mono font-bold text-sm">+{trader.roi.toFixed(1)}%</div>
+          <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">ROI</div>
+        </div>
+        <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
+          <div className={`font-mono font-bold text-sm ${trader.total_pnl >= 0 ? 'text-[#00d4aa]' : 'text-red-400'}`}>${trader.total_pnl.toLocaleString()}</div>
+          <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Total PnL</div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        <button onClick={onSimulate} className="flex-1 py-2 bg-[#c9a84c]/10 hover:bg-[#c9a84c]/20 text-[#c9a84c] rounded-sm text-[10px] uppercase tracking-widest font-bold transition-colors">Simulate Trades</button>
+        <button onClick={onFollowers} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-sm text-[10px] uppercase tracking-widest font-bold transition-colors">View Followers</button>
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={onEdit} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-sm text-[11px] uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-1.5"><Edit className="w-3.5 h-3.5" /> Edit</button>
+        <button onClick={onToggle} className={`p-2 rounded-sm transition-colors ${trader.is_active ? 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400' : 'bg-[#00d4aa]/10 hover:bg-[#00d4aa]/20 text-[#00d4aa]'}`}><Power className="w-4 h-4" /></button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild><button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded-sm transition-colors"><Trash2 className="w-4 h-4" /></button></AlertDialogTrigger>
+          <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+            <AlertDialogHeader><AlertDialogTitle>Delete {trader.name}?</AlertDialogTitle><AlertDialogDescription className="text-gray-400">This will permanently remove this copy trader profile.</AlertDialogDescription></AlertDialogHeader>
+            <AlertDialogFooter><AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-red-600 text-white hover:bg-red-700">Delete</AlertDialogAction></AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

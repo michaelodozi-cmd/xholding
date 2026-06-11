@@ -97,6 +97,12 @@ export function useTransactionStore() {
     if (error) {
       console.error('Error adding transaction:', error);
       fetchTransactions();
+    } else if (tx.type === 'withdrawal') {
+      // Immediately deduct balance for pending withdrawal to prevent double spending
+      await supabase.rpc('increment_balance', {
+        p_user_id: user.id,
+        p_amount: -Number(tx.amount)
+      });
     }
   };
 
@@ -114,19 +120,21 @@ export function useTransactionStore() {
       return;
     }
 
-    if (status === 'approved') {
-      const amountToAdd = tx.type === 'deposit' 
-        ? (usdValue !== undefined ? Number(usdValue) : Number(tx.amount)) 
-        : -Number(tx.amount);
-
+    if (status === 'approved' && tx.type === 'deposit') {
+      // Credit balance only for approved deposits (withdrawals are deducted on creation)
+      const amountToAdd = usdValue !== undefined ? Number(usdValue) : Number(tx.amount);
       const { error: rpcError } = await supabase.rpc('increment_balance', {
         p_user_id: tx.userId,
         p_amount: amountToAdd
       });
-
-      if (rpcError) {
-        console.error('Error incrementing balance:', rpcError);
-      }
+      if (rpcError) console.error('Error incrementing balance:', rpcError);
+    } else if (status === 'rejected' && tx.type === 'withdrawal') {
+      // Refund balance if withdrawal is rejected by admin
+      const { error: rpcError } = await supabase.rpc('increment_balance', {
+        p_user_id: tx.userId,
+        p_amount: Number(tx.amount)
+      });
+      if (rpcError) console.error('Error refunding balance:', rpcError);
     }
   };
 

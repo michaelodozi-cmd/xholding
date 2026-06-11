@@ -47,44 +47,81 @@ function Dashboard() {
   const [settings, setSettings] = useState<any>(null);
 
   useEffect(() => {
+    let profileChannel: any = null;
+
     const fetchProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        const { data: appSettings } = await supabase.from('platform_settings').select('*').eq('id', 1).single();
-        
-        if (data?.role !== 'admin' && appSettings?.maintenance_mode) {
-          await supabase.auth.signOut();
-          navigate({ to: "/login" });
-          return;
-        }
-
-        if (data) setProfile(data);
-        if (appSettings) setSettings(appSettings);
-
-        // Register background push subscription after profile loads
-        registerPushSubscription();
+      if (!user) {
+        navigate({ to: "/login" });
+        return;
       }
+
+      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      const { data: appSettings } = await supabase.from('platform_settings').select('*').eq('id', 1).single();
+      
+      if (data?.role !== 'admin' && appSettings?.maintenance_mode) {
+        await supabase.auth.signOut();
+        navigate({ to: "/login" });
+        return;
+      }
+
+      if (data) setProfile(data);
+      if (appSettings) setSettings(appSettings);
+
+      // Register background push subscription after profile loads
+      registerPushSubscription();
+
+      // Setup Realtime listener for this user's profile to instantly reflect balance changes
+      profileChannel = supabase
+        .channel(`profile_changes_${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+          (payload) => {
+            setProfile(payload.new);
+          }
+        )
+        .subscribe();
     };
     fetchProfile();
+
+    return () => {
+      if (profileChannel) supabase.removeChannel(profileChannel);
+    };
   }, [navigate]);
 
   const { transactions } = useTransactionStore();
   // Track previous statuses so we only fire once per change
   const prevStatuses = useRef<Record<string, string>>({});
+  // Whether we have seeded the initial snapshot (prevents firing on first load)
+  const isSeeded = useRef(false);
 
-  // Request OS notification permission on first load
+  // Request OS notification permission on first load — do it proactively
   useEffect(() => {
-    requestNotificationPermission();
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
   }, []);
 
-  // Watch for transaction status changes and fire push notifications
+  // Watch for transaction status changes and fire browser notifications
   useEffect(() => {
+    if (transactions.length === 0) return;
+
+    if (!isSeeded.current) {
+      // First time: just snapshot current statuses, don't fire anything
+      transactions.forEach(tx => {
+        prevStatuses.current[tx.id] = tx.status;
+      });
+      isSeeded.current = true;
+      return;
+    }
+
+    // Subsequent updates: detect genuine changes and notify
     transactions.forEach(tx => {
       const prev = prevStatuses.current[tx.id];
       const curr = tx.status;
-      if (prev && prev !== curr) {
-        const amt = Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+      if (prev !== undefined && prev !== curr) {
+        const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         const asset = tx.asset || '';
         if (tx.type === 'deposit') {
           if (curr === 'approved') notifyDepositApproved(amt, asset);
@@ -158,7 +195,7 @@ function Dashboard() {
 
         {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} profile={profile} />}
         {activeTab === 'invest' && <InvestTab profile={profile} />}
-        {activeTab === 'copytrade' && <CopyTradeTab />}
+        {activeTab === 'copytrade' && <CopyTradeTab profile={profile} />}
         {activeTab === 'wallet' && <WalletTab profile={profile} settings={settings} />}
         {activeTab === 'rewards' && <RewardsTab profile={profile} />}
         {activeTab === 'profile' && <ProfileTab profile={profile} />}
@@ -201,19 +238,237 @@ function Dashboard() {
   );
 }
 
-function CopyTradeTab() {
+function CopyTradeTab({ profile }: { profile?: any }) {
+  const [traders, setTraders] = useState<any[]>([]);
+  const [mySubs, setMySubs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [copying, setCopying] = useState(false);
+  const [selectedTrader, setSelectedTrader] = useState<any>(null);
+  const [amount, setAmount] = useState<number | ''>('');
+  const [alertState, setAlertState] = useState({ open: false, title: '', message: '' });
+
+  const fetchCopyData = async () => {
+    if (!profile) return;
+    setLoading(true);
+    const { data: t } = await supabase.from('master_traders').select('*').eq('is_active', true);
+    setTraders(t || []);
+    
+    const { data: s } = await supabase.from('copy_trading_subscriptions')
+      .select('*, master_traders(*)')
+      .eq('user_id', profile.id)
+      .eq('status', 'active');
+    setMySubs(s || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchCopyData();
+  }, [profile]);
+
+  const showAlert = (title: string, message: string) => {
+    setAlertState({ open: true, title, message });
+  };
+
+  const handleCopy = async () => {
+    if (!selectedTrader || !amount || amount <= 0) return;
+    if (amount > (profile?.balance || 0)) {
+      showAlert("Insufficient Funds", "You do not have enough available balance to copy this trader.");
+      return;
+    }
+    
+    setCopying(true);
+    
+    // Deduct balance securely
+    const { error: rpcError } = await supabase.rpc('increment_balance', {
+      p_user_id: profile.id,
+      p_amount: -Number(amount)
+    });
+    
+    if (rpcError) {
+      showAlert("Error", "Could not process transaction. Please try again.");
+      setCopying(false);
+      return;
+    }
+
+    // Insert subscription
+    const { error: insertError } = await supabase.from('copy_trading_subscriptions').insert({
+      user_id: profile.id,
+      master_trader_id: selectedTrader.id,
+      amount: Number(amount),
+      status: 'active'
+    });
+
+    if (insertError) {
+      // Refund if error
+      await supabase.rpc('increment_balance', { p_user_id: profile.id, p_amount: Number(amount) });
+      showAlert("Error", "Could not start copy trading. Your funds have been refunded.");
+    } else {
+      await supabase.from('master_traders').update({ followers_count: selectedTrader.followers_count + 1 }).eq('id', selectedTrader.id);
+      showAlert("Success!", `You are now successfully copying ${selectedTrader.name}!`);
+      setSelectedTrader(null);
+      setAmount('');
+      fetchCopyData();
+      if (profile) profile.balance = Number(profile.balance) - Number(amount);
+    }
+    setCopying(false);
+  };
+
+  if (loading) {
+    return <div className="py-20 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">Loading Copy Trading...</div>;
+  }
+
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <div className="w-20 h-20 bg-[#c9a84c]/10 rounded-full flex items-center justify-center mb-6 border border-[#c9a84c]/20">
-        <Users className="w-10 h-10 text-[#c9a84c]" />
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto">
+      <AlertDialog open={alertState.open} onOpenChange={(open) => setAlertState(prev => ({ ...prev, open }))}>
+        <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertState.title}</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">{alertState.message}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setAlertState(prev => ({ ...prev, open: false }))} className="bg-[#c9a84c] text-[#070b14] hover:bg-[#b89945]">
+              Okay
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="mb-8 mt-4 md:mt-10">
+        <h1 className="text-3xl text-white font-['Outfit'] font-light mb-2">Copy Trading</h1>
+        <p className="text-gray-400 text-[13px]">Automatically mirror the trades of our top-performing algorithmic portfolios and expert traders.</p>
       </div>
-      <h1 className="text-3xl text-white font-['Outfit'] mb-4">Copy Trading</h1>
-      <p className="text-gray-400 max-w-md mx-auto mb-8 leading-relaxed">
-        Automatically mirror the trades of our top-performing algorithmic portfolios and expert traders.
-      </p>
-      <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#00d4aa]/10 border border-[#00d4aa]/20 rounded-full text-[11px] text-[#00d4aa] font-bold uppercase tracking-widest">
-        <Rocket className="w-3 h-3" /> Coming Soon
+
+      {mySubs.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-sm text-white font-bold uppercase tracking-widest mb-4">Your Active Copies</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mySubs.map(sub => (
+              <div key={sub.id} className="p-5 bg-gradient-to-br from-[#0a0f1c] to-[#070b14] border border-[#00d4aa]/30 rounded-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[#00d4aa]/10 blur-xl rounded-full" />
+                <div className="flex justify-between items-start mb-4 relative z-10">
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-widest mb-1">Copying</div>
+                    <div className="text-lg text-white font-['Outfit']">{sub.master_traders?.name || 'Unknown'}</div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full bg-[#00d4aa]/10 flex items-center justify-center border border-[#00d4aa]/20">
+                    <Activity className="w-5 h-5 text-[#00d4aa]" />
+                  </div>
+                </div>
+                <div className="flex justify-between items-end relative z-10">
+                  <div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Invested Amount</div>
+                    <div className="text-xl text-white font-mono">${Number(sub.amount).toLocaleString()}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-[#00d4aa] uppercase tracking-widest font-bold">Active</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h2 className="text-sm text-white font-bold uppercase tracking-widest mb-4">Top Master Traders</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {traders.length === 0 ? (
+          <div className="col-span-full py-12 text-center text-gray-500 border border-white/5 bg-[#0a0f1c] rounded-sm">No master traders available at the moment.</div>
+        ) : (
+          traders.map(trader => (
+            <div key={trader.id} className="bg-[#0a0f1c] border border-white/5 rounded-sm overflow-hidden flex flex-col group hover:border-[#c9a84c]/30 transition-colors">
+              <div className="p-6 flex-grow">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                      {trader.avatar_url ? <img src={trader.avatar_url} alt={trader.name} className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-gray-400" />}
+                    </div>
+                    <div>
+                      <h3 className="text-lg text-white font-['Outfit'] font-semibold leading-tight">{trader.name}</h3>
+                      <div className="text-[11px] text-gray-500 uppercase tracking-widest mt-1">{trader.followers_count} Followers</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <p className="text-[13px] text-gray-400 leading-relaxed mb-6 line-clamp-2 min-h-[40px]">
+                  {trader.description || 'Professional quantitative trader.'}
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 p-3 bg-[#070b14] border border-white/5 rounded-sm">
+                  <div className="text-center border-r border-white/5">
+                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Win Rate</div>
+                    <div className="text-[15px] text-white font-['Outfit'] font-semibold">{Number(trader.win_rate).toFixed(1)}%</div>
+                  </div>
+                  <div className="text-center border-r border-white/5">
+                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">Total PnL</div>
+                    <div className="text-[15px] text-[#00d4aa] font-['Outfit'] font-semibold">+${Number(trader.total_pnl).toLocaleString()}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[9px] text-gray-500 uppercase tracking-widest mb-1">ROI</div>
+                    <div className="text-[15px] text-[#c9a84c] font-['Outfit'] font-semibold">+{Number(trader.roi).toFixed(1)}%</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 border-t border-white/5 bg-white/[0.01]">
+                <button 
+                  onClick={() => setSelectedTrader(trader)}
+                  className="w-full py-3 bg-white/5 hover:bg-[#c9a84c] text-white hover:text-[#070b14] transition-colors rounded-sm text-[12px] uppercase tracking-widest font-bold"
+                >
+                  Copy Trader
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
+
+      <Dialog open={!!selectedTrader} onOpenChange={(open) => !open && setSelectedTrader(null)}>
+        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white sm:max-w-md">
+          {selectedTrader && (
+            <>
+              <div className="py-6">
+                <div className="flex flex-col items-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-white/5 border border-[#c9a84c]/30 flex items-center justify-center mb-4 overflow-hidden">
+                    {selectedTrader.avatar_url ? <img src={selectedTrader.avatar_url} alt={selectedTrader.name} className="w-full h-full object-cover" /> : <Users className="w-7 h-7 text-[#c9a84c]" />}
+                  </div>
+                  <h2 className="text-2xl text-white font-['Outfit']">{selectedTrader.name}</h2>
+                  <div className="text-[11px] text-[#00d4aa] uppercase tracking-widest font-bold mt-1">Win Rate: {Number(selectedTrader.win_rate).toFixed(1)}%</div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold">Copy Amount (USD)</label>
+                      <span className="text-[11px] text-gray-500">Available: ${Number(profile?.balance || 0).toLocaleString()}</span>
+                    </div>
+                    <input 
+                      type="number" 
+                      value={amount}
+                      onChange={(e) => setAmount(Number(e.target.value))}
+                      placeholder="0.00" 
+                      className="w-full bg-[#070b14] border border-white/10 text-white p-4 rounded-sm focus:outline-none focus:border-[#c9a84c]/50 transition-colors text-xl font-['Outfit']"
+                    />
+                  </div>
+
+                  <div className="p-4 bg-white/5 border border-[#c9a84c]/20 rounded-sm text-[12px] text-gray-400 leading-relaxed">
+                    By copying this trader, your portfolio will automatically mirror their market positions. The amount you specify will be dedicated to their strategy. You can withdraw your copy funds at any time.
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <button onClick={() => setSelectedTrader(null)} className="flex-1 py-3 bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-sm uppercase tracking-widest text-xs font-bold transition-colors">
+                  Cancel
+                </button>
+                <button disabled={copying} onClick={handleCopy} className="flex-1 py-3 bg-[#c9a84c] text-[#070b14] hover:bg-[#b59640] rounded-sm uppercase tracking-widest text-xs font-bold transition-colors">
+                  {copying ? 'Processing...' : 'Confirm Copy'}
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
@@ -227,7 +482,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
   const userTransactions = [...transactions].sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
   
   const roiEarned = investments.reduce((acc, inv) => {
-    const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
+    const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
     return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
   }, 0);
   const activePlans = investments.filter(inv => inv.status === 'active').length;
@@ -727,7 +982,8 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   const usdValue = selectedPrice ? amountNum * selectedPrice : null;
 
   const roiEarned = investments.reduce((acc, inv) => {
-    const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
+    // Floor the days passed to prevent the balance from artificially 'counting up' in real-time
+    const daysPassed = Math.floor((Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24));
     return acc + (inv.amount * inv.daily_roi * Math.max(0, daysPassed));
   }, 0);
   const totalBalance = Number(profile?.balance || 0) + roiEarned + Number(profile?.total_earned_referrals || 0);
@@ -783,12 +1039,19 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
     const sym = selectedCryptoData?.symbol?.toUpperCase() || '';
     const livePrice = cryptoPrices[sym];
     const cryptoAmt = parseFloat(amount);
+    
+    if (!livePrice && sym !== 'USDT' && sym !== 'USDC') {
+      showModal("Network Error", "Unable to securely fetch live crypto prices. Please wait a few seconds and try again, or use a stablecoin.", 'error');
+      setDepositLoading(false);
+      return;
+    }
+
     const usdAmount = livePrice ? cryptoAmt * livePrice : cryptoAmt;
 
     await addTransaction({
       type: 'deposit',
       amount: usdAmount,
-      asset: selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase(),
+      asset: `(${cryptoAmt} ${selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase()})`,
       txid,
       screenshotUrl
     } as any);
@@ -809,22 +1072,36 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       showModal("Missing Information", "Please enter both the amount and your receiving wallet address.", 'error');
       return;
     }
-    const numAmount = parseFloat(amount);
-    if (numAmount > totalBalance) {
-      showModal("Insufficient Funds", "You do not have enough available balance for this withdrawal request.", 'error');
+    
+    const sym = selectedCryptoData?.symbol?.toUpperCase() || '';
+    const livePrice = cryptoPrices[sym];
+    const cryptoAmt = parseFloat(amount);
+    
+    if (!livePrice && sym !== 'USDT' && sym !== 'USDC') {
+      showModal("Network Error", "Unable to securely fetch live crypto prices. Please wait a few seconds and try again, or use a stablecoin.", 'error');
       return;
     }
+
+    const usdAmount = livePrice ? cryptoAmt * livePrice : cryptoAmt;
+
+    if (usdAmount > totalBalance) {
+      showModal("Insufficient Funds", `You do not have enough available balance for this withdrawal. (${cryptoAmt} ${sym} ≈ $${usdAmount.toLocaleString(undefined, {maximumFractionDigits: 2})})`, 'error');
+      return;
+    }
+    
     setWithdrawLoading(true);
     await addTransaction({
       type: 'withdrawal',
-      amount: numAmount,
-      asset: selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase(),
+      amount: usdAmount,
+      asset: `(${cryptoAmt} ${selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase()})`,
       txid: withdrawAddress
     });
     setWithdrawLoading(false);
     setAmount('');
     setWithdrawAddress('');
-    showModal("Withdrawal Requested!", `Your withdrawal of $${numAmount.toLocaleString()} in ${selectedCryptoData?.symbol || 'crypto'} has been submitted and is pending approval. You'll be notified once it's processed.`, 'withdrawal');
+    
+    const usdNote = livePrice ? ` (~$${usdAmount.toLocaleString(undefined, {maximumFractionDigits: 2})})` : '';
+    showModal("Withdrawal Requested!", `Your withdrawal of ${cryptoAmt} ${sym}${usdNote} has been submitted and is pending approval. You'll be notified once it's processed.`, 'withdrawal');
   };
 
   return (
@@ -1031,8 +1308,25 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
 
             <div className="space-y-6 mb-8">
               <div>
-                <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Amount ($)</label>
-                <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount" className="w-full bg-[#070b14] border border-white/10 text-white p-3 rounded-sm focus:outline-none focus:border-[#00d4aa]/50" />
+                <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Amount ({selectedSymbol || 'Crypto'})</label>
+                <div className="relative">
+                  <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 0.5" className="w-full bg-[#070b14] border border-white/10 text-white p-3 rounded-sm focus:outline-none focus:border-[#00d4aa]/50 pr-16" />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-500 font-bold">{selectedSymbol}</span>
+                </div>
+                {amountNum > 0 && (
+                  <div className="mt-1.5 flex items-center gap-1">
+                    {pricesLoading ? (
+                      <span className="text-[11px] text-gray-600">Fetching price...</span>
+                    ) : usdValue ? (
+                      <span className="text-[12px] text-[#00d4aa] font-semibold">≈ ${usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} USD</span>
+                    ) : (
+                      <span className="text-[11px] text-gray-500">Price unavailable</span>
+                    )}
+                    {selectedPrice && !pricesLoading && (
+                      <span className="text-[10px] text-gray-600 ml-1">· 1 {selectedSymbol} = ${selectedPrice.toLocaleString()}</span>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="text-[11px] text-gray-400 uppercase tracking-widest mb-2 block">Withdrawal Method</label>
