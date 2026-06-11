@@ -133,6 +133,7 @@ function AdminDashboard() {
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'transactions' && <TransactionsTab />}
+        {activeTab === 'balance_ops' && <BalanceOpsTab />}
         {activeTab === 'wallets' && <WalletsTab />}
         {activeTab === 'plans' && <PlansTab />}
         {activeTab === 'copy_trading' && <CopyTradingTab />}
