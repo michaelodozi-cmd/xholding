@@ -110,6 +110,7 @@ function AdminDashboard() {
           <TabButton active={activeTab === 'balance_ops'} onClick={() => {setActiveTab('balance_ops'); setIsMobileMenuOpen(false);}} icon={Sliders} label="Balance Ops" />
           <TabButton active={activeTab === 'wallets'} onClick={() => {setActiveTab('wallets'); setIsMobileMenuOpen(false);}} icon={Wallet} label="Platform Wallets" />
           <TabButton active={activeTab === 'plans'} onClick={() => {setActiveTab('plans'); setIsMobileMenuOpen(false);}} icon={TrendingUp} label="Investment Plans" />
+          <TabButton active={activeTab === 'user_plans'} onClick={() => {setActiveTab('user_plans'); setIsMobileMenuOpen(false);}} icon={Users} label="Manage User Plans" />
           <TabButton active={activeTab === 'copy_trading'} onClick={() => {setActiveTab('copy_trading'); setIsMobileMenuOpen(false);}} icon={Copy} label="Copy Trading" />
           <TabButton active={activeTab === 'security'} onClick={() => {setActiveTab('security'); setIsMobileMenuOpen(false);}} icon={ShieldAlert} label="Security logs" />
         </div>
