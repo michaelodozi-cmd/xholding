@@ -4,10 +4,11 @@ import { supabase } from "../lib/supabase";
 import { 
   Users, DollarSign, Wallet, ShieldAlert, CheckCircle, XCircle, 
   Trash2, Ban, Edit, Settings, Activity, Search, Power, Clock,
-  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu, Copy
+  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu, Copy, Sliders
 } from "lucide-react";
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
+import BalanceOpsTab from "../components/admin/BalanceOpsTab";
 import {
   AlertDialog,
   AlertDialogAction,
