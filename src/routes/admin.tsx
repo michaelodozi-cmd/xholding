@@ -4,10 +4,11 @@ import { supabase } from "../lib/supabase";
 import { 
   Users, DollarSign, Wallet, ShieldAlert, CheckCircle, XCircle, 
   Trash2, Ban, Edit, Settings, Activity, Search, Power, Clock,
-  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu, Copy
+  TrendingUp, Plus, ImageIcon, ToggleLeft, ToggleRight, Eye, X as XIcon, Menu, Copy, Sliders
 } from "lucide-react";
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
+import BalanceOpsTab from "../components/admin/BalanceOpsTab";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -105,6 +106,7 @@ function AdminDashboard() {
           <TabButton active={activeTab === 'overview'} onClick={() => {setActiveTab('overview'); setIsMobileMenuOpen(false);}} icon={Activity} label="Overview" />
           <TabButton active={activeTab === 'users'} onClick={() => {setActiveTab('users'); setIsMobileMenuOpen(false);}} icon={Users} label="Manage Users" />
           <TabButton active={activeTab === 'transactions'} onClick={() => {setActiveTab('transactions'); setIsMobileMenuOpen(false);}} icon={DollarSign} label="Transactions" />
+          <TabButton active={activeTab === 'balance_ops'} onClick={() => {setActiveTab('balance_ops'); setIsMobileMenuOpen(false);}} icon={Sliders} label="Balance Ops" />
           <TabButton active={activeTab === 'wallets'} onClick={() => {setActiveTab('wallets'); setIsMobileMenuOpen(false);}} icon={Wallet} label="Platform Wallets" />
           <TabButton active={activeTab === 'plans'} onClick={() => {setActiveTab('plans'); setIsMobileMenuOpen(false);}} icon={TrendingUp} label="Investment Plans" />
           <TabButton active={activeTab === 'copy_trading'} onClick={() => {setActiveTab('copy_trading'); setIsMobileMenuOpen(false);}} icon={Copy} label="Copy Trading" />
@@ -131,6 +133,7 @@ function AdminDashboard() {
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'transactions' && <TransactionsTab />}
+        {activeTab === 'balance_ops' && <BalanceOpsTab />}
         {activeTab === 'wallets' && <WalletsTab />}
         {activeTab === 'plans' && <PlansTab />}
         {activeTab === 'copy_trading' && <CopyTradingTab />}
