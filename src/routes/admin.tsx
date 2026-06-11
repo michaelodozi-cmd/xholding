@@ -138,6 +138,7 @@ function AdminDashboard() {
         {activeTab === 'balance_ops' && <BalanceOpsTab />}
         {activeTab === 'wallets' && <WalletsTab />}
         {activeTab === 'plans' && <PlansTab />}
+        {activeTab === 'user_plans' && <UserPlansTab />}
         {activeTab === 'copy_trading' && <CopyTradingTab />}
         {activeTab === 'security' && <SecurityTab />}
       </main>
