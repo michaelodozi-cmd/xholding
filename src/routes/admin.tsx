@@ -9,6 +9,7 @@ import {
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
 import BalanceOpsTab from "../components/admin/BalanceOpsTab";
+import UserPlansTab from "../components/admin/UserPlansTab";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -109,6 +110,7 @@ function AdminDashboard() {
           <TabButton active={activeTab === 'balance_ops'} onClick={() => {setActiveTab('balance_ops'); setIsMobileMenuOpen(false);}} icon={Sliders} label="Balance Ops" />
           <TabButton active={activeTab === 'wallets'} onClick={() => {setActiveTab('wallets'); setIsMobileMenuOpen(false);}} icon={Wallet} label="Platform Wallets" />
           <TabButton active={activeTab === 'plans'} onClick={() => {setActiveTab('plans'); setIsMobileMenuOpen(false);}} icon={TrendingUp} label="Investment Plans" />
+          <TabButton active={activeTab === 'user_plans'} onClick={() => {setActiveTab('user_plans'); setIsMobileMenuOpen(false);}} icon={Users} label="Manage User Plans" />
           <TabButton active={activeTab === 'copy_trading'} onClick={() => {setActiveTab('copy_trading'); setIsMobileMenuOpen(false);}} icon={Copy} label="Copy Trading" />
           <TabButton active={activeTab === 'security'} onClick={() => {setActiveTab('security'); setIsMobileMenuOpen(false);}} icon={ShieldAlert} label="Security logs" />
         </div>
@@ -136,6 +138,7 @@ function AdminDashboard() {
         {activeTab === 'balance_ops' && <BalanceOpsTab />}
         {activeTab === 'wallets' && <WalletsTab />}
         {activeTab === 'plans' && <PlansTab />}
+        {activeTab === 'user_plans' && <UserPlansTab />}
         {activeTab === 'copy_trading' && <CopyTradingTab />}
         {activeTab === 'security' && <SecurityTab />}
       </main>
