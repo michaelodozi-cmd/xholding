@@ -213,21 +213,22 @@ function Landing() {
       </section>
 
       {/* TRADE WITH CONFIDENCE */}
+      {/* ALGORITHMIC COPY TRADING */}
       <section className="py-24 lg:py-32 bg-[#020605]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Trade With<br/>XHoldings</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Master Your<br/>Portfolio</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Buy, sell, and convert BTC, ETH, USDT, and 70+ digital assets with the best global rates on XHoldings, a platform trusted by over a million users.
+              Mirror the strategies of elite master traders and automate your market positions on XHoldings' secure, institutional-grade platform.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Trade anytime on XHoldings</span>
+                <span className="text-sm font-medium text-white">Verified algorithmic strategies</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Robust compliance and regulatory oversight</span>
+                <span className="text-sm font-medium text-white">Real-time execution & transparency</span>
               </div>
             </div>
           </div>
@@ -239,21 +240,21 @@ function Landing() {
                   <div className="w-6 h-6 rounded-full border border-black/20 flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-black/60"></div>
                   </div>
-                  <h3 className="text-xl font-bold">Buy, Sell & Convert Instantly</h3>
+                  <h3 className="text-xl font-bold">Automate Your Strategy</h3>
                 </div>
                 <p className="text-black/80 font-medium">
-                  Trade dozens of top cryptocurrencies on XHoldings with new listings added regularly.
+                  Mirror top algorithmic traders with proven win rates to capture market alpha effortlessly on XHoldings.
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
-                <h4 className="font-semibold">Automate Your Strategy</h4>
+                <h4 className="font-semibold">Institutional-Grade Execution</h4>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
-                <h4 className="font-semibold">Instant Wallet Funding & Payouts</h4>
+                <h4 className="font-semibold">Transparent Performance Tracking</h4>
               </div>
             </div>
             <div className="relative rounded-3xl overflow-hidden min-h-[400px] border border-white/10 group">
-              <img src="/assets/images/trade_with_confidence.png" alt="Trade with confidence" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <img src="/assets/images/trade_with_confidence.png" alt="Automate your portfolio" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-black/20"></div>
               {/* Glass UI overlay */}
               <div className="absolute top-1/2 -translate-y-1/2 left-8 bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-[200px] shadow-2xl">
@@ -262,19 +263,19 @@ function Landing() {
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                       <span className="text-xl leading-none mb-1">+</span>
                     </div>
-                    <span className="font-semibold">Buy</span>
+                    <span className="font-semibold">Subscribe</span>
                   </div>
                   <div className="flex items-center gap-4 text-white hover:text-red-400 transition-colors cursor-pointer">
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                       <span className="text-xl leading-none mb-1">-</span>
                     </div>
-                    <span className="font-semibold">Sell</span>
+                    <span className="font-semibold">Unsubscribe</span>
                   </div>
                   <div className="flex items-center gap-4 text-white hover:text-[#c9a84c] transition-colors cursor-pointer">
                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                     </div>
-                    <span className="font-semibold">Convert</span>
+                    <span className="font-semibold">Performance</span>
                   </div>
                 </div>
               </div>
@@ -289,16 +290,16 @@ function Landing() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Grow Your Wealth<br/>With XHoldings</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Manage and deploy your digital assets on XHoldings, including optional earn features and collateral-based liquidity solutions provided through licensed partners.
+              Deploy your digital assets into high-yield structured plans designed to provide consistent daily returns and preserve capital on XHoldings.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Earn daily interest on your XHoldings savings</span>
+                <span className="text-sm font-medium text-white">Earn daily ROI on structured plans</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Licensed & secure infrastructure</span>
+                <span className="text-sm font-medium text-white">Institutional security & asset custody</span>
               </div>
             </div>
           </div>
@@ -310,7 +311,7 @@ function Landing() {
               {/* Glass UI overlay */}
               <div className="absolute top-1/2 -translate-y-1/2 right-8 bg-black/40 backdrop-blur-xl border border-[#c9a84c]/30 rounded-3xl p-8 w-[240px] shadow-2xl flex flex-col items-center justify-center">
                 <div className="text-[40px] font-bold text-white mb-1 tracking-tight leading-none">1,980</div>
-                <div className="text-white/60 text-sm font-medium mb-10">USDC</div>
+                <div className="text-white/60 text-sm font-medium mb-10">USDT Yield</div>
                 
                 <div className="w-full text-center space-y-3 mt-4 border-t border-white/10 pt-8">
                   <div className="text-white/80 text-sm">Matures in 6 months</div>
@@ -325,14 +326,14 @@ function Landing() {
                   <div className="w-6 h-6 rounded-full border border-black/20 flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-black/60"></div>
                   </div>
-                  <h3 className="text-xl font-bold">Earn up to 18% annual interest</h3>
+                  <h3 className="text-xl font-bold">Consistent Daily Passive Returns</h3>
                 </div>
                 <p className="text-black/80 font-medium">
-                  Optional yield opportunities available on eligible digital assets with risks disclosed and no guaranteed returns.
+                  Institutional yield opportunities available on XHoldings with fully transparent performance metrics and real-time tracking.
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
-                <h4 className="font-semibold">Borrow without selling</h4>
+                <h4 className="font-semibold">Flexible Maturation Periods</h4>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
                 <h4 className="font-semibold">Full Control, Anytime</h4>
