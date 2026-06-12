@@ -153,87 +153,190 @@
  * component code, functionality, colors, branding, or content.
  * ========================================================================= */
 
-/* Page surface: deep black with a soft warm vignette behind content. */
+/* Page surface — deep night with cinematic gold/mint vignette. */
 .bg-black {
-  background-color: #000;
+  background-color: #04070d;
   background-image:
-    radial-gradient(1100px 600px at 12% -10%, rgba(201, 168, 76, 0.06), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(0, 212, 170, 0.04), transparent 60%);
+    radial-gradient(1200px 700px at 8% -10%, rgba(201, 168, 76, 0.10), transparent 55%),
+    radial-gradient(900px 600px at 110% 5%, rgba(0, 212, 170, 0.06), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(201, 168, 76, 0.05), transparent 60%);
   background-attachment: fixed;
 }
 
-/* Card surfaces — softer gradient, refined border, larger radius, subtle depth. */
+/* === RADII OVERHAUL — promote tiny corners to confident pill/card radii. */
+.rounded-sm { border-radius: 18px !important; }
+.rounded-md { border-radius: 20px !important; }
+.rounded-lg { border-radius: 22px !important; }
+.rounded-xl { border-radius: 26px !important; }
+.rounded-2xl { border-radius: 28px !important; }
+.rounded-full { border-radius: 9999px !important; }
+
+/* === CARD SURFACES — bigger radius, layered gradient, ambient drop. */
 .bg-\[\#0a0f1c\],
-.bg-\[\#070b14\] {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
-  border-radius: 16px !important;
-  border-color: rgba(255, 255, 255, 0.06) !important;
+.bg-\[\#070b14\],
+.bg-gradient-to-br.from-\[\#0a0f1c\] {
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(201, 168, 76, 0.025), rgba(0, 0, 0, 0) 80%);
+  background-color: #0c1220 !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.03) inset,
-    0 10px 30px -18px rgba(0, 0, 0, 0.8);
-  transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 60px -36px rgba(0, 0, 0, 0.9),
+    0 8px 24px -16px rgba(0, 0, 0, 0.6);
+  transition: border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
 }
 
 .bg-\[\#0a0f1c\].hover\:bg-white\/5:hover,
 .bg-\[\#070b14\].hover\:bg-white\/5:hover {
-  border-color: rgba(201, 168, 76, 0.25) !important;
+  border-color: rgba(201, 168, 76, 0.32) !important;
+  transform: translateY(-1px);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 18px 40px -22px rgba(0, 0, 0, 0.9);
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 28px 70px -30px rgba(201, 168, 76, 0.18),
+    0 12px 32px -18px rgba(0, 0, 0, 0.85);
 }
 
-/* Premium gold accents — gradient text on the brand color. */
+/* Nested inner surfaces — quieter. */
+.bg-\[\#0a0f1c\] .bg-\[\#070b14\],
+.bg-\[\#0a0f1c\] .bg-black\/40,
+.bg-\[\#070b14\] .bg-black\/40 {
+  box-shadow: none !important;
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  border-radius: 16px !important;
+}
+
+/* === TYPOGRAPHY — dramatic display hierarchy ============================ */
+h1, h2, h3, h4 { letter-spacing: -0.022em; }
+h1 { font-weight: 600 !important; }
+
+.text-2xl { font-size: 1.9rem !important; line-height: 1.15 !important; letter-spacing: -0.025em; }
+.text-3xl { font-size: 2.4rem !important; line-height: 1.1 !important; letter-spacing: -0.03em; }
+.text-4xl { font-size: 3rem !important;   line-height: 1.05 !important; letter-spacing: -0.035em; }
+.text-5xl { font-size: 3.6rem !important; line-height: 1 !important;    letter-spacing: -0.04em; }
+@media (min-width: 768px) {
+  .md\:text-5xl { font-size: 4.4rem !important; letter-spacing: -0.045em; }
+  .md\:p-8 { padding: 2.5rem !important; }
+  .p-5 { padding: 1.75rem !important; }
+  .p-6 { padding: 2rem !important; }
+}
+
+.uppercase.tracking-widest {
+  letter-spacing: 0.18em !important;
+  font-weight: 700 !important;
+}
+
+/* === GOLD + MINT ACCENTS =============================================== */
 .text-\[\#c9a84c\] {
-  background: linear-gradient(135deg, #e8c96a 0%, #c9a84c 60%, #b89945 100%);
+  background: linear-gradient(135deg, #f0d27a 0%, #d4b25a 45%, #b8923e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-/* Gold filled surfaces pick up a soft glow. */
 .bg-\[\#c9a84c\] {
-  background-image: linear-gradient(135deg, #e8c96a 0%, #c9a84c 55%, #b89945 100%);
-  box-shadow: 0 8px 28px -10px rgba(201, 168, 76, 0.55);
+  background-image: linear-gradient(135deg, #ecc468 0%, #c9a84c 55%, #a98735 100%);
+  box-shadow:
+    0 10px 32px -10px rgba(201, 168, 76, 0.55),
+    inset 0 0 0 1px rgba(255, 220, 140, 0.25);
 }
 .bg-\[\#c9a84c\]:hover {
-  box-shadow: 0 10px 34px -8px rgba(201, 168, 76, 0.75);
+  box-shadow:
+    0 14px 40px -10px rgba(201, 168, 76, 0.75),
+    inset 0 0 0 1px rgba(255, 220, 140, 0.35);
 }
-
-/* Mint/success accent — subtle glow on filled chips. */
 .bg-\[\#00d4aa\] {
-  box-shadow: 0 6px 24px -10px rgba(0, 212, 170, 0.55);
+  background-image: linear-gradient(135deg, #2ce8bf 0%, #00d4aa 60%, #009d80 100%);
+  box-shadow: 0 10px 32px -10px rgba(0, 212, 170, 0.6);
 }
 
-/* Inputs (bg-black/40 pattern) — softer radius + refined focus ring. */
+/* === INPUTS =========================================================== */
 .bg-black\/40 {
-  border-radius: 12px !important;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  border-radius: 14px !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
 .bg-black\/40:focus,
 .bg-black\/40:focus-within {
-  border-color: rgba(201, 168, 76, 0.45) !important;
-  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1);
+  border-color: rgba(201, 168, 76, 0.55) !important;
+  box-shadow: 0 0 0 5px rgba(201, 168, 76, 0.12);
+  background-color: rgba(0, 0, 0, 0.55) !important;
   outline: none;
 }
 
-/* Fixed bottom nav — glassy backdrop. */
+/* === BOTTOM NAV — premium glass tab bar =============================== */
 .fixed.bottom-0 {
-  backdrop-filter: blur(20px) saturate(140%);
-  background-color: rgba(7, 11, 20, 0.78) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  background-color: rgba(8, 12, 22, 0.72) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 -16px 40px -20px rgba(0, 0, 0, 0.6);
+  padding-top: 0.5rem;
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
-/* Headings — tighter tracking for the Outfit display font. */
-h1, h2, h3 {
-  letter-spacing: -0.015em;
+/* Sidebar */
+aside.bg-\[\#0a0f1c\] {
+  background-image: linear-gradient(180deg, rgba(201, 168, 76, 0.04), rgba(0, 0, 0, 0) 50%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+aside button[class*="rounded-sm"],
+aside a[class*="rounded-sm"] {
+  border-radius: 14px !important;
+  padding-top: 0.7rem !important;
+  padding-bottom: 0.7rem !important;
 }
 
-/* Slim, on-brand scrollbar. */
+/* === HERO BALANCE CARD — aurora wash =================================== */
+.lg\:col-span-8.bg-\[\#0a0f1c\] {
+  background-image:
+    radial-gradient(420px 280px at 88% -10%, rgba(201, 168, 76, 0.22), transparent 60%),
+    radial-gradient(360px 240px at -5% 110%, rgba(0, 212, 170, 0.12), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 60%);
+  background-color: #0d1424 !important;
+  border-radius: 28px !important;
+  border-color: rgba(201, 168, 76, 0.14) !important;
+}
+
+/* === BUTTONS — premium pill tap targets =============================== */
+button.bg-\[\#c9a84c\],
+a.bg-\[\#c9a84c\] {
+  border-radius: 9999px !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hover\:bg-white\/5:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+
+/* === DIALOGS ========================================================== */
+[role="dialog"] > div { border-radius: 24px !important; }
+
+/* === TABLES — premium density ========================================= */
+table { border-collapse: separate; border-spacing: 0; }
+thead th {
+  font-size: 11px !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: rgba(255, 255, 255, 0.45);
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+tbody tr { transition: background-color 160ms ease; }
+tbody tr:hover { background-color: rgba(255, 255, 255, 0.025); }
+tbody td { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+
+.divide-white\/5 > * + * { border-color: rgba(255, 255, 255, 0.05) !important; }
+
+span.uppercase.tracking-widest,
+div.uppercase.tracking-widest { font-size: 10px !important; }
+
+/* === SCROLLBAR ======================================================== */
 *::-webkit-scrollbar { width: 8px; height: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-*::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.35); }
+*::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.4); }
+
 
