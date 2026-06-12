@@ -221,7 +221,7 @@ function Dashboard() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-[1400px] mx-auto px-4 py-4 md:px-10 md:py-8 relative z-10 w-full flex-1 min-h-screen">
+      <main className="w-full mx-auto px-4 py-4 md:px-10 md:py-8 relative z-10 flex-1 min-h-screen">
         
         {/* Top Header Desktop */}
         <header className="hidden md:flex items-center justify-end gap-4 mb-8">
@@ -360,7 +360,7 @@ function CopyTradeTab({ profile }: { profile?: any }) {
   }
 
   return (
-    <div className="max-w-[1000px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6 flex flex-col gap-6">
+    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6 flex flex-col gap-6">
       <AlertDialog open={alertState.open} onOpenChange={(open) => setAlertState(prev => ({ ...prev, open }))}>
         <AlertDialogContent className="bg-[#131714] border border-white/5 text-white rounded-3xl">
           <AlertDialogHeader>
@@ -431,7 +431,7 @@ function CopyTradeTab({ profile }: { profile?: any }) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
           {traders.length === 0 ? (
             <div className="col-span-full py-12 text-center text-gray-500 border border-white/5 bg-[#131714] rounded-2xl">No master traders available at the moment.</div>
           ) : (
@@ -603,7 +603,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
             </div>
           </div>
           
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center flex-wrap gap-3 sm:gap-6">
             <button className="flex flex-col items-center gap-2.5 group" onClick={() => setActiveTab('invest')}>
               <div className="w-14 h-14 rounded-full bg-[#13c74b] flex items-center justify-center group-hover:scale-105 transition-transform">
                 <ArrowUpRight className="w-6 h-6 text-black" />
@@ -649,7 +649,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
         </div>
 
         {/* Tabs & Assets List */}
-        <div className="p-6 md:p-8">
+        <div className="p-6 md:p-8 overflow-x-auto">
           <div className="bg-[#0a0e0b] rounded-full p-1.5 flex mb-8 max-w-[400px]">
             <button className="flex-1 py-2.5 bg-[#1a221d] text-[#13c74b] font-bold rounded-full text-[14px]">
               Cash
@@ -659,7 +659,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
             </button>
           </div>
 
-          <table className="w-full text-left">
+          <table className="w-full text-left min-w-[600px]">
             <thead>
               <tr className="text-gray-400 text-[13px]">
                 <th className="pb-4 font-normal px-4">Account</th>
@@ -769,7 +769,7 @@ function InvestTab({ profile }: { profile?: any }) {
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6 flex flex-col gap-6">
+    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6 flex flex-col gap-6">
       <AlertDialog open={alertState.open} onOpenChange={(open) => setAlertState(prev => ({ ...prev, open }))}>
         <AlertDialogContent className="bg-[#131714] border border-white/5 text-white rounded-3xl">
           <AlertDialogHeader>
@@ -849,7 +849,7 @@ function InvestTab({ profile }: { profile?: any }) {
       {investments.length > 0 && (
         <div className="mt-8">
           <h2 className="text-xl md:text-2xl text-white font-bold mb-6">Active Investments</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {investments.map((inv, idx) => {
               const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
               const validDays = Math.max(0, Math.min(daysPassed, inv.duration_days || 60));
@@ -1188,7 +1188,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   };
 
   return (
-    <div className="max-w-[800px] mx-auto w-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="w-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
       {/* Rich Deposit/Withdrawal Success Modal */}
       <Dialog open={alertState.open} onOpenChange={(open) => setAlertState(prev => ({ ...prev, open }))}>
@@ -1448,7 +1448,7 @@ function ProfileTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
   ];
 
   return (
-    <div className="max-w-[1100px] mx-auto w-full flex flex-col md:flex-row gap-8 lg:gap-12 animate-in fade-in duration-500 py-6">
+    <div className="w-full flex flex-col md:flex-row gap-8 lg:gap-12 animate-in fade-in duration-500 py-6">
       
       {/* Settings Sidebar */}
       <div className="w-full md:w-64 shrink-0 flex flex-col gap-2">
@@ -1689,7 +1689,7 @@ function RewardsTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6 flex flex-col gap-6">
+    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6 flex flex-col gap-6">
       
       {/* Top Section */}
       <div className="flex items-center gap-4 mb-2">
@@ -2045,10 +2045,10 @@ function TransactionsTab({ profile }: { profile?: any }) {
   };
   
   return (
-    <div className="max-w-[1000px] mx-auto w-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6">
+    <div className="w-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 py-4 md:py-6">
       
       {/* Search and Filters Bar */}
-      <div className="flex items-center gap-3 w-full">
+      <div className="flex flex-wrap items-center gap-3 w-full">
         <div className="flex-1 relative">
           <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input 

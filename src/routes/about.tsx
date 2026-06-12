@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldCheck, Zap, Target, Briefcase, Users, Wallet } from "lucide-react";
+import { ShieldCheck, Zap, Target, Briefcase, Users, Wallet, Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute("/about")({
@@ -8,6 +8,7 @@ export const Route = createFileRoute("/about")({
 
 function About() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -47,7 +48,35 @@ function About() {
               </button>
             </Link>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button className="lg:hidden text-white p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden absolute top-full left-0 w-full bg-[#020605] border-b border-white/5 flex flex-col p-6 shadow-2xl h-screen">
+            <div className="flex flex-col gap-6 text-lg font-medium">
+              <Link to="/personal" onClick={() => setMobileMenuOpen(false)} className="border-b border-white/10 pb-4">Personal</Link>
+              <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="border-b border-white/10 pb-4 text-[#12b744]">About</Link>
+              <Link to="/company" onClick={() => setMobileMenuOpen(false)} className="border-b border-white/10 pb-4">Company</Link>
+            </div>
+            <div className="flex flex-col gap-4 mt-8">
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full rounded-xl py-6 text-lg border border-white/20 text-white hover:bg-white/5">
+                  Log in
+                </button>
+              </Link>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full bg-[#12b744] hover:bg-[#10a13c] text-black rounded-xl py-6 text-lg font-bold flex items-center justify-center gap-2">
+                  Get Started <ArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Introduction Section */}

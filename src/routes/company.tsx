@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, ChevronRight, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronRight, ShieldCheck, Zap, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export const Route = createFileRoute("/company")({
@@ -8,6 +8,7 @@ export const Route = createFileRoute("/company")({
 
 function Company() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -47,7 +48,35 @@ function Company() {
               </button>
             </Link>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button className="lg:hidden text-white p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden absolute top-full left-0 w-full bg-[#020605] border-b border-white/5 flex flex-col p-6 shadow-2xl h-screen">
+            <div className="flex flex-col gap-6 text-lg font-medium">
+              <Link to="/personal" onClick={() => setMobileMenuOpen(false)} className="border-b border-white/10 pb-4">Personal</Link>
+              <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="border-b border-white/10 pb-4">About</Link>
+              <Link to="/company" onClick={() => setMobileMenuOpen(false)} className="border-b border-white/10 pb-4 text-[#12b744]">Company</Link>
+            </div>
+            <div className="flex flex-col gap-4 mt-8">
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full rounded-xl py-6 text-lg border border-white/20 text-white hover:bg-white/5">
+                  Log in
+                </button>
+              </Link>
+              <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                <button className="w-full bg-[#12b744] hover:bg-[#10a13c] text-black rounded-xl py-6 text-lg font-bold flex items-center justify-center gap-2">
+                  Get Started <ArrowRight className="w-5 h-5" />
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -163,17 +192,17 @@ function Company() {
             </div>
 
             {/* Glowing Phone Mockup Card */}
-            <div className="bg-[#0b100d] rounded-[40px] p-10 border border-white/5 relative h-[500px] flex items-center justify-center overflow-hidden">
+            <div className="bg-[#0b100d] rounded-[40px] p-6 md:p-10 border border-white/5 relative h-[500px] flex items-center justify-center overflow-hidden">
                <div className="absolute w-[400px] h-[400px] border border-[#12b744]/20 rounded-full" />
                <div className="absolute w-[600px] h-[600px] border border-[#12b744]/10 rounded-full" />
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#12b744]/20 blur-[100px] rounded-full" />
                
                {/* Phone UI Placeholder */}
-               <div className="w-[280px] h-[580px] bg-[#020605] border border-white/20 rounded-[40px] shadow-2xl relative z-10 flex flex-col p-6 mt-20">
+               <div className="w-full max-w-[280px] h-[580px] bg-[#020605] border border-white/20 rounded-[40px] shadow-2xl relative z-10 flex flex-col p-6 mt-20 shrink-0">
                   <div className="w-12 h-1 bg-gray-800 rounded-full mx-auto mb-8" />
                   <div className="text-center mb-8">
                     <p className="text-gray-500 text-sm mb-1">Total Balance</p>
-                    <h3 className="text-4xl font-bold">$428,500.00</h3>
+                    <h3 className="text-[32px] sm:text-4xl font-bold break-words leading-tight">$428,500.00</h3>
                   </div>
                   <div className="space-y-4">
                     <div className="h-16 bg-linear-to-r from-[#12b744]/10 to-transparent border border-[#12b744]/20 rounded-2xl flex items-center px-4 justify-between">
@@ -207,15 +236,15 @@ function Company() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="grid md:grid-cols-2 gap-8 items-center">
              {/* Glowing Phone Mockup Card (Left Side this time) */}
-             <div className="bg-[#0b100d] rounded-[40px] p-10 border border-white/5 relative h-[500px] flex items-center justify-center overflow-hidden order-2 md:order-1">
+             <div className="bg-[#0b100d] rounded-[40px] p-6 md:p-10 border border-white/5 relative h-[500px] flex items-center justify-center overflow-hidden order-2 md:order-1">
                <div className="absolute w-[400px] h-[400px] border border-[#12b744]/20 rounded-full" />
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#12b744]/20 blur-[100px] rounded-full" />
                
-               <div className="w-[280px] h-[580px] bg-[#020605] border border-[#12b744]/30 rounded-[40px] shadow-[0_0_50px_rgba(18,183,68,0.2)] relative z-10 flex flex-col p-6 mt-20">
+               <div className="w-full max-w-[280px] h-[580px] bg-[#020605] border border-[#12b744]/30 rounded-[40px] shadow-[0_0_50px_rgba(18,183,68,0.2)] relative z-10 flex flex-col p-6 mt-20 shrink-0">
                   <div className="w-12 h-1 bg-gray-800 rounded-full mx-auto mb-8" />
                   <div className="text-center mb-8">
                     <p className="text-gray-500 text-sm mb-1">Status</p>
-                    <h3 className="text-2xl font-bold text-[#12b744]">Withdrawal Approved</h3>
+                    <h3 className="text-[22px] sm:text-2xl font-bold text-[#12b744]">Withdrawal Approved</h3>
                   </div>
                   <div className="space-y-4">
                     <div className="p-4 bg-white/5 rounded-xl border border-white/10 text-center">
