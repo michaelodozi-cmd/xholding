@@ -51,7 +51,7 @@ function About() {
       </nav>
 
       {/* Introduction Section */}
-      <section className="pt-32 pb-40 px-6 md:px-8 relative bg-white text-black overflow-hidden">
+      <section className="pt-32 pb-64 px-6 md:px-8 relative bg-white text-black overflow-hidden">
         <div className="absolute bottom-0 left-0 w-full h-[150px] bg-[#0c1e11] transform origin-bottom-left -skew-y-2"></div>
         <div className="max-w-[1300px] mx-auto grid md:grid-cols-2 gap-16 relative z-10 pt-16">
           <div>
