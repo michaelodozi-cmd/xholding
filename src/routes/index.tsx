@@ -212,120 +212,130 @@ function Landing() {
         </div>
       </section>
 
-      {/* Feature 1: Trade / Invest */}
+      {/* TRADE WITH CONFIDENCE */}
       <section className="py-24 lg:py-32 bg-[#020605]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">Invest & Copy Top Traders</h2>
-            <p className="text-gray-400 text-lg">Deploy your capital into high-yield structured plans and mirror the strategies of elite algorithmic traders automatically.</p>
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Trade With<br/>Confidence</h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Buy, sell, and convert BTC, ETH, USDT, and 70+ digital assets with the best local rates and a platform trusted by over a million users.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
+                <span className="text-sm font-medium text-white">Trade anytime</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
+                <span className="text-sm font-medium text-white">Robust compliance and regulatory oversight</span>
+              </div>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-[#0a0f0d] rounded-[32px] p-8 border border-white/5 hover:border-white/10 transition-colors group">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <BarChart3 className="w-6 h-6 text-white" />
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch h-full">
+            <div className="flex flex-col gap-4">
+              <div className="bg-[#c9a84c] text-black rounded-3xl p-8 shadow-xl flex-grow min-h-[260px]">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-6 h-6 rounded-full border border-black/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-black/60"></div>
+                  </div>
+                  <h3 className="text-xl font-bold">Buy, Sell & Convert Instantly</h3>
+                </div>
+                <p className="text-black/80 font-medium">
+                  Trade dozens of top cryptocurrencies with new listings added regularly.
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Daily ROI Investments</h3>
-              <p className="text-gray-400 font-light leading-relaxed">
-                Deploy your capital into structured investment plans and earn daily passive returns with full transparency and real-time tracking.
-              </p>
+              <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
+                <h4 className="font-semibold">Automate Your Strategy</h4>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
+                <h4 className="font-semibold">Instant Wallet Funding & Payouts</h4>
+              </div>
             </div>
-            
-            <div className="bg-[#0a0f0d] rounded-[32px] p-8 border border-white/5 hover:border-white/10 transition-colors group">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Wallet className="w-6 h-6 text-white" />
+            <div className="relative rounded-3xl overflow-hidden min-h-[400px] border border-white/10 group">
+              <img src="/assets/images/trade_with_confidence.png" alt="Trade with confidence" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-black/20"></div>
+              {/* Glass UI overlay */}
+              <div className="absolute top-1/2 -translate-y-1/2 left-8 bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-[200px] shadow-2xl">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 text-white hover:text-[#12b744] transition-colors cursor-pointer">
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                      <span className="text-xl leading-none mb-1">+</span>
+                    </div>
+                    <span className="font-semibold">Buy</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-white hover:text-red-400 transition-colors cursor-pointer">
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                      <span className="text-xl leading-none mb-1">-</span>
+                    </div>
+                    <span className="font-semibold">Sell</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-white hover:text-[#c9a84c] transition-colors cursor-pointer">
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    </div>
+                    <span className="font-semibold">Convert</span>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Instant Deposits & Payouts</h3>
-              <p className="text-gray-400 font-light leading-relaxed">
-                Seamlessly fund your account with crypto and request withdrawals that are processed directly and securely to your wallet.
-              </p>
-            </div>
-
-            <div className="bg-[#0a0f0d] rounded-[32px] p-8 border border-white/5 hover:border-white/10 transition-colors group">
-              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-3 text-white">Premium Copy Trading</h3>
-              <p className="text-gray-400 font-light leading-relaxed">
-                Experience the most convenient platform for mirroring expert algorithmic traders, capturing their win rates, and earning passive income.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Feature 2: Grow Your Wealth */}
+      {/* GROW YOUR WEALTH */}
       <section className="py-24 lg:py-32 bg-[#000000]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#12b744]/10 text-[#12b744] text-sm font-semibold mb-6">
-                <Landmark className="w-4 h-4" /> Yield & Copying
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Grow Your<br/>Wealth</h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Manage and deploy your digital assets, including optional earn features and collateral-based liquidity solutions provided through licensed partners
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
+                <span className="text-sm font-medium text-white">Earn daily interest on your savings</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white">
-                Build Your Wealth
-              </h2>
-              <p className="text-gray-400 text-lg mb-10 font-light">
-                Deploy your digital assets into high-yield algorithmic plans and mirror top-performing master traders to grow your portfolio effortlessly.
-              </p>
-              
-              <div className="space-y-8">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 shrink-0 rounded-[20px] bg-white/5 flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold mb-1 text-white">Earn daily ROI on investments</h4>
-                    <p className="text-gray-400 text-sm leading-relaxed">Multiple structured plans designed to provide consistent daily returns on your digital assets.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 shrink-0 rounded-[20px] bg-white/5 flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold mb-1 text-white">Algorithmic Copy Trading</h4>
-                    <p className="text-gray-400 text-sm leading-relaxed">Subscribe to top master traders and automatically mirror their market positions and proven win rates.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 shrink-0 rounded-[20px] bg-white/5 flex items-center justify-center">
-                    <ShieldCheck className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold mb-1 text-white">Full Control, Anytime</h4>
-                    <p className="text-gray-400 text-sm leading-relaxed">Track your live portfolio, view active investment progress, and manage your assets through a single dashboard.</p>
-                  </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
+                <span className="text-sm font-medium text-white">Licensed & secure</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch h-full">
+            <div className="relative rounded-3xl overflow-hidden min-h-[400px] border border-white/10 order-2 lg:order-1 group">
+              <img src="/assets/images/grow_your_wealth.png" alt="Grow your wealth" className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-black/10"></div>
+              {/* Glass UI overlay */}
+              <div className="absolute top-1/2 -translate-y-1/2 right-8 bg-black/40 backdrop-blur-xl border border-[#c9a84c]/30 rounded-3xl p-8 w-[240px] shadow-2xl flex flex-col items-center justify-center">
+                <div className="text-[40px] font-bold text-white mb-1 tracking-tight leading-none">1,980</div>
+                <div className="text-white/60 text-sm font-medium mb-10">USDC</div>
+                
+                <div className="w-full text-center space-y-3 mt-4 border-t border-white/10 pt-8">
+                  <div className="text-white/80 text-sm">Matures in 6 months</div>
+                  <div className="text-[#c9a84c] text-sm font-semibold">25% per annum</div>
                 </div>
               </div>
             </div>
-            
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#12b744]/20 to-transparent blur-[100px] rounded-full" />
-              <div className="relative bg-[#0a0f0d] rounded-[32px] border border-white/10 p-8 shadow-2xl">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <div className="text-gray-400 text-sm mb-1">Investment Portfolio</div>
-                    <div className="text-3xl font-bold text-white">$45,250.00</div>
-                  </div>
-                  <div className="px-4 py-2 rounded-full bg-green-500/10 text-[#12b744] font-semibold text-sm">
-                    +3.2% Daily
-                  </div>
-                </div>
-                
-                {/* Chart Mockup */}
-                <div className="h-40 w-full border-b border-white/10 relative flex items-end mb-8 pb-4">
-                  <svg viewBox="0 0 100 40" className="w-full h-full stroke-[#12b744] stroke-[2] fill-none preserve-3d">
-                    <path d="M0 40 Q 20 30, 40 35 T 80 15 T 100 0" />
-                  </svg>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#12b744]/20 to-transparent mix-blend-screen pointer-events-none" style={{ clipPath: 'path("M0 40 Q 20 30, 40 35 T 80 15 T 100 0 L 100 40 L 0 40 Z")' }}></div>
-                </div>
 
-                <Link to={LOGIN}>
-                  <Button className="w-full bg-white text-black hover:bg-gray-200 rounded-xl py-6 font-semibold">
-                    Start Investing
-                  </Button>
-                </Link>
+            <div className="flex flex-col gap-4 order-1 lg:order-2">
+              <div className="bg-[#c9a84c] text-black rounded-3xl p-8 shadow-xl flex-grow min-h-[260px]">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-6 h-6 rounded-full border border-black/20 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-black/60"></div>
+                  </div>
+                  <h3 className="text-xl font-bold">Earn up to 18% annual interest</h3>
+                </div>
+                <p className="text-black/80 font-medium">
+                  Optional yield opportunities available on eligible digital assets with risks disclosed and no guaranteed returns.
+                </p>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
+                <h4 className="font-semibold">Borrow without selling</h4>
+              </div>
+              <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
+                <h4 className="font-semibold">Full Control, Anytime</h4>
               </div>
             </div>
           </div>
