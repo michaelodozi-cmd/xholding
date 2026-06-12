@@ -140,5 +140,100 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
+
+/* =========================================================================
+ * Authenticated UI polish — premium fintech feel inspired by reference set.
+ * Scoped to the exact arbitrary Tailwind hex classes already used by
+ * dashboard.tsx and admin.tsx so we elevate visuals WITHOUT touching
+ * component code, functionality, colors, branding, or content.
+ * ========================================================================= */
+
+/* Page surface: deep black with a soft warm vignette behind content. */
+.bg-black {
+  background-color: #000;
+  background-image:
+    radial-gradient(1100px 600px at 12% -10%, rgba(201, 168, 76, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(0, 212, 170, 0.04), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Card surfaces — softer gradient, refined border, larger radius, subtle depth. */
+.bg-\[\#0a0f1c\],
+.bg-\[\#070b14\] {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0));
+  border-radius: 16px !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.03) inset,
+    0 10px 30px -18px rgba(0, 0, 0, 0.8);
+  transition: border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+
+.bg-\[\#0a0f1c\].hover\:bg-white\/5:hover,
+.bg-\[\#070b14\].hover\:bg-white\/5:hover {
+  border-color: rgba(201, 168, 76, 0.25) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 18px 40px -22px rgba(0, 0, 0, 0.9);
+}
+
+/* Premium gold accents — gradient text on the brand color. */
+.text-\[\#c9a84c\] {
+  background: linear-gradient(135deg, #e8c96a 0%, #c9a84c 60%, #b89945 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gold filled surfaces pick up a soft glow. */
+.bg-\[\#c9a84c\] {
+  background-image: linear-gradient(135deg, #e8c96a 0%, #c9a84c 55%, #b89945 100%);
+  box-shadow: 0 8px 28px -10px rgba(201, 168, 76, 0.55);
+}
+.bg-\[\#c9a84c\]:hover {
+  box-shadow: 0 10px 34px -8px rgba(201, 168, 76, 0.75);
+}
+
+/* Mint/success accent — subtle glow on filled chips. */
+.bg-\[\#00d4aa\] {
+  box-shadow: 0 6px 24px -10px rgba(0, 212, 170, 0.55);
+}
+
+/* Inputs (bg-black/40 pattern) — softer radius + refined focus ring. */
+.bg-black\/40 {
+  border-radius: 12px !important;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.bg-black\/40:focus,
+.bg-black\/40:focus-within {
+  border-color: rgba(201, 168, 76, 0.45) !important;
+  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1);
+  outline: none;
+}
+
+/* Fixed bottom nav — glassy backdrop. */
+.fixed.bottom-0 {
+  backdrop-filter: blur(20px) saturate(140%);
+  background-color: rgba(7, 11, 20, 0.78) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Headings — tighter tracking for the Outfit display font. */
+h1, h2, h3 {
+  letter-spacing: -0.015em;
+}
+
+/* Slim, on-brand scrollbar. */
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.35); }
+
