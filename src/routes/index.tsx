@@ -132,7 +132,7 @@ function Landing() {
           </p>
 
           {/* Cards Row Container */}
-          <div className="w-full max-w-[1100px] flex gap-4 md:gap-6 justify-center items-end h-[280px]">
+          <div className="w-full max-w-[1100px] hidden md:flex gap-4 md:gap-6 justify-center items-end h-[280px]">
             
             {/* Card 1: Large Green */}
             <div className="bg-[#12b744] rounded-[32px] p-8 w-[320px] h-full flex flex-col justify-between shadow-2xl relative overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
