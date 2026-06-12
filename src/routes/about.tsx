@@ -198,7 +198,7 @@ function About() {
       </section>
 
       {/* Dark Footer */}
-      <footer className="pt-20 pb-10 bg-[#000] border-t border-white/5 relative z-10">
+      <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
             <p>© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>

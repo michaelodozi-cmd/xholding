@@ -124,7 +124,7 @@ function Landing() {
         <div className="max-w-[1000px] mx-auto px-6 md:px-8 relative z-10 text-center flex flex-col items-center w-full">
           
           {/* Main Headline & Subhead */}
-          <h1 className="text-[56px] md:text-[72px] lg:text-[84px] font-bold tracking-tight leading-[1] mb-8 font-['Inter'] uppercase">
+          <h1 className="text-[56px] md:text-[72px] lg:text-[84px] font-bold tracking-tight leading-none mb-8 font-['Inter'] uppercase">
             XHOLDINGS IS YOUR<br/>PRIVATE WEALTH APP
           </h1>
           <p className="text-[17px] md:text-[20px] text-gray-300 mb-20 max-w-2xl font-medium leading-relaxed">
@@ -235,7 +235,7 @@ function Landing() {
 
           <div className="grid lg:grid-cols-2 gap-8 items-stretch h-full">
             <div className="flex flex-col gap-4">
-              <div className="bg-[#c9a84c] text-black rounded-3xl p-8 shadow-xl flex-grow min-h-[260px]">
+              <div className="bg-[#c9a84c] text-black rounded-3xl p-8 shadow-xl grow min-h-[260px]">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-6 h-6 rounded-full border border-black/20 flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-black/60"></div>
@@ -321,7 +321,7 @@ function Landing() {
             </div>
 
             <div className="flex flex-col gap-4 order-1 lg:order-2">
-              <div className="bg-[#c9a84c] text-black rounded-3xl p-8 shadow-xl flex-grow min-h-[260px]">
+              <div className="bg-[#c9a84c] text-black rounded-3xl p-8 shadow-xl grow min-h-[260px]">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-6 h-6 rounded-full border border-black/20 flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-black/60"></div>

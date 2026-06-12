@@ -103,7 +103,7 @@ function AdminDashboard() {
           <div className="w-8 h-8 bg-red-600/20 border border-red-500/50 flex items-center justify-center font-bold text-red-500 font-['Outfit'] text-sm">A</div>
           <span className="font-light text-xl tracking-[0.15em] text-white font-['Outfit'] uppercase">SuperAdmin</span>
         </Link>
-        <div className="flex flex-col gap-2 flex-grow mt-4 lg:mt-0">
+        <div className="flex flex-col gap-2 grow mt-4 lg:mt-0">
           <TabButton active={activeTab === 'overview'} onClick={() => {setActiveTab('overview'); setIsMobileMenuOpen(false);}} icon={Activity} label="Overview" />
           <TabButton active={activeTab === 'users'} onClick={() => {setActiveTab('users'); setIsMobileMenuOpen(false);}} icon={Users} label="Manage Users" />
           <TabButton active={activeTab === 'transactions'} onClick={() => {setActiveTab('transactions'); setIsMobileMenuOpen(false);}} icon={DollarSign} label="Transactions" />
@@ -484,7 +484,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
             <TrendingUp className="w-10 h-10 text-gray-700" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1c] to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#0a0f1c] to-transparent" />
         {/* Active badge */}
         <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-widest ${plan.is_active ? 'bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}>
           {plan.is_active ? 'Active' : 'Inactive'}
@@ -672,7 +672,7 @@ function OverviewTab() {
                 <div className={`mt-[5px] w-2 h-2 rounded-full shrink-0 ${getDotColor(tx.status)}`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="text-[13px] text-gray-200 break-words">{getActivityLabel(tx)}</span>
+                    <span className="text-[13px] text-gray-200 wrap-break-word">{getActivityLabel(tx)}</span>
                     <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${getBadgeStyle(tx.status)}`}>
                       {tx.status}
                     </span>
@@ -892,7 +892,7 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
   };
 
   return (
-    <tr className="hover:bg-white/[0.02] transition-colors">
+    <tr className="hover:bg-white/2 transition-colors">
       <td className="p-3 sm:p-4 max-w-[160px]">
         <div className="text-[13px] text-white font-medium truncate">{name || '—'}</div>
         <div className="text-[11px] text-gray-500 truncate">{email}</div>
@@ -1162,7 +1162,7 @@ function TransactionCard({ tx }: { tx: any }) {
     {/* Screenshot Lightbox */}
     {lightboxOpen && tx.screenshotUrl && (
       <div
-        className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4"
+        className="fixed inset-0 z-200 bg-black/90 flex items-center justify-center p-4"
         onClick={() => setLightboxOpen(false)}
       >
         <button
@@ -1192,7 +1192,7 @@ function TransactionCard({ tx }: { tx: any }) {
             alt="Deposit proof screenshot"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-2 left-3 flex items-center gap-1.5 text-[10px] text-white/70 font-bold uppercase tracking-widest">
             <Eye className="w-3 h-3" /> Deposit Proof - Click to enlarge
           </div>
@@ -1223,7 +1223,7 @@ function TransactionCard({ tx }: { tx: any }) {
             </button>
           </DialogTrigger>
           <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white p-0 overflow-hidden max-w-md">
-            <div className="h-1.5 w-full bg-gradient-to-r from-[#00d4aa] to-[#00f5c8]" />
+            <div className="h-1.5 w-full bg-linear-to-r from-[#00d4aa] to-[#00f5c8]" />
             <div className="p-6">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 rounded-full bg-[#00d4aa]/15 flex items-center justify-center shrink-0">
@@ -1257,7 +1257,7 @@ function TransactionCard({ tx }: { tx: any }) {
               {/* Screenshot preview inside modal */}
               {tx.screenshotUrl && tx.type === 'deposit' && (
                 <div className="mb-5">
-                  <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 block flex items-center gap-1.5"><Eye className="w-3 h-3" /> Deposit Screenshot</label>
+                  <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 flex items-center gap-1.5"><Eye className="w-3 h-3" /> Deposit Screenshot</label>
                   <div
                     className="relative rounded-sm overflow-hidden cursor-pointer group border border-white/10"
                     onClick={() => setLightboxOpen(true)}

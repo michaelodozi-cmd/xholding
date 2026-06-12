@@ -54,12 +54,12 @@ function Company() {
       <section className="pt-40 pb-32 px-6 md:px-8 relative flex flex-col items-center text-center overflow-hidden min-h-[90vh]">
         
         {/* Giant Overlapping Circles Background */}
-        <div className="absolute top-[10%] right-[-15%] w-[800px] h-[800px] bg-[#020605] border-[2px] border-white/10 rounded-full pointer-events-none opacity-50 z-0" />
+        <div className="absolute top-[10%] right-[-15%] w-[800px] h-[800px] bg-[#020605] border-2 border-white/10 rounded-full pointer-events-none opacity-50 z-0" />
         
-        <div className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[1100px] h-[1100px] bg-gradient-to-b from-[#0a1e12] to-[#020605] border-[2px] border-[#12b744]/30 rounded-full pointer-events-none shadow-[inset_0_-80px_100px_rgba(18,183,68,0.15)] z-0" />
+        <div className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[1100px] h-[1100px] bg-linear-to-b from-[#0a1e12] to-[#020605] border-2 border-[#12b744]/30 rounded-full pointer-events-none shadow-[inset_0_-80px_100px_rgba(18,183,68,0.15)] z-0" />
         
-        <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#020605] border-[2px] border-white/10 rounded-full pointer-events-none opacity-80 z-0" />
-        <div className="absolute bottom-[0%] left-[5%] w-[400px] h-[400px] bg-[#020605] border-[2px] border-[#12b744]/20 rounded-full pointer-events-none z-0" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#020605] border-2 border-white/10 rounded-full pointer-events-none opacity-80 z-0" />
+        <div className="absolute bottom-[0%] left-[5%] w-[400px] h-[400px] bg-[#020605] border-2 border-[#12b744]/20 rounded-full pointer-events-none z-0" />
 
         <h1 className="text-[48px] md:text-[72px] font-bold tracking-tight leading-[1.1] mb-6 relative z-10 font-['Outfit'] uppercase max-w-4xl mx-auto">
           ACCESS THE WORLD <br/> THROUGH ONE PLATFORM
@@ -110,19 +110,19 @@ function Company() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="rounded-3xl overflow-hidden relative h-[400px] group">
               <img src="https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?q=80&w=2070&auto=format&fit=crop" alt="Personal Wealth" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
                 <h3 className="text-white text-2xl font-bold">Personal Wealth</h3>
               </div>
             </div>
             <div className="rounded-3xl overflow-hidden relative h-[400px] group">
               <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop" alt="Corporate Treasury" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
                 <h3 className="text-white text-2xl font-bold">Corporate Treasury</h3>
               </div>
             </div>
             <div className="rounded-3xl overflow-hidden relative h-[400px] group">
               <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop" alt="Private Equity" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
                 <h3 className="text-white text-2xl font-bold">Private Equity</h3>
               </div>
             </div>
@@ -176,7 +176,7 @@ function Company() {
                     <h3 className="text-4xl font-bold">$428,500.00</h3>
                   </div>
                   <div className="space-y-4">
-                    <div className="h-16 bg-gradient-to-r from-[#12b744]/10 to-transparent border border-[#12b744]/20 rounded-2xl flex items-center px-4 justify-between">
+                    <div className="h-16 bg-linear-to-r from-[#12b744]/10 to-transparent border border-[#12b744]/20 rounded-2xl flex items-center px-4 justify-between">
                        <span className="text-sm font-bold">Daily ROI</span>
                        <span className="text-[#12b744] font-bold">+$1,240.50</span>
                     </div>
@@ -353,7 +353,7 @@ function Company() {
       </section>
 
       {/* Dark Footer */}
-      <footer className="pt-20 pb-10 bg-[#000] border-t border-white/5 relative z-10">
+      <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
             <p>© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>

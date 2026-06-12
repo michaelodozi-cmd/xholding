@@ -230,7 +230,7 @@ export default function BalanceOpsTab() {
             </div>
           ) : (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-gradient-to-br from-[#0a0f1c] to-[#070b14] border border-[#00d4aa]/20 p-6 rounded-sm relative overflow-hidden">
+              <div className="bg-linear-to-br from-[#0a0f1c] to-[#070b14] border border-[#00d4aa]/20 p-6 rounded-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#00d4aa]/5 blur-2xl rounded-full" />
                 <div className="flex items-baseline justify-between mb-6 relative z-10">
                   <div>

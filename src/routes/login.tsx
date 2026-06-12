@@ -75,7 +75,7 @@ function Login() {
       {/* Header */}
       <header className="flex items-center justify-between p-6 md:px-8 absolute top-0 left-0 right-0 z-20">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-[4px] bg-transparent border-[2px] border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-[12px] rotate-45">
+          <div className="w-7 h-7 rounded-[4px] bg-transparent border-2 border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-[12px] rotate-45">
             <div className="-rotate-45">X</div>
           </div>
           <span className="font-semibold text-xl tracking-tight text-white font-['Outfit']">XHoldings</span>
@@ -134,7 +134,7 @@ function Login() {
                   type="checkbox" 
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="appearance-none w-[18px] h-[18px] border-[2px] border-[#12b744] rounded-[4px] bg-transparent cursor-pointer checked:bg-[#12b744] transition-colors peer" 
+                  className="appearance-none w-[18px] h-[18px] border-2 border-[#12b744] rounded-[4px] bg-transparent cursor-pointer checked:bg-[#12b744] transition-colors peer" 
                 />
                 <svg className="absolute w-[10px] h-[10px] text-black pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

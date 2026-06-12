@@ -277,7 +277,7 @@ function ArticlePage() {
         <div className="max-w-[1000px] mx-auto px-6">
           <div className="w-full h-[400px] md:h-[500px] relative overflow-hidden border border-white/5">
             <img src={article.image} alt={article.title} className="absolute inset-0 w-full h-full object-cover opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] to-transparent opacity-50 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-[#070b14] to-transparent opacity-50 pointer-events-none" />
           </div>
         </div>
       </section>

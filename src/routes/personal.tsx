@@ -123,7 +123,7 @@ function Personal() {
               {/* Floating UI Mockup */}
               <div className="absolute top-1/2 left-8 -translate-y-1/2 w-[220px] bg-black/40 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white shadow-2xl">
                 <div className="h-20 border-b border-white/10 mb-4 flex items-center justify-center">
-                   <svg viewBox="0 0 100 40" className="w-full h-full stroke-white stroke-[2] fill-none">
+                   <svg viewBox="0 0 100 40" className="w-full h-full stroke-white stroke-2 fill-none">
                      <path d="M0 20 Q 20 10, 40 25 T 80 15 T 100 5" />
                    </svg>
                 </div>
@@ -341,7 +341,7 @@ function Personal() {
       </section>
 
       {/* Dark Footer */}
-      <footer className="pt-20 pb-10 bg-[#000] border-t border-white/5 relative z-10">
+      <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
             <p>© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>

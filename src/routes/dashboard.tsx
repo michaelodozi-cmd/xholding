@@ -437,7 +437,7 @@ function CopyTradeTab({ profile }: { profile?: any }) {
           ) : (
             traders.map(trader => (
               <div key={trader.id} className="bg-[#131714] border border-white/5 rounded-2xl overflow-hidden flex flex-col group hover:border-[#13c74b]/30 transition-colors">
-                <div className="p-6 flex-grow">
+                <div className="p-6 grow">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
@@ -470,7 +470,7 @@ function CopyTradeTab({ profile }: { profile?: any }) {
                   </div>
                 </div>
                 
-                <div className="p-4 border-t border-white/5 bg-white/[0.01]">
+                <div className="p-4 border-t border-white/5 bg-white/1">
                   <button 
                     onClick={() => setSelectedTrader(trader)}
                     className="w-full py-3 bg-white/5 hover:bg-[#13c74b] text-white hover:text-black transition-colors rounded-full text-[13px] font-bold"
@@ -669,7 +669,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
               </tr>
             </thead>
             <tbody>
-              <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer group" onClick={() => setActiveTab('wallet')}>
+              <tr className="border-t border-white/5 hover:bg-white/2 transition-colors cursor-pointer group" onClick={() => setActiveTab('wallet')}>
                 <td className="py-5 px-4">
                   <div className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-full bg-[#13c74b] flex items-center justify-center text-black font-bold text-[14px]">
@@ -692,7 +692,7 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
                 </td>
               </tr>
               {totalInvested > 0 && (
-                <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors cursor-pointer group" onClick={() => setActiveTab('invest')}>
+                <tr className="border-t border-white/5 hover:bg-white/2 transition-colors cursor-pointer group" onClick={() => setActiveTab('invest')}>
                   <td className="py-5 px-4">
                     <div className="flex items-center gap-4">
                       <div className="w-11 h-11 rounded-full bg-[#13c74b]/20 flex items-center justify-center text-[#13c74b] font-bold text-[14px]">
@@ -898,10 +898,10 @@ function InvestTab({ profile }: { profile?: any }) {
                     {/* Progress Bar */}
                     <div className="w-full bg-[#131714] h-2 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-[#13c74b]/50 to-[#13c74b] rounded-full relative" 
+                        className="h-full bg-linear-to-r from-[#13c74b]/50 to-[#13c74b] rounded-full relative" 
                         style={{ width: `${progress}%` }}
                       >
-                        <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] animate-[shimmer_2s_linear_infinite]" />
+                        <div className="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%,transparent_100%)] bg-size-[20px_20px] animate-[shimmer_2s_linear_infinite]" />
                       </div>
                     </div>
                   </div>
@@ -1195,10 +1195,10 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
         <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white p-0 overflow-hidden max-w-md">
           {/* Colored top bar */}
           <div className={`h-1.5 w-full ${
-            alertState.type === 'deposit' ? 'bg-gradient-to-r from-[#c9a84c] to-[#f0d080]' :
-            alertState.type === 'withdrawal' ? 'bg-gradient-to-r from-[#00d4aa] to-[#00f5c8]' :
-            alertState.type === 'error' ? 'bg-gradient-to-r from-red-500 to-red-400' :
-            'bg-gradient-to-r from-white/20 to-white/10'
+            alertState.type === 'deposit' ? 'bg-linear-to-r from-[#c9a84c] to-[#f0d080]' :
+            alertState.type === 'withdrawal' ? 'bg-linear-to-r from-[#00d4aa] to-[#00f5c8]' :
+            alertState.type === 'error' ? 'bg-linear-to-r from-red-500 to-red-400' :
+            'bg-linear-to-r from-white/20 to-white/10'
           }`} />
 
           <div className="p-8">
@@ -1471,7 +1471,7 @@ function ProfileTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
                 className={`w-full flex items-center gap-4 px-4 py-3 rounded-full transition-colors text-left ${
                   isActive 
                     ? 'bg-white/10 text-white font-bold' 
-                    : 'text-gray-400 hover:text-white hover:bg-white/[0.02] font-medium'
+                    : 'text-gray-400 hover:text-white hover:bg-white/2 font-medium'
                 }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-400'}`} />
@@ -1736,7 +1736,7 @@ function RewardsTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
           </button>
         </div>
 
-        <div className="h-[1px] w-full bg-white/5 mb-6"></div>
+        <div className="h-px w-full bg-white/5 mb-6"></div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-start gap-3">
@@ -1946,7 +1946,7 @@ function NotificationBell({ transactions, hasFetched, align = 'right' }: { trans
           {/* Dropdown Panel */}
           <div className={`absolute top-14 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-[#06120b] border border-white/10 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.8)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${align === 'left' ? 'left-0' : 'right-0'}`}>
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-white/[0.02]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-white/2">
               <div className="flex items-center gap-2">
                 <Bell className="w-4 h-4 text-[#00d4aa]" />
                 <span className="text-[14px] text-white font-semibold">Notifications</span>
@@ -1979,7 +1979,7 @@ function NotificationBell({ transactions, hasFetched, align = 'right' }: { trans
                 </div>
               ) : (
                 notifs.map(n => (
-                  <div key={n.id} className={`px-5 py-4 flex gap-4 transition-colors relative group ${n.read ? 'opacity-60 hover:opacity-100' : 'bg-white/[0.02] hover:bg-white/[0.04]'}`}>
+                  <div key={n.id} className={`px-5 py-4 flex gap-4 transition-colors relative group ${n.read ? 'opacity-60 hover:opacity-100' : 'bg-white/2 hover:bg-white/4'}`}>
                     {!n.read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00d4aa] rounded-r-full" />}
                     <div className={`w-10 h-10 rounded-full border shrink-0 flex items-center justify-center ${getIconBg(n.iconType)}`}>
                       {getIcon(n.iconType)}
@@ -2113,7 +2113,7 @@ function TransactionsTab({ profile }: { profile?: any }) {
                   <div 
                     key={tx.id} 
                     onClick={() => setSelectedTx(tx)}
-                    className="group bg-transparent hover:bg-white/[0.02] border-b border-white/5 last:border-0 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer"
+                    className="group bg-transparent hover:bg-white/2 border-b border-white/5 last:border-0 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
