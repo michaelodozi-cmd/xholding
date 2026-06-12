@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Button } from "../components/ui/button";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeOff, Sun, HeadphonesIcon } from "lucide-react";
+import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
 export const Route = createFileRoute("/login")({
@@ -16,6 +15,17 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // On mount, load saved email if "Keep me signed in" was previously used
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("xholdings_remember_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -26,19 +36,29 @@ function Login() {
       password,
     });
 
-    setLoading(false);
-
     if (signInError) {
+      setLoading(false);
       setError(signInError.message);
       return;
     }
 
-    // Check if admin
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+    // Handle "Keep me signed in"
+    if (rememberMe) {
+      localStorage.setItem("xholdings_remember_email", email);
+    } else {
+      localStorage.removeItem("xholdings_remember_email");
+    }
+
+    // Execute necessary database checks concurrently to reduce redirect latency
+    const [profileRes, settingsRes] = await Promise.all([
+      supabase.from('profiles').select('role').eq('id', data.user.id).single(),
+      supabase.from('platform_settings').select('maintenance_mode').eq('id', 1).single()
+    ]);
     
-    if (profile?.role !== 'admin') {
-      const { data: settings } = await supabase.from('platform_settings').select('maintenance_mode').eq('id', 1).single();
-      if (settings?.maintenance_mode) {
+    setLoading(false);
+
+    if (profileRes.data?.role !== 'admin') {
+      if (settingsRes.data?.maintenance_mode) {
         await supabase.auth.signOut();
         setError("The platform is currently under maintenance. Please try again later.");
         return;
@@ -50,108 +70,100 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] selection:bg-[#c9a84c]/30 flex flex-col md:flex-row">
-      {/* Left Branding/Image Section */}
-      <div className="hidden md:flex md:w-5/12 lg:w-1/3 relative bg-[#0a0f1c] border-r border-white/5 flex-col justify-between p-12">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=3270&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-luminosity" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1c] via-[#0a0f1c]/80 to-[#0a0f1c] pointer-events-none" />
-        
-        <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center gap-2 text-[12px] font-medium text-gray-400 hover:text-[#c9a84c] transition-colors uppercase tracking-widest mb-16">
-            <ArrowLeft className="w-4 h-4" /> Back to Home
-          </Link>
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-10 h-10 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-lg">
-              X
-            </div>
-            <span className="font-light text-2xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
+    <div className="min-h-screen bg-black text-[#f0f4ff] font-['Inter'] selection:bg-[#12b744]/30 flex flex-col relative">
+      
+      {/* Header */}
+      <header className="flex items-center justify-between p-6 md:px-8 absolute top-0 left-0 right-0 z-20">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-[4px] bg-transparent border-[2px] border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-[12px] rotate-45">
+            <div className="-rotate-45">X</div>
           </div>
-          <h2 className="text-3xl font-light text-white font-['Outfit'] leading-snug">
-            Welcome <br/> Back
-          </h2>
+          <span className="font-semibold text-xl tracking-tight text-white font-['Outfit']">XHoldings</span>
+        </Link>
+        <div className="flex items-center gap-4">
         </div>
+      </header>
 
-        <div className="relative z-10 text-[11px] text-gray-500 uppercase tracking-widest leading-loose">
-          <p>Log in to securely access <br/> your investment portfolio.</p>
-          <p className="mt-4">© {new Date().getFullYear()} XHoldings Inc.</p>
-        </div>
-      </div>
-
-      {/* Right Form Section */}
-      <div className="flex-1 w-full md:w-7/12 lg:w-2/3 flex flex-col justify-start md:justify-center items-center p-6 sm:p-12 md:p-24 relative bg-[#070b14] min-h-[100dvh] md:min-h-0">
-        {/* Mobile Header */}
-        <div className="md:hidden w-full max-w-[400px] flex justify-between items-center mb-10 mt-6 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-sm">X</div>
-          </div>
-          <Link to="/" className="text-[12px] text-gray-500 uppercase tracking-widest">Return</Link>
-        </div>
-        
-        <div className="w-full max-w-[400px]">
-          <div className="mb-12">
-            <div className="text-[12px] text-[#c9a84c] uppercase tracking-[0.2em] mb-4 font-bold">Secure Login</div>
-            <h3 className="text-4xl font-light mb-2 font-['Outfit']">Sign In</h3>
-            <p className="text-[14px] text-gray-400 font-light leading-relaxed">Enter your email and password to view your portfolio.</p>
-          </div>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-[460px] mx-auto z-10 mt-16 md:mt-0">
+        <div className="w-full">
+          <h1 className="text-[32px] md:text-[34px] font-bold text-white mb-2 tracking-tight">Log in to your account</h1>
+          <p className="text-[15px] text-[#8e9a93] mb-8">
+            New user? <Link to="/register" className="text-white font-bold hover:underline">Create account</Link>
+          </p>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-sm">
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl">
               {error}
             </div>
           )}
 
-          <form className="space-y-8" onSubmit={handleSubmit}>
-            <div className="space-y-3">
-              <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.15em]">Email Address</label>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
               <input 
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-transparent border-b border-white/20 py-3 text-[15px] text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c] transition-colors rounded-none"
-                placeholder="you@email.com"
+                className="w-full bg-[#06120b] border border-[#113a1f] px-5 py-4 rounded-xl text-[15px] text-white placeholder-[#325240] focus:outline-none focus:border-[#12b744] focus:ring-1 focus:ring-[#12b744] transition-all"
+                placeholder="Email address"
               />
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-[0.15em]">Password</label>
-                <Link to="/forgot-password" className="text-[11px] text-[#c9a84c] hover:text-white uppercase tracking-widest transition-colors">Forgot?</Link>
-              </div>
-              <div className="relative">
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full bg-transparent border-b border-white/20 py-3 pr-10 text-[15px] text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c] transition-colors rounded-none"
-                  placeholder="••••••••"
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full bg-[#06120b] border border-[#113a1f] px-5 py-4 pr-12 rounded-xl text-[15px] text-white placeholder-[#325240] focus:outline-none focus:border-[#12b744] focus:ring-1 focus:ring-[#12b744] transition-all"
+                placeholder="Password"
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#325240] hover:text-[#12b744] transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
 
-            <Button disabled={loading} className="w-full py-6 text-[13px] rounded-none bg-[#c9a84c] hover:bg-[#b59640] text-[#070b14] font-bold uppercase tracking-[0.15em] transition-colors border-none mt-4">
-              {loading ? "Signing in..." : "Sign In"}
-            </Button>
+            <label className="flex items-center gap-3 pt-2 pb-4 cursor-pointer group">
+              <div className="relative flex items-center justify-center w-5 h-5">
+                <input 
+                  type="checkbox" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="appearance-none w-[18px] h-[18px] border-[2px] border-[#12b744] rounded-[4px] bg-transparent cursor-pointer checked:bg-[#12b744] transition-colors peer" 
+                />
+                <svg className="absolute w-[10px] h-[10px] text-black pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="text-[14px] text-white font-medium">Keep me signed in on this device</span>
+            </label>
+
+            <button 
+              disabled={loading} 
+              type="submit"
+              className="w-full py-4 text-[16px] rounded-full bg-[#13c74b] hover:bg-[#10a13c] text-black font-bold transition-all border-none"
+            >
+              {loading ? "Logging in..." : "Log in"}
+            </button>
           </form>
 
-          <div className="mt-12 pt-8 border-t border-white/5 text-center">
-            <p className="text-[12px] text-gray-500 font-light">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-white hover:text-[#c9a84c] uppercase tracking-widest font-medium transition-colors ml-2">
-                Create Account
-              </Link>
-            </p>
+          <div className="mt-6">
+            <Link to="/forgot-password" className="text-white text-[15px] font-bold underline decoration-white/40 underline-offset-4 hover:decoration-white transition-all">
+              Forgot password?
+            </Link>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="absolute bottom-6 left-6 md:left-8 z-20 hidden sm:block">
+        <span className="text-[#52665a] text-[13px] font-medium">© XHoldings {new Date().getFullYear()}</span>
+      </footer>
     </div>
   );
 }

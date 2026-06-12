@@ -146,6 +146,7 @@
   }
 }
 
+
 /* =========================================================================
  * Authenticated UI polish — premium fintech feel inspired by reference set.
  * Scoped to the exact arbitrary Tailwind hex classes already used by
@@ -164,12 +165,29 @@
 }
 
 /* === RADII OVERHAUL — promote tiny corners to confident pill/card radii. */
-.rounded-sm { border-radius: 18px !important; }
-.rounded-md { border-radius: 20px !important; }
-.rounded-lg { border-radius: 22px !important; }
-.rounded-xl { border-radius: 26px !important; }
-.rounded-2xl { border-radius: 28px !important; }
-.rounded-full { border-radius: 9999px !important; }
+.rounded-sm {
+  border-radius: 18px !important;
+}
+
+.rounded-md {
+  border-radius: 20px !important;
+}
+
+.rounded-lg {
+  border-radius: 22px !important;
+}
+
+.rounded-xl {
+  border-radius: 26px !important;
+}
+
+.rounded-2xl {
+  border-radius: 28px !important;
+}
+
+.rounded-full {
+  border-radius: 9999px !important;
+}
 
 /* === CARD SURFACES — bigger radius, layered gradient, ambient drop. */
 .bg-\[\#0a0f1c\],
@@ -208,18 +226,58 @@
 }
 
 /* === TYPOGRAPHY — dramatic display hierarchy ============================ */
-h1, h2, h3, h4 { letter-spacing: -0.022em; }
-h1 { font-weight: 600 !important; }
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.022em;
+}
 
-.text-2xl { font-size: 1.9rem !important; line-height: 1.15 !important; letter-spacing: -0.025em; }
-.text-3xl { font-size: 2.4rem !important; line-height: 1.1 !important; letter-spacing: -0.03em; }
-.text-4xl { font-size: 3rem !important;   line-height: 1.05 !important; letter-spacing: -0.035em; }
-.text-5xl { font-size: 3.6rem !important; line-height: 1 !important;    letter-spacing: -0.04em; }
+h1 {
+  font-weight: 600 !important;
+}
+
+.text-2xl {
+  font-size: 1.9rem !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.025em;
+}
+
+.text-3xl {
+  font-size: 2.4rem !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.03em;
+}
+
+.text-4xl {
+  font-size: 3rem !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.035em;
+}
+
+.text-5xl {
+  font-size: 3.6rem !important;
+  line-height: 1 !important;
+  letter-spacing: -0.04em;
+}
+
 @media (min-width: 768px) {
-  .md\:text-5xl { font-size: 4.4rem !important; letter-spacing: -0.045em; }
-  .md\:p-8 { padding: 2.5rem !important; }
-  .p-5 { padding: 1.75rem !important; }
-  .p-6 { padding: 2rem !important; }
+  .md\:text-5xl {
+    font-size: 4.4rem !important;
+    letter-spacing: -0.045em;
+  }
+
+  .md\:p-8 {
+    padding: 2.5rem !important;
+  }
+
+  .p-5 {
+    padding: 1.75rem !important;
+  }
+
+  .p-6 {
+    padding: 2rem !important;
+  }
 }
 
 .uppercase.tracking-widest {
@@ -234,17 +292,20 @@ h1 { font-weight: 600 !important; }
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
 .bg-\[\#c9a84c\] {
   background-image: linear-gradient(135deg, #ecc468 0%, #c9a84c 55%, #a98735 100%);
   box-shadow:
     0 10px 32px -10px rgba(201, 168, 76, 0.55),
     inset 0 0 0 1px rgba(255, 220, 140, 0.25);
 }
+
 .bg-\[\#c9a84c\]:hover {
   box-shadow:
     0 14px 40px -10px rgba(201, 168, 76, 0.75),
     inset 0 0 0 1px rgba(255, 220, 140, 0.35);
 }
+
 .bg-\[\#00d4aa\] {
   background-image: linear-gradient(135deg, #2ce8bf 0%, #00d4aa 60%, #009d80 100%);
   box-shadow: 0 10px 32px -10px rgba(0, 212, 170, 0.6);
@@ -256,6 +317,7 @@ h1 { font-weight: 600 !important; }
   border-color: rgba(255, 255, 255, 0.08) !important;
   transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
+
 .bg-black\/40:focus,
 .bg-black\/40:focus-within {
   border-color: rgba(201, 168, 76, 0.55) !important;
@@ -282,6 +344,7 @@ aside.bg-\[\#0a0f1c\] {
   box-shadow: none !important;
   border-radius: 0 !important;
 }
+
 aside button[class*="rounded-sm"],
 aside a[class*="rounded-sm"] {
   border-radius: 14px !important;
@@ -308,13 +371,21 @@ a.bg-\[\#c9a84c\] {
   letter-spacing: 0.02em;
 }
 
-.hover\:bg-white\/5:hover { background-color: rgba(255, 255, 255, 0.04) !important; }
+.hover\:bg-white\/5:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
 
 /* === DIALOGS ========================================================== */
-[role="dialog"] > div { border-radius: 24px !important; }
+[role="dialog"]>div {
+  border-radius: 24px !important;
+}
 
 /* === TABLES — premium density ========================================= */
-table { border-collapse: separate; border-spacing: 0; }
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 thead th {
   font-size: 11px !important;
   letter-spacing: 0.16em !important;
@@ -324,19 +395,48 @@ thead th {
   padding-top: 1rem !important;
   padding-bottom: 1rem !important;
 }
-tbody tr { transition: background-color 160ms ease; }
-tbody tr:hover { background-color: rgba(255, 255, 255, 0.025); }
-tbody td { padding-top: 1rem !important; padding-bottom: 1rem !important; }
 
-.divide-white\/5 > * + * { border-color: rgba(255, 255, 255, 0.05) !important; }
+tbody tr {
+  transition: background-color 160ms ease;
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.025);
+}
+
+tbody td {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+.divide-white\/5>*+* {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
 
 span.uppercase.tracking-widest,
-div.uppercase.tracking-widest { font-size: 10px !important; }
+div.uppercase.tracking-widest {
+  font-size: 10px !important;
+}
 
-/* === SCROLLBAR ======================================================== */
-*::-webkit-scrollbar { width: 8px; height: 8px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 8px; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.4); }
+::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
+::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 
+::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #113a1f;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #12b744;
+}
+

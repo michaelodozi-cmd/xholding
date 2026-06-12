@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
-import { Route as PublicationsRouteImport } from './routes/publications'
+import { Route as PersonalRouteImport } from './routes/personal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CompanyRouteImport } from './routes/company'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArticleArticleIdRouteImport } from './routes/article.$articleId'
 
@@ -23,9 +25,9 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PublicationsRoute = PublicationsRouteImport.update({
-  id: '/publications',
-  path: '/publications',
+const PersonalRoute = PersonalRouteImport.update({
+  id: '/personal',
+  path: '/personal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -43,9 +45,19 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -61,32 +73,38 @@ const ArticleArticleIdRoute = ArticleArticleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/company': typeof CompanyRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/publications': typeof PublicationsRoute
+  '/personal': typeof PersonalRoute
   '/register': typeof RegisterRoute
   '/article/$articleId': typeof ArticleArticleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/company': typeof CompanyRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/publications': typeof PublicationsRoute
+  '/personal': typeof PersonalRoute
   '/register': typeof RegisterRoute
   '/article/$articleId': typeof ArticleArticleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/company': typeof CompanyRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/publications': typeof PublicationsRoute
+  '/personal': typeof PersonalRoute
   '/register': typeof RegisterRoute
   '/article/$articleId': typeof ArticleArticleIdRoute
 }
@@ -94,42 +112,50 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/admin'
+    | '/company'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
-    | '/publications'
+    | '/personal'
     | '/register'
     | '/article/$articleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/admin'
+    | '/company'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
-    | '/publications'
+    | '/personal'
     | '/register'
     | '/article/$articleId'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/admin'
+    | '/company'
     | '/dashboard'
     | '/forgot-password'
     | '/login'
-    | '/publications'
+    | '/personal'
     | '/register'
     | '/article/$articleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  CompanyRoute: typeof CompanyRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
-  PublicationsRoute: typeof PublicationsRoute
+  PersonalRoute: typeof PersonalRoute
   RegisterRoute: typeof RegisterRoute
   ArticleArticleIdRoute: typeof ArticleArticleIdRoute
 }
@@ -143,11 +169,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/publications': {
-      id: '/publications'
-      path: '/publications'
-      fullPath: '/publications'
-      preLoaderRoute: typeof PublicationsRouteImport
+    '/personal': {
+      id: '/personal'
+      path: '/personal'
+      fullPath: '/personal'
+      preLoaderRoute: typeof PersonalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -171,11 +197,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/company': {
+      id: '/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -197,14 +237,26 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  CompanyRoute: CompanyRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
-  PublicationsRoute: PublicationsRoute,
+  PersonalRoute: PersonalRoute,
   RegisterRoute: RegisterRoute,
   ArticleArticleIdRoute: ArticleArticleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
