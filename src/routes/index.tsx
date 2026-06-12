@@ -216,14 +216,14 @@ function Landing() {
       <section className="py-24 lg:py-32 bg-[#020605]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Trade With<br/>Confidence</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Trade With<br/>XHoldings</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Buy, sell, and convert BTC, ETH, USDT, and 70+ digital assets with the best local rates and a platform trusted by over a million users.
+              Buy, sell, and convert BTC, ETH, USDT, and 70+ digital assets with the best global rates on XHoldings, a platform trusted by over a million users.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Trade anytime</span>
+                <span className="text-sm font-medium text-white">Trade anytime on XHoldings</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
@@ -242,7 +242,7 @@ function Landing() {
                   <h3 className="text-xl font-bold">Buy, Sell & Convert Instantly</h3>
                 </div>
                 <p className="text-black/80 font-medium">
-                  Trade dozens of top cryptocurrencies with new listings added regularly.
+                  Trade dozens of top cryptocurrencies on XHoldings with new listings added regularly.
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
@@ -287,18 +287,18 @@ function Landing() {
       <section className="py-24 lg:py-32 bg-[#000000]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Grow Your<br/>Wealth</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Grow Your Wealth<br/>With XHoldings</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Manage and deploy your digital assets, including optional earn features and collateral-based liquidity solutions provided through licensed partners
+              Manage and deploy your digital assets on XHoldings, including optional earn features and collateral-based liquidity solutions provided through licensed partners.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Earn daily interest on your savings</span>
+                <span className="text-sm font-medium text-white">Earn daily interest on your XHoldings savings</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-[#12b744]" />
-                <span className="text-sm font-medium text-white">Licensed & secure</span>
+                <span className="text-sm font-medium text-white">Licensed & secure infrastructure</span>
               </div>
             </div>
           </div>
