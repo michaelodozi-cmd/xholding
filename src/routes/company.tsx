@@ -103,11 +103,11 @@ function Company() {
               Create a business account <ArrowRight className="w-4 h-4" />
             </button>
           </Link>
-          <Link to="/contact">
+          <a href="mailto:support@xholdings.com">
             <button className="px-6 py-3 bg-transparent hover:bg-white/5 text-white border border-white/10 rounded-lg font-bold text-[15px] transition-all flex items-center justify-center gap-2">
               Speak to our team
             </button>
-          </Link>
+          </a>
         </div>
 
 
@@ -202,7 +202,7 @@ function Company() {
                   <div className="w-12 h-1 bg-gray-800 rounded-full mx-auto mb-8" />
                   <div className="text-center mb-8">
                     <p className="text-gray-500 text-sm mb-1">Total Balance</p>
-                    <h3 className="text-[32px] sm:text-4xl font-bold break-words leading-tight">$428,500.00</h3>
+                    <h3 className="text-[32px] sm:text-4xl font-bold break-all leading-tight">$428,500.00</h3>
                   </div>
                   <div className="space-y-4">
                     <div className="h-16 bg-linear-to-r from-[#12b744]/10 to-transparent border border-[#12b744]/20 rounded-2xl flex items-center px-4 justify-between">
