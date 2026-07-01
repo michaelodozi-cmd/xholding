@@ -44,22 +44,28 @@ function AdminDashboard() {
 
   useEffect(() => {
     const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate({ to: '/login' });
-        return;
-      }
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate({ to: '/login' });
+          return;
+        }
         
-      if (!profile || profile.role !== 'admin') {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (error || !profile || profile.role !== 'admin') {
+          console.error("Access denied or profile error:", error);
+          navigate({ to: '/dashboard' });
+        } else {
+          setIsChecking(false);
+        }
+      } catch (err) {
+        console.error("Failed to check admin session:", err);
         navigate({ to: '/dashboard' });
-      } else {
-        setIsChecking(false);
       }
     };
     checkAdmin();
@@ -72,17 +78,17 @@ function AdminDashboard() {
 
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-[#070b14] flex flex-col items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#c9a84c] border-t-transparent rounded-full animate-spin mb-4"></div>
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#13c74b] border-t-transparent rounded-full animate-spin mb-4"></div>
         <div className="text-gray-500 uppercase tracking-widest text-[11px] font-bold">Verifying Access...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-[#f0f4ff] font-['Inter'] flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-black text-[#f0f4ff] font-['Inter'] flex flex-col lg:flex-row">
       {/* Mobile Header */}
-      <div className="lg:hidden sticky top-0 z-40 bg-[#0a0f1c] border-b border-white/5 p-4 flex items-center justify-between">
+      <div className="lg:hidden sticky top-0 z-40 bg-black border-b border-white/5 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-red-600/20 border border-red-500/50 flex items-center justify-center font-bold text-red-500 font-['Outfit'] text-sm">A</div>
           <span className="font-light text-lg tracking-[0.15em] text-white font-['Outfit'] uppercase">SuperAdmin</span>
@@ -98,7 +104,7 @@ function AdminDashboard() {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:sticky top-0 left-0 h-screen bg-[#0a0f1c] border-r border-white/5 p-6 z-50 flex flex-col transition-transform duration-300 w-64 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:sticky top-0 left-0 h-screen bg-black border-r border-white/5 p-6 z-50 flex flex-col transition-transform duration-300 w-64 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <Link to="/" className="hidden lg:flex items-center gap-3 mb-12">
           <div className="w-8 h-8 bg-red-600/20 border border-red-500/50 flex items-center justify-center font-bold text-red-500 font-['Outfit'] text-sm">A</div>
           <span className="font-light text-xl tracking-[0.15em] text-white font-['Outfit'] uppercase">SuperAdmin</span>
@@ -123,7 +129,7 @@ function AdminDashboard() {
                 <div className="text-[10px] text-gray-500 uppercase tracking-widest">Level 5 Access</div>
               </div>
             </div>
-            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-sm transition-colors" title="Logout">
+            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-2xl transition-colors" title="Logout">
               <Power className="w-4 h-4" />
             </button>
           </div>
@@ -294,7 +300,7 @@ function PlansTab() {
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-6 py-3 bg-[#c9a84c] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945] transition-colors"
+          className="flex items-center gap-2 px-6 py-3 bg-[#13c74b] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-2xl hover:bg-[#10a13c] transition-colors"
         >
           <Plus className="w-4 h-4" /> New Plan
         </button>
@@ -303,10 +309,10 @@ function PlansTab() {
       {loading ? (
         <div className="text-center py-16 text-gray-500">Loading plans...</div>
       ) : plans.length === 0 ? (
-        <div className="text-center py-16 border border-white/5 bg-[#0a0f1c] rounded-sm">
+        <div className="text-center py-16 border border-white/5 bg-[#131714] rounded-2xl">
           <TrendingUp className="w-10 h-10 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-500">No investment plans yet.</p>
-          <button onClick={openAdd} className="mt-4 px-6 py-2 bg-[#c9a84c] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945]">
+          <button onClick={openAdd} className="mt-4 px-6 py-2 bg-[#13c74b] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-2xl hover:bg-[#10a13c]">
             Create First Plan
           </button>
         </div>
@@ -326,7 +332,7 @@ function PlansTab() {
 
       {/* Add / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-[#131714] border border-white/5 text-white max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-['Outfit'] text-xl">
               {editingPlan ? 'Edit Plan' : 'New Investment Plan'}
@@ -341,7 +347,7 @@ function PlansTab() {
             <div>
               <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Plan Image</label>
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 bg-[#070b14] border border-white/10 rounded-sm overflow-hidden flex items-center justify-center shrink-0">
+                <div className="w-20 h-20 bg-black border border-white/5 rounded-2xl overflow-hidden flex items-center justify-center shrink-0">
                   {imagePreview ? (
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
@@ -349,7 +355,7 @@ function PlansTab() {
                   )}
                 </div>
                 <label className="flex-1 cursor-pointer">
-                  <div className="border border-dashed border-white/20 hover:border-[#c9a84c]/50 rounded-sm p-3 text-center transition-colors">
+                  <div className="border border-dashed border-white/20 hover:border-[#13c74b]/50 rounded-2xl p-3 text-center transition-colors">
                     <p className="text-[12px] text-gray-400">Click to upload image</p>
                     <p className="text-[10px] text-gray-600 mt-1">PNG, JPG, WEBP – max 5MB</p>
                   </div>
@@ -365,7 +371,7 @@ function PlansTab() {
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="e.g. Gold Tier"
-                className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white"
+                className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white"
               />
             </div>
 
@@ -377,7 +383,7 @@ function PlansTab() {
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 placeholder="Short plan description..."
                 rows={2}
-                className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white resize-none"
+                className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white resize-none"
               />
             </div>
 
@@ -391,7 +397,7 @@ function PlansTab() {
                   min="0.01"
                   value={form.daily_roi}
                   onChange={e => setForm(f => ({ ...f, daily_roi: Number(e.target.value) }))}
-                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                  className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono"
                 />
               </div>
               <div>
@@ -401,7 +407,7 @@ function PlansTab() {
                   min="1"
                   value={form.duration_days}
                   onChange={e => setForm(f => ({ ...f, duration_days: Number(e.target.value) }))}
-                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                  className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono"
                 />
               </div>
             </div>
@@ -415,7 +421,7 @@ function PlansTab() {
                   min="0"
                   value={form.min_amount}
                   onChange={e => setForm(f => ({ ...f, min_amount: Number(e.target.value) }))}
-                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                  className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono"
                 />
               </div>
               <div>
@@ -426,13 +432,13 @@ function PlansTab() {
                   value={form.max_amount ?? ''}
                   placeholder="No limit"
                   onChange={e => setForm(f => ({ ...f, max_amount: e.target.value ? Number(e.target.value) : null }))}
-                  className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono"
+                  className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono"
                 />
               </div>
             </div>
 
             {/* Active Toggle */}
-            <div className="flex items-center justify-between p-3 bg-[#070b14] border border-white/10 rounded-sm">
+            <div className="flex items-center justify-between p-3 bg-black border border-white/5 rounded-2xl">
               <div>
                 <div className="text-[13px] text-white font-medium">Active</div>
                 <div className="text-[11px] text-gray-500">Visible to users on the platform</div>
@@ -440,7 +446,7 @@ function PlansTab() {
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
-                className={`transition-colors ${form.is_active ? 'text-[#00d4aa]' : 'text-gray-600'}`}
+                className={`transition-colors ${form.is_active ? 'text-[#13c74b]' : 'text-gray-600'}`}
               >
                 {form.is_active
                   ? <ToggleRight className="w-8 h-8" />
@@ -449,17 +455,17 @@ function PlansTab() {
               </button>
             </div>
 
-            {error && <p className="text-red-400 text-[12px] bg-red-500/10 border border-red-500/20 p-3 rounded-sm">{error}</p>}
+            {error && <p className="text-red-400 text-[12px] bg-red-500/10 border border-red-500/20 p-3 rounded-2xl">{error}</p>}
           </div>
 
           <DialogFooter>
             <DialogClose asChild>
-              <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm text-[12px] uppercase tracking-widest">Cancel</button>
+              <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-full text-[12px] uppercase tracking-widest">Cancel</button>
             </DialogClose>
             <button
               onClick={handleSave}
               disabled={saving || uploading}
-              className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest"
+              className="px-6 py-2 bg-[#13c74b] text-black font-bold rounded-full hover:bg-[#10a13c] hover:bg-[#10a13c] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest"
             >
               {uploading ? 'Uploading...' : saving ? 'Saving...' : editingPlan ? 'Update Plan' : 'Create Plan'}
             </button>
@@ -474,9 +480,9 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
   const totalRoi = (plan.daily_roi * plan.duration_days).toFixed(1);
 
   return (
-    <div className={`bg-[#0a0f1c] border ${plan.is_active ? 'border-[#c9a84c]/30' : 'border-white/5'} rounded-sm overflow-hidden group relative`}>
+    <div className={`bg-[#131714] border ${plan.is_active ? 'border-[#13c74b]/30' : 'border-white/5'} rounded-2xl overflow-hidden group relative`}>
       {/* Image */}
-      <div className="h-36 bg-[#070b14] overflow-hidden relative">
+      <div className="h-36 bg-black overflow-hidden relative">
         {plan.image_url ? (
           <img src={plan.image_url} alt={plan.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
@@ -486,7 +492,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
         )}
         <div className="absolute inset-0 bg-linear-to-t from-[#0a0f1c] to-transparent" />
         {/* Active badge */}
-        <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-widest ${plan.is_active ? 'bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}>
+        <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest ${plan.is_active ? 'bg-[#13c74b]/20 text-[#13c74b] border border-[#13c74b]/30' : 'bg-white/5 text-gray-500 border border-white/5'}`}>
           {plan.is_active ? 'Active' : 'Inactive'}
         </div>
       </div>
@@ -497,16 +503,16 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-2 mb-4">
-          <div className="bg-[#070b14] border border-white/5 p-2.5 rounded-sm text-center">
-            <div className="text-[#c9a84c] font-mono font-bold text-lg">{plan.daily_roi}%</div>
+          <div className="bg-black border border-white/5 p-2.5 rounded-2xl text-center">
+            <div className="text-[#13c74b] font-mono font-bold text-lg">{plan.daily_roi}%</div>
             <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Daily ROI</div>
           </div>
-          <div className="bg-[#070b14] border border-white/5 p-2.5 rounded-sm text-center">
+          <div className="bg-black border border-white/5 p-2.5 rounded-2xl text-center">
             <div className="text-white font-mono font-bold text-lg">{plan.duration_days}d</div>
             <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Duration</div>
           </div>
-          <div className="bg-[#070b14] border border-[#00d4aa]/20 p-2.5 rounded-sm text-center">
-            <div className="text-[#00d4aa] font-mono font-bold text-lg">{totalRoi}%</div>
+          <div className="bg-black border border-[#13c74b]/20 p-2.5 rounded-2xl text-center">
+            <div className="text-[#13c74b] font-mono font-bold text-lg">{totalRoi}%</div>
             <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Total ROI</div>
           </div>
         </div>
@@ -520,24 +526,24 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
         <div className="flex gap-2">
           <button
             onClick={onEdit}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-sm text-[11px] uppercase tracking-widest font-bold transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[11px] uppercase tracking-widest font-bold transition-colors"
           >
             <Edit className="w-3.5 h-3.5" /> Edit
           </button>
           <button
             onClick={onToggle}
             title={plan.is_active ? 'Deactivate' : 'Activate'}
-            className={`p-2 rounded-sm transition-colors ${plan.is_active ? 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400' : 'bg-[#00d4aa]/10 hover:bg-[#00d4aa]/20 text-[#00d4aa]'}`}
+            className={`p-2 rounded-2xl transition-colors ${plan.is_active ? 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400' : 'bg-[#13c74b]/10 hover:bg-[#13c74b]/20 text-[#13c74b]'}`}
           >
             <Power className="w-4 h-4" />
           </button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded-sm transition-colors">
+              <button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded-2xl transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+            <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete "{plan.name}"?</AlertDialogTitle>
                 <AlertDialogDescription className="text-gray-400">
@@ -545,7 +551,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={onDelete} className="bg-red-600 text-white hover:bg-red-700">Delete</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -560,7 +566,7 @@ function TabButton({ active, onClick, icon: Icon, label }: any) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex items-center gap-3 px-4 py-3 rounded-sm transition-colors w-full text-left ${active ? 'bg-red-500/10 border-l-2 border-red-500 text-white' : 'text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent'}`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors w-full text-left ${active ? 'bg-red-500/10 border-l-2 border-red-500 text-white' : 'text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent'}`}
     >
       <Icon className={`w-5 h-5 ${active ? 'text-red-400' : ''}`} /> 
       <span className="text-[13px] font-medium tracking-wide">{label}</span>
@@ -622,14 +628,14 @@ function OverviewTab() {
   };
 
   const getDotColor = (status: string) => {
-    if (status === 'approved') return 'bg-[#00d4aa]';
-    if (status === 'pending') return 'bg-[#c9a84c]';
+    if (status === 'approved') return 'bg-[#13c74b]';
+    if (status === 'pending') return 'bg-[#13c74b]';
     return 'bg-red-500';
   };
 
   const getBadgeStyle = (status: string) => {
-    if (status === 'approved') return 'bg-[#00d4aa]/10 text-[#00d4aa]';
-    if (status === 'pending') return 'bg-[#c9a84c]/10 text-[#c9a84c]';
+    if (status === 'approved') return 'bg-[#13c74b]/10 text-[#13c74b]';
+    if (status === 'pending') return 'bg-[#13c74b]/10 text-[#13c74b]';
     return 'bg-red-500/10 text-red-400';
   };
 
@@ -643,18 +649,18 @@ function OverviewTab() {
         <StatCard
           title="Total AUM"
           value={`$${totalAUM.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-          change="Managed by platform" color="text-[#00d4aa]"
+          change="Managed by platform" color="text-[#13c74b]"
         />
         <StatCard
           title="Total Deposits"
           value={`$${totalDepositedAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-          change={`${approvedDeposits.length} approved`} color="text-[#00d4aa]"
+          change={`${approvedDeposits.length} approved`} color="text-[#13c74b]"
         />
-        <StatCard title="Pending" value={pendingDeposits.length.toString()} change={`$${pendingAmount.toLocaleString()} pending`} color="text-[#c9a84c]" />
+        <StatCard title="Pending" value={pendingDeposits.length.toString()} change={`$${pendingAmount.toLocaleString()} pending`} color="text-[#13c74b]" />
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-[#0a0f1c] border border-white/5 rounded-sm p-4 sm:p-6">
+      <div className="bg-[#131714] border border-white/5 rounded-2xl p-4 sm:p-6">
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-[14px] text-white font-semibold uppercase tracking-widest">Recent Activity</h3>
           <span className="text-[11px] text-gray-500 uppercase tracking-widest">{recentActivity.length} events</span>
@@ -673,7 +679,7 @@ function OverviewTab() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="text-[13px] text-gray-200 wrap-break-word">{getActivityLabel(tx)}</span>
-                    <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${getBadgeStyle(tx.status)}`}>
+                    <span className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-2xl ${getBadgeStyle(tx.status)}`}>
                       {tx.status}
                     </span>
                   </div>
@@ -695,7 +701,7 @@ function OverviewTab() {
 
 function StatCard({ title, value, change, color = "text-white" }: any) {
   return (
-    <div className="bg-[#0a0f1c] border border-white/5 p-6 rounded-sm">
+    <div className="bg-[#131714] border border-white/5 p-6 rounded-2xl">
       <div className="text-[11px] text-gray-500 uppercase tracking-widest font-semibold mb-2">{title}</div>
       <div className={`text-3xl font-light font-['Outfit'] mb-2 ${color}`}>{value}</div>
       <div className="text-[12px] text-gray-400">{change}</div>
@@ -781,13 +787,13 @@ function UsersTab() {
           <input
             type="text"
             placeholder="Search email or ID..."
-            className="w-full sm:w-64 bg-[#0a0f1c] border border-white/10 text-white pl-10 pr-4 py-2.5 rounded-sm text-sm focus:outline-none focus:border-white/30"
+            className="w-full sm:w-64 bg-[#131714] border border-white/5 text-white pl-10 pr-4 py-2.5 rounded-2xl text-sm focus:outline-none focus:border-white/30"
           />
         </div>
       </div>
 
       {/* Table — horizontally scrollable on mobile */}
-      <div className="bg-[#0a0f1c] border border-white/5 rounded-sm overflow-hidden">
+      <div className="bg-[#131714] border border-white/5 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-[640px] w-full text-left border-collapse">
             <thead>
@@ -902,12 +908,12 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
         <div className="text-[10px] text-gray-500 mt-0.5" title="Base Wallet Balance">Wallet: {balance}</div>
       </td>
       <td className="p-3 sm:p-4">
-        <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${role === 'admin' ? 'bg-purple-500/10 text-purple-400' : 'bg-gray-500/10 text-gray-400'}`}>
+        <span className={`px-2 py-1 rounded-2xl text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${role === 'admin' ? 'bg-purple-500/10 text-purple-400' : 'bg-gray-500/10 text-gray-400'}`}>
           {role}
         </span>
       </td>
       <td className="p-3 sm:p-4">
-        <span className={`px-2 py-1 rounded-sm text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${status === 'Active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : status === 'Suspended' ? 'bg-red-500/10 text-red-500' : 'bg-[#c9a84c]/10 text-[#c9a84c]'}`}>
+        <span className={`px-2 py-1 rounded-2xl text-[10px] uppercase tracking-widest font-bold whitespace-nowrap ${status === 'Active' ? 'bg-[#13c74b]/10 text-[#13c74b]' : status === 'Suspended' ? 'bg-red-500/10 text-red-500' : 'bg-[#13c74b]/10 text-[#13c74b]'}`}>
           {status}
         </span>
       </td>
@@ -917,17 +923,17 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
           {role !== 'admin' && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button className="px-3 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-sm text-[11px] font-bold uppercase transition-colors mr-2">
+                <button className="px-3 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-2xl text-[11px] font-bold uppercase transition-colors mr-2">
                   Make Admin
                 </button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+              <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Make {name} an Admin?</AlertDialogTitle>
                   <AlertDialogDescription className="text-gray-400">This will grant them full access to the admin dashboard.</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={onMakeAdmin} className="bg-purple-500 text-white hover:bg-purple-600">Yes, Make Admin</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -937,9 +943,9 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
         {/* View Plans Modal */}
         <Dialog open={plansOpen} onOpenChange={setPlansOpen}>
           <DialogTrigger asChild>
-            <button className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-sm transition-colors" title="View User Plans"><TrendingUp className="w-4 h-4" /></button>
+            <button className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-2xl transition-colors" title="View User Plans"><TrendingUp className="w-4 h-4" /></button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogContent className="bg-[#131714] border border-white/5 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Investments & Copy Trading for {name}</DialogTitle>
               <DialogDescription className="text-gray-400">View active plans and force withdrawals.</DialogDescription>
@@ -955,15 +961,15 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
                     {userPlans.length === 0 ? <p className="text-gray-500 text-sm">No standard investments.</p> : (
                       <div className="space-y-2">
                         {userPlans.map(p => (
-                          <div key={p.id} className="flex items-center justify-between bg-[#070b14] border border-white/5 p-3 rounded-sm">
+                          <div key={p.id} className="flex items-center justify-between bg-black border border-white/5 p-3 rounded-2xl">
                             <div>
                               <div className="text-sm font-semibold text-white">{p.investment_plans?.name || 'Unknown Plan'}</div>
                               <div className="text-xs text-gray-500 font-mono">${Number(p.amount).toLocaleString()}</div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${p.status === 'active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : 'bg-gray-500/10 text-gray-400'}`}>{p.status}</span>
+                              <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-2xl ${p.status === 'active' ? 'bg-[#13c74b]/10 text-[#13c74b]' : 'bg-gray-500/10 text-gray-400'}`}>{p.status}</span>
                               {p.status === 'active' && (
-                                <button onClick={() => handleWithdrawPlan(p)} className="px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-sm hover:bg-red-500/20 font-bold uppercase tracking-widest">Withdraw</button>
+                                <button onClick={() => handleWithdrawPlan(p)} className="px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-2xl hover:bg-red-500/20 font-bold uppercase tracking-widest">Withdraw</button>
                               )}
                             </div>
                           </div>
@@ -978,15 +984,15 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
                     {userSubs.length === 0 ? <p className="text-gray-500 text-sm">No copy trading subscriptions.</p> : (
                       <div className="space-y-2">
                         {userSubs.map(s => (
-                          <div key={s.id} className="flex items-center justify-between bg-[#070b14] border border-white/5 p-3 rounded-sm">
+                          <div key={s.id} className="flex items-center justify-between bg-black border border-white/5 p-3 rounded-2xl">
                             <div>
                               <div className="text-sm font-semibold text-white">Copy: {s.master_traders?.name || 'Unknown Trader'}</div>
                               <div className="text-xs text-gray-500 font-mono">${Number(s.amount).toLocaleString()}</div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${s.status === 'active' ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : 'bg-gray-500/10 text-gray-400'}`}>{s.status}</span>
+                              <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-2xl ${s.status === 'active' ? 'bg-[#13c74b]/10 text-[#13c74b]' : 'bg-gray-500/10 text-gray-400'}`}>{s.status}</span>
                               {s.status === 'active' && (
-                                <button onClick={() => handleWithdrawSub(s)} className="px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-sm hover:bg-red-500/20 font-bold uppercase tracking-widest">Withdraw</button>
+                                <button onClick={() => handleWithdrawSub(s)} className="px-3 py-1 bg-red-500/10 text-red-400 text-xs rounded-2xl hover:bg-red-500/20 font-bold uppercase tracking-widest">Withdraw</button>
                               )}
                             </div>
                           </div>
@@ -1002,21 +1008,21 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
 
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogTrigger asChild>
-            <button className="p-2 bg-white/5 hover:bg-white/10 text-white rounded-sm transition-colors" title="Edit Balance"><Edit className="w-4 h-4" /></button>
+            <button className="p-2 bg-white/5 hover:bg-white/10 text-white rounded-2xl transition-colors" title="Edit Balance"><Edit className="w-4 h-4" /></button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <DialogContent className="bg-[#131714] border border-white/5 text-white">
             <DialogHeader>
               <DialogTitle>Edit Balance for {name}</DialogTitle>
             </DialogHeader>
             <div className="py-4">
               <label className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2 block">New Balance</label>
-              <input type="number" value={editBalance} onChange={e => setEditBalance(e.target.value)} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              <input type="number" value={editBalance} onChange={e => setEditBalance(e.target.value)} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm">Cancel</button>
+                <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-full">Cancel</button>
               </DialogClose>
-              <button onClick={submitEdit} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] transition-colors">
+              <button onClick={submitEdit} className="px-6 py-2 bg-[#13c74b] text-black font-bold rounded-full hover:bg-[#10a13c] hover:bg-[#10a13c] transition-colors">
                 Save
               </button>
             </DialogFooter>
@@ -1025,9 +1031,9 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="p-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-sm transition-colors" title={status === 'Suspended' ? 'Unban User' : 'Ban User'}><Ban className="w-4 h-4" /></button>
+            <button className="p-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-2xl transition-colors" title={status === 'Suspended' ? 'Unban User' : 'Ban User'}><Ban className="w-4 h-4" /></button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
             <AlertDialogHeader>
               <AlertDialogTitle>{status === 'Suspended' ? 'Unban' : 'Ban'} {name}?</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-400">
@@ -1035,7 +1041,7 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={() => onBan(status === 'Suspended' ? 'Active' : 'Suspended')} className="bg-orange-500 text-white hover:bg-orange-600">{status === 'Suspended' ? 'Unban' : 'Ban'}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1043,9 +1049,9 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-600 rounded-sm transition-colors" title="Delete User"><Trash2 className="w-4 h-4" /></button>
+            <button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-600 rounded-2xl transition-colors" title="Delete User"><Trash2 className="w-4 h-4" /></button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
             <AlertDialogHeader>
               <AlertDialogTitle>Delete {name}?</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-400">
@@ -1053,7 +1059,7 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={onDelete} className="bg-red-600 text-white hover:bg-red-700">Delete Permanently</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1076,7 +1082,7 @@ function TransactionsTab() {
       
       <div className="space-y-4">
         {pendingTxs.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 border border-white/5 bg-[#0a0f1c] rounded-sm">No pending transactions.</div>
+          <div className="text-center py-12 text-gray-500 border border-white/5 bg-[#131714] rounded-2xl">No pending transactions.</div>
         ) : (
           pendingTxs.map(tx => (
             <TransactionCard key={tx.id} tx={tx} />
@@ -1174,17 +1180,17 @@ function TransactionCard({ tx }: { tx: any }) {
         <img
           src={tx.screenshotUrl}
           alt="Deposit proof"
-          className="max-w-full max-h-[90vh] object-contain rounded-sm shadow-2xl"
+          className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl"
           onClick={e => e.stopPropagation()}
         />
       </div>
     )}
 
-    <div className="bg-[#0a0f1c] border border-[#c9a84c]/30 rounded-sm overflow-hidden">
+    <div className="bg-[#131714] border border-[#13c74b]/30 rounded-2xl overflow-hidden">
       {/* Screenshot strip - visible only for deposits with a screenshot */}
       {tx.screenshotUrl && tx.type === 'deposit' && (
         <div
-          className="relative h-32 bg-[#070b14] overflow-hidden cursor-pointer group"
+          className="relative h-32 bg-black overflow-hidden cursor-pointer group"
           onClick={() => setLightboxOpen(true)}
         >
           <img
@@ -1201,10 +1207,10 @@ function TransactionCard({ tx }: { tx: any }) {
 
       <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
       <div>
-        <div className="text-[10px] text-[#c9a84c] uppercase tracking-widest font-bold mb-2">{tx.type} Pending</div>
+        <div className="text-[10px] text-[#13c74b] uppercase tracking-widest font-bold mb-2">{tx.type} Pending</div>
         <div className="flex items-center gap-4 mb-2">
           <span className="text-2xl text-white font-light">{tx.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 6})}</span>
-          <span className="text-[11px] font-bold tracking-widest bg-white/10 px-2 py-1 uppercase rounded-sm text-gray-300">{tx.asset}</span>
+          <span className="text-[11px] font-bold tracking-widest bg-white/10 px-2 py-1 uppercase rounded-2xl text-gray-300">{tx.asset}</span>
         </div>
         <div className="text-[13px] text-gray-400 mb-1">From: <span className="text-white font-medium">{tx.userEmail}</span></div>
         <div className="text-[13px] text-gray-400">TXID: <span className="font-mono text-white text-[12px]">{tx.txid || 'N/A'}</span></div>
@@ -1218,16 +1224,16 @@ function TransactionCard({ tx }: { tx: any }) {
       <div className="flex flex-col gap-3">
         <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
           <DialogTrigger asChild>
-            <button className="px-8 py-3 bg-[#00d4aa] hover:bg-[#00b38f] text-[#070b14] font-bold text-[12px] uppercase tracking-widest rounded-sm transition-colors flex items-center justify-center gap-2">
+            <button className="px-8 py-3 bg-[#13c74b] hover:bg-[#10a13c] text-[#070b14] font-bold text-[12px] uppercase tracking-widest rounded-2xl transition-colors flex items-center justify-center gap-2">
               <CheckCircle className="w-4 h-4" /> Approve
             </button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white p-0 overflow-hidden max-w-md">
-            <div className="h-1.5 w-full bg-linear-to-r from-[#00d4aa] to-[#00f5c8]" />
+          <DialogContent className="bg-[#131714] border border-white/5 text-white p-0 overflow-hidden max-w-md">
+            <div className="h-1.5 w-full bg-linear-to-r from-[#13c74b] to-[#00f5c8]" />
             <div className="p-6">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full bg-[#00d4aa]/15 flex items-center justify-center shrink-0">
-                  <CheckCircle className="w-5 h-5 text-[#00d4aa]" />
+                <div className="w-10 h-10 rounded-full bg-[#13c74b]/15 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-5 h-5 text-[#13c74b]" />
                 </div>
                 <div>
                   <h2 className="text-lg font-['Outfit'] font-semibold text-white capitalize">Approve {tx.type}</h2>
@@ -1235,7 +1241,7 @@ function TransactionCard({ tx }: { tx: any }) {
                 </div>
               </div>
 
-              <div className="bg-[#070b14] border border-white/5 rounded-sm p-4 mb-5 space-y-2.5">
+              <div className="bg-black border border-white/5 rounded-2xl p-4 mb-5 space-y-2.5">
                 <div className="flex justify-between items-center">
                   <span className="text-[11px] text-gray-500 uppercase tracking-widest">Amount</span>
                   <span className="text-white font-mono font-semibold">{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })} {tx.asset}</span>
@@ -1259,7 +1265,7 @@ function TransactionCard({ tx }: { tx: any }) {
                 <div className="mb-5">
                   <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 flex items-center gap-1.5"><Eye className="w-3 h-3" /> Deposit Screenshot</label>
                   <div
-                    className="relative rounded-sm overflow-hidden cursor-pointer group border border-white/10"
+                    className="relative rounded-2xl overflow-hidden cursor-pointer group border border-white/5"
                     onClick={() => setLightboxOpen(true)}
                   >
                     <img
@@ -1275,8 +1281,8 @@ function TransactionCard({ tx }: { tx: any }) {
               )}
 
               {tx.type === 'deposit' && (
-                <div className="mb-5 bg-[#00d4aa]/10 border border-[#00d4aa]/20 p-4 rounded-sm">
-                  <p className="text-[14px] text-[#00d4aa] font-medium text-center">
+                <div className="mb-5 bg-[#13c74b]/10 border border-[#13c74b]/20 p-4 rounded-2xl">
+                  <p className="text-[14px] text-[#13c74b] font-medium text-center">
                     Have you confirmed that payment has been received in your account?
                   </p>
                   <p className="text-[11px] text-gray-400 text-center mt-2">
@@ -1290,8 +1296,8 @@ function TransactionCard({ tx }: { tx: any }) {
                   <div>
                     <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 block">User's Receiving Address</label>
                     <div className="flex gap-2">
-                      <div className="flex-1 bg-[#070b14] border border-white/10 text-gray-300 p-3 rounded-sm text-[12px] font-mono truncate">{tx.txid || 'No address provided'}</div>
-                      <button onClick={() => handleCopy(tx.txid)} className="px-4 bg-[#00d4aa]/10 hover:bg-[#00d4aa]/20 border border-[#00d4aa]/30 text-[#00d4aa] rounded-sm text-[11px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap">
+                      <div className="flex-1 bg-black border border-white/5 text-gray-300 p-3 rounded-2xl text-[12px] font-mono truncate">{tx.txid || 'No address provided'}</div>
+                      <button onClick={() => handleCopy(tx.txid)} className="px-4 bg-[#13c74b]/10 hover:bg-[#13c74b]/20 border border-[#13c74b]/30 text-[#13c74b] rounded-2xl text-[11px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap">
                         {copied ? '✓ Copied' : 'Copy'}
                       </button>
                     </div>
@@ -1299,17 +1305,17 @@ function TransactionCard({ tx }: { tx: any }) {
                   <div>
                     <label className="text-[11px] text-gray-400 uppercase tracking-widest font-bold mb-2 block">Sent TXID <span className="text-gray-600 normal-case tracking-normal font-normal">(optional)</span></label>
                     <input type="text" value={sentTxid} onChange={e => setSentTxid(e.target.value)} placeholder="Paste transaction hash after sending..."
-                      className="w-full bg-[#070b14] border border-white/10 focus:border-[#00d4aa]/50 p-3 rounded-sm text-[12px] focus:outline-none text-white font-mono transition-colors" />
+                      className="w-full bg-black border border-white/5 focus:border-[#13c74b]/50 p-3 rounded-2xl text-[12px] focus:outline-none text-white font-mono transition-colors" />
                   </div>
                 </div>
               )}
 
               <div className="flex gap-3">
                 <DialogClose asChild>
-                  <button className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-gray-300 rounded-sm transition-colors">Cancel</button>
+                  <button className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 text-gray-300 rounded-2xl transition-colors">Cancel</button>
                 </DialogClose>
                 <button onClick={handleApprove}
-                  className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-[#00d4aa] hover:bg-[#00b38f] text-[#070b14] rounded-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-[#13c74b] hover:bg-[#10a13c] text-[#070b14] rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                   ✓ Confirm Approval
                 </button>
               </div>
@@ -1319,11 +1325,11 @@ function TransactionCard({ tx }: { tx: any }) {
 
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="px-8 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-[12px] uppercase tracking-widest border border-red-500/30 rounded-sm transition-colors flex items-center justify-center gap-2">
+            <button className="px-8 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-[12px] uppercase tracking-widest border border-red-500/30 rounded-2xl transition-colors flex items-center justify-center gap-2">
               <XCircle className="w-4 h-4" /> Reject
             </button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
             <AlertDialogHeader>
               <AlertDialogTitle>Reject {tx.type}</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-400">
@@ -1331,7 +1337,7 @@ function TransactionCard({ tx }: { tx: any }) {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={() => updateStatus(tx.id, 'rejected')} className="bg-red-500 text-white hover:bg-red-600">
                 Yes, Reject
               </AlertDialogAction>
@@ -1359,11 +1365,11 @@ function WalletsTab() {
       id: symbol.toLowerCase(),
       name,
       symbol: symbol.toUpperCase(),
-      color: '#c9a84c',
+      color: '#13c74b',
       address,
       network,
       active: true
-    });
+    } as any);
     setIsOpen(false);
     setSymbol(''); setName(''); setNetwork('Native'); setAddress('');
   };
@@ -1374,11 +1380,11 @@ function WalletsTab() {
         <h1 className="text-3xl text-white font-light font-['Outfit']">Platform Wallets</h1>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <button className="px-6 py-3 bg-white text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-gray-200 transition-colors">
+            <button className="px-6 py-3 bg-[#13c74b] text-black text-[12px] font-bold uppercase tracking-widest rounded-full hover:bg-[#10a13c] hover:bg-gray-200 transition-colors">
               + Add New Wallet
             </button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <DialogContent className="bg-[#131714] border border-white/5 text-white">
             <DialogHeader>
               <DialogTitle>Add New Wallet</DialogTitle>
               <DialogDescription className="text-gray-400">
@@ -1388,26 +1394,26 @@ function WalletsTab() {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-gray-400 font-bold">Symbol</label>
-                <input value={symbol} onChange={e => setSymbol(e.target.value)} placeholder="e.g. BTC" className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white" />
+                <input value={symbol} onChange={e => setSymbol(e.target.value)} placeholder="e.g. BTC" className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-gray-400 font-bold">Name</label>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Bitcoin" className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white" />
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Bitcoin" className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-gray-400 font-bold">Network</label>
-                <input value={network} onChange={e => setNetwork(e.target.value)} placeholder="e.g. Native" className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white" />
+                <input value={network} onChange={e => setNetwork(e.target.value)} placeholder="e.g. Native" className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-gray-400 font-bold">Wallet Address</label>
-                <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Enter wallet address" className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Enter wallet address" className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm">Cancel</button>
+                <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-full">Cancel</button>
               </DialogClose>
-              <button onClick={handleAdd} disabled={!symbol || !name || !network || !address} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors">
+              <button onClick={handleAdd} disabled={!symbol || !name || !network || !address} className="px-6 py-2 bg-[#13c74b] text-black font-bold rounded-full hover:bg-[#10a13c] hover:bg-[#10a13c] disabled:opacity-50 transition-colors">
                 Save Wallet
               </button>
             </DialogFooter>
@@ -1437,12 +1443,12 @@ function WalletCard({ crypto }: { crypto: any }) {
   };
 
   return (
-    <div className={`bg-[#0a0f1c] border ${crypto.active ? 'border-white/20' : 'border-white/5'} p-6 rounded-sm relative overflow-hidden group`}>
-      {!crypto.active && <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center backdrop-blur-[1px] pointer-events-none"><span className="text-[11px] font-bold tracking-widest uppercase bg-black px-3 py-1 rounded-sm border border-white/10 text-gray-400">Inactive</span></div>}
+    <div className={`bg-[#131714] border ${crypto.active ? 'border-white/20' : 'border-white/5'} p-6 rounded-2xl relative overflow-hidden group`}>
+      {!crypto.active && <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center backdrop-blur-[1px] pointer-events-none"><span className="text-[11px] font-bold tracking-widest uppercase bg-black px-3 py-1 rounded-2xl border border-white/5 text-gray-400">Inactive</span></div>}
       
       <div className="flex justify-between items-start mb-6 relative z-20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[12px] font-bold" style={{ backgroundColor: `${crypto.color}15`, color: crypto.color }}>
+          <div className="w-8 h-8 rounded-full border border-white/5 flex items-center justify-center text-[12px] font-bold" style={{ backgroundColor: `${crypto.color}15`, color: crypto.color }}>
             {crypto.symbol.substring(0,1)}
           </div>
           <div>
@@ -1451,13 +1457,13 @@ function WalletCard({ crypto }: { crypto: any }) {
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => toggleActive(crypto.id)} title={crypto.active ? "Deactivate" : "Activate"} className={`transition-colors p-2 rounded-sm ${crypto.active ? 'text-gray-500 hover:text-orange-400 bg-white/5 hover:bg-orange-500/10' : 'text-white hover:text-green-400 bg-white/10 hover:bg-green-500/20'}`}><Power className="w-4 h-4" /></button>
+          <button onClick={() => toggleActive(crypto.id)} title={crypto.active ? "Deactivate" : "Activate"} className={`transition-colors p-2 rounded-2xl ${crypto.active ? 'text-gray-500 hover:text-orange-400 bg-white/5 hover:bg-orange-500/10' : 'text-white hover:text-green-400 bg-white/10 hover:bg-green-500/20'}`}><Power className="w-4 h-4" /></button>
           
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 p-2 rounded-sm"><Trash2 className="w-4 h-4" /></button>
+              <button className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 p-2 rounded-2xl"><Trash2 className="w-4 h-4" /></button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+            <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete {crypto.symbol}?</AlertDialogTitle>
                 <AlertDialogDescription className="text-gray-400">
@@ -1465,32 +1471,32 @@ function WalletCard({ crypto }: { crypto: any }) {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
                 <AlertDialogAction onClick={() => removeCrypto(crypto.id)} className="bg-red-500 text-white hover:bg-red-600">Delete</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
       </div>
-      <div className="bg-[#070b14] border border-white/10 p-3 rounded-sm flex items-center justify-between relative z-20">
+      <div className="bg-black border border-white/5 p-3 rounded-2xl flex items-center justify-between relative z-20">
         <code className="text-[13px] text-gray-300 truncate mr-4">{crypto.address || 'No address set'}</code>
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogTrigger asChild>
-            <button className="text-[#c9a84c] text-[11px] uppercase tracking-widest font-bold hover:underline shrink-0">Edit Address</button>
+            <button className="text-[#13c74b] text-[11px] uppercase tracking-widest font-bold hover:underline shrink-0">Edit Address</button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <DialogContent className="bg-[#131714] border border-white/5 text-white">
             <DialogHeader>
               <DialogTitle>Update {crypto.symbol} Address</DialogTitle>
             </DialogHeader>
             <div className="py-4">
               <label className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2 block">Wallet Address</label>
-              <input value={editAddress} onChange={e => setEditAddress(e.target.value)} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              <input value={editAddress} onChange={e => setEditAddress(e.target.value)} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm">Cancel</button>
+                <button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-full">Cancel</button>
               </DialogClose>
-              <button onClick={handleEdit} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] transition-colors">
+              <button onClick={handleEdit} className="px-6 py-2 bg-[#13c74b] text-black font-bold rounded-full hover:bg-[#10a13c] hover:bg-[#10a13c] transition-colors">
                 Update
               </button>
             </DialogFooter>
@@ -1502,7 +1508,7 @@ function WalletCard({ crypto }: { crypto: any }) {
 }
 
 function SecurityTab() {
-  const [settings, setSettings] = useState({ maintenance_mode: false, withdrawals_halted: false });
+  const [settings, setSettings] = useState({ maintenance_mode: false, withdrawals_halted: false, lock_withdrawals_until_maturity: false });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -1526,6 +1532,12 @@ function SecurityTab() {
     setSettings(prev => ({ ...prev, withdrawals_halted: newVal }));
   };
 
+  const toggleWithdrawalLock = async () => {
+    const newVal = !settings.lock_withdrawals_until_maturity;
+    await supabase.from('platform_settings').update({ lock_withdrawals_until_maturity: newVal }).eq('id', 1);
+    setSettings(prev => ({ ...prev, lock_withdrawals_until_maturity: newVal }));
+  };
+
   const handleWipe = async () => {
     await supabase.rpc('wipe_database');
     window.location.reload();
@@ -1538,23 +1550,63 @@ function SecurityTab() {
       <h1 className="text-3xl text-white font-light font-['Outfit'] mb-8">SuperAdmin Settings</h1>
       
       <div className="space-y-6">
-        <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-sm">
+
+        {/* Investment Withdrawal Controls */}
+        <div className="p-6 bg-[#131714] border border-white/5 rounded-2xl">
+          <h3 className="text-lg text-white font-['Outfit'] mb-1 flex items-center gap-2">
+            <svg className="w-5 h-5 text-[#13c74b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+            Investment &amp; Withdrawal Controls
+          </h3>
+          <p className="text-[13px] text-gray-500 mb-6">Control how withdrawals interact with active investment plans.</p>
+
+          <div className="space-y-4">
+            <div className="flex items-start justify-between p-4 bg-black border border-white/5 rounded-2xl gap-4">
+              <div className="flex-1">
+                <div className="text-[14px] text-white font-semibold mb-1">Lock Withdrawals Until Plan Maturity</div>
+                <div className="text-[12px] text-gray-400 leading-relaxed">When enabled, users with an <span className="text-[#13c74b] font-semibold">active investment plan</span> that has NOT yet reached its maturity date will be blocked from making any withdrawal. They can only withdraw once all their plans have fully completed their investment duration.</div>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button className={`shrink-0 px-6 py-2 text-[11px] uppercase tracking-widest font-bold rounded-2xl border transition-colors ${settings.lock_withdrawals_until_maturity ? 'bg-[#13c74b]/10 text-[#13c74b] border-[#13c74b]/20 hover:bg-[#13c74b]/20' : 'bg-white/5 hover:bg-white/10 text-white border-white/5'}`}>
+                    {settings.lock_withdrawals_until_maturity ? 'Enabled' : 'Disabled'}
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{settings.lock_withdrawals_until_maturity ? 'Disable' : 'Enable'} Investment Withdrawal Lock?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-gray-400">
+                      {settings.lock_withdrawals_until_maturity
+                        ? 'Users will be able to withdraw at any time regardless of active investment plans.'
+                        : 'Users with active, non-matured investment plans will be blocked from withdrawing until their plan duration is complete.'}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={toggleWithdrawalLock} className={settings.lock_withdrawals_until_maturity ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-[#13c74b] text-black hover:bg-[#10a13c]'}>Confirm</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl">
           <h3 className="text-lg text-red-400 font-['Outfit'] mb-2 flex items-center gap-2"><ShieldAlert className="w-5 h-5" /> Danger Zone</h3>
           <p className="text-[13px] text-gray-400 mb-6">These actions affect the entire platform. Proceed with extreme caution.</p>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-[#070b14] border border-white/5 rounded-sm">
+            <div className="flex items-center justify-between p-4 bg-black border border-white/5 rounded-2xl">
               <div>
                 <div className="text-[14px] text-white font-semibold">Maintenance Mode</div>
                 <div className="text-[12px] text-gray-500">Disable all user logins and trading</div>
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className={`px-6 py-2 text-[11px] uppercase tracking-widest font-bold rounded-sm border transition-colors ${settings.maintenance_mode ? 'bg-[#c9a84c]/10 text-[#c9a84c] border-[#c9a84c]/20 hover:bg-[#c9a84c]/20' : 'bg-white/5 hover:bg-white/10 text-white border-white/10'}`}>
+                  <button className={`px-6 py-2 text-[11px] uppercase tracking-widest font-bold rounded-2xl border transition-colors ${settings.maintenance_mode ? 'bg-[#13c74b]/10 text-[#13c74b] border-[#13c74b]/20 hover:bg-[#13c74b]/20' : 'bg-white/5 hover:bg-white/10 text-white border-white/5'}`}>
                     {settings.maintenance_mode ? 'Disable' : 'Enable'}
                   </button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+                <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
                   <AlertDialogHeader>
                     <AlertDialogTitle>{settings.maintenance_mode ? 'Disable' : 'Enable'} Maintenance Mode?</AlertDialogTitle>
                     <AlertDialogDescription className="text-gray-400">
@@ -1562,25 +1614,25 @@ function SecurityTab() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                    <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={toggleMaintenance} className="bg-red-600 text-white hover:bg-red-700">Confirm</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
             
-            <div className="flex items-center justify-between p-4 bg-[#070b14] border border-white/5 rounded-sm">
+            <div className="flex items-center justify-between p-4 bg-black border border-white/5 rounded-2xl">
               <div>
                 <div className="text-[14px] text-white font-semibold">Halt Withdrawals</div>
                 <div className="text-[12px] text-gray-500">Temporarily suspend all outgoing transactions</div>
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className={`px-6 py-2 text-[11px] uppercase tracking-widest font-bold rounded-sm border transition-colors ${settings.withdrawals_halted ? 'bg-[#c9a84c]/10 text-[#c9a84c] border-[#c9a84c]/20 hover:bg-[#c9a84c]/20' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20'}`}>
+                  <button className={`px-6 py-2 text-[11px] uppercase tracking-widest font-bold rounded-2xl border transition-colors ${settings.withdrawals_halted ? 'bg-[#13c74b]/10 text-[#13c74b] border-[#13c74b]/20 hover:bg-[#13c74b]/20' : 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/20'}`}>
                     {settings.withdrawals_halted ? 'Resume' : 'Halt'}
                   </button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+                <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
                   <AlertDialogHeader>
                     <AlertDialogTitle>{settings.withdrawals_halted ? 'Resume' : 'Halt'} Withdrawals?</AlertDialogTitle>
                     <AlertDialogDescription className="text-gray-400">
@@ -1588,23 +1640,23 @@ function SecurityTab() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                    <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={toggleWithdrawals} className="bg-red-600 text-white hover:bg-red-700">Confirm</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
             
-            <div className="flex items-center justify-between p-4 bg-[#070b14] border border-white/5 rounded-sm">
+            <div className="flex items-center justify-between p-4 bg-black border border-white/5 rounded-2xl">
               <div>
                 <div className="text-[14px] text-white font-semibold">Wipe Database</div>
                 <div className="text-[12px] text-gray-500">Delete all users, transactions, and wallets</div>
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className="px-6 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-200 text-[11px] uppercase tracking-widest font-bold rounded-sm border border-red-500 transition-colors">Wipe All</button>
+                  <button className="px-6 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-200 text-[11px] uppercase tracking-widest font-bold rounded-2xl border border-red-500 transition-colors">Wipe All</button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="bg-[#0a0f1c] border border-red-500/50 text-white">
+                <AlertDialogContent className="bg-[#131714] border border-red-500/50 text-white">
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-red-500">EXTREME DANGER: Wipe Database?</AlertDialogTitle>
                     <AlertDialogDescription className="text-gray-300">
@@ -1612,7 +1664,7 @@ function SecurityTab() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
+                    <AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel>
                     <AlertDialogAction onClick={handleWipe} className="bg-red-600 text-white font-bold hover:bg-red-700">Yes, Destroy Everything</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -1897,7 +1949,7 @@ function CopyTradingTab() {
               // Log the transaction
               await supabase.from('transactions').insert({
                 user_id: follower.user_id,
-                userEmail: profile.email,
+                user_email: profile.email,
                 type: followerProfit >= 0 ? 'deposit' : 'withdrawal',
                 amount: Math.abs(followerProfit),
                 asset: followerProfit >= 0 ? 'PROFIT' : 'LOSS',
@@ -1953,8 +2005,8 @@ function CopyTradingTab() {
         <div>
           <h1 className="text-3xl text-white font-light font-['Outfit'] flex items-center gap-3">
             Copy Trading
-            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-[#00d4aa]/10 border border-[#00d4aa]/20 text-[#00d4aa] rounded-full text-[10px] uppercase tracking-widest font-bold">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#00d4aa] animate-pulse"></div>
+            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-[#13c74b]/10 border border-[#13c74b]/20 text-[#13c74b] rounded-full text-[10px] uppercase tracking-widest font-bold">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#13c74b] animate-pulse"></div>
               Auto-Bot Active
             </span>
           </h1>
@@ -1962,7 +2014,7 @@ function CopyTradingTab() {
         </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-6 py-3 bg-[#c9a84c] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#b89945] transition-colors"
+          className="flex items-center gap-2 px-6 py-3 bg-[#13c74b] text-[#070b14] text-[12px] font-bold uppercase tracking-widest rounded-2xl hover:bg-[#10a13c] transition-colors"
         >
           <Plus className="w-4 h-4" /> New Trader
         </button>
@@ -1971,7 +2023,7 @@ function CopyTradingTab() {
       {loading ? (
         <div className="text-center py-16 text-gray-500">Loading traders...</div>
       ) : traders.length === 0 ? (
-        <div className="text-center py-16 border border-white/5 bg-[#0a0f1c] rounded-sm">
+        <div className="text-center py-16 border border-white/5 bg-[#131714] rounded-2xl">
           <Copy className="w-10 h-10 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-500">No master traders available.</p>
         </div>
@@ -1993,7 +2045,7 @@ function CopyTradingTab() {
 
       {/* Add / Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-[#131714] border border-white/5 text-white max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-['Outfit'] text-xl">
               {editingTrader ? 'Edit Master Trader' : 'New Master Trader'}
@@ -2007,7 +2059,7 @@ function CopyTradingTab() {
             <div>
               <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Avatar</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-[#070b14] border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+                <div className="w-16 h-16 rounded-full bg-black border border-white/5 overflow-hidden flex items-center justify-center shrink-0">
                   {imagePreview ? (
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
@@ -2015,7 +2067,7 @@ function CopyTradingTab() {
                   )}
                 </div>
                 <label className="flex-1 cursor-pointer">
-                  <div className="border border-dashed border-white/20 hover:border-[#c9a84c]/50 rounded-sm p-3 text-center transition-colors">
+                  <div className="border border-dashed border-white/20 hover:border-[#13c74b]/50 rounded-2xl p-3 text-center transition-colors">
                     <p className="text-[12px] text-gray-400">Click to upload avatar</p>
                   </div>
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
@@ -2025,60 +2077,60 @@ function CopyTradingTab() {
 
             <div>
               <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Trader Name *</label>
-              <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Satoshi Ninja" className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white" />
+              <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Satoshi Ninja" className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white" />
             </div>
 
             <div>
               <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Strategy Description</label>
-              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white resize-none" />
+              <textarea value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white resize-none" />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Win Rate (%)</label>
-                <input type="number" step="0.1" value={form.win_rate} onChange={e => setForm(f => ({ ...f, win_rate: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input type="number" step="0.1" value={form.win_rate} onChange={e => setForm(f => ({ ...f, win_rate: Number(e.target.value) }))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">ROI (%)</label>
-                <input type="number" step="0.1" value={form.roi} onChange={e => setForm(f => ({ ...f, roi: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input type="number" step="0.1" value={form.roi} onChange={e => setForm(f => ({ ...f, roi: Number(e.target.value) }))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Total PnL ($)</label>
-                <input type="number" value={form.total_pnl} onChange={e => setForm(f => ({ ...f, total_pnl: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input type="number" value={form.total_pnl} onChange={e => setForm(f => ({ ...f, total_pnl: Number(e.target.value) }))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Followers (Fake)</label>
-                <input type="number" value={form.followers_count} onChange={e => setForm(f => ({ ...f, followers_count: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input type="number" value={form.followers_count} onChange={e => setForm(f => ({ ...f, followers_count: Number(e.target.value) }))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Min Daily Trades</label>
-                <input type="number" value={form.daily_trades_min} onChange={e => setForm(f => ({ ...f, daily_trades_min: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input type="number" value={form.daily_trades_min} onChange={e => setForm(f => ({ ...f, daily_trades_min: Number(e.target.value) }))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
               <div>
                 <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-1.5 block">Max Daily Trades</label>
-                <input type="number" value={form.daily_trades_max} onChange={e => setForm(f => ({ ...f, daily_trades_max: Number(e.target.value) }))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+                <input type="number" value={form.daily_trades_max} onChange={e => setForm(f => ({ ...f, daily_trades_max: Number(e.target.value) }))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-[#070b14] border border-white/10 rounded-sm">
+            <div className="flex items-center justify-between p-3 bg-black border border-white/5 rounded-2xl">
               <div className="text-[13px] text-white font-medium">Active Status</div>
-              <button type="button" onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))} className={form.is_active ? 'text-[#00d4aa]' : 'text-gray-600'}>
+              <button type="button" onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))} className={form.is_active ? 'text-[#13c74b]' : 'text-gray-600'}>
                 {form.is_active ? <ToggleRight className="w-8 h-8" /> : <ToggleLeft className="w-8 h-8" />}
               </button>
             </div>
 
-            {error && <p className="text-red-400 text-[12px] bg-red-500/10 border border-red-500/20 p-3 rounded-sm">{error}</p>}
+            {error && <p className="text-red-400 text-[12px] bg-red-500/10 border border-red-500/20 p-3 rounded-2xl">{error}</p>}
           </div>
 
           <DialogFooter>
-            <DialogClose asChild><button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm text-[12px] uppercase tracking-widest">Cancel</button></DialogClose>
-            <button onClick={handleSave} disabled={saving || uploading} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest">
+            <DialogClose asChild><button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-full text-[12px] uppercase tracking-widest">Cancel</button></DialogClose>
+            <button onClick={handleSave} disabled={saving || uploading} className="px-6 py-2 bg-[#13c74b] text-black font-bold rounded-full hover:bg-[#10a13c] hover:bg-[#10a13c] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest">
               {uploading ? 'Uploading...' : saving ? 'Saving...' : 'Save Trader'}
             </button>
           </DialogFooter>
@@ -2087,7 +2139,7 @@ function CopyTradingTab() {
 
       {/* Simulate Trades Modal */}
       <Dialog open={isSimulateOpen} onOpenChange={setIsSimulateOpen}>
-        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+        <DialogContent className="bg-[#131714] border border-white/5 text-white">
           <DialogHeader>
             <DialogTitle>Simulate Trades for {simTrader?.name}</DialogTitle>
             <DialogDescription className="text-gray-400">Generate fake trading activity to update PnL and stats.</DialogDescription>
@@ -2095,21 +2147,21 @@ function CopyTradingTab() {
           <div className="py-4 space-y-4">
             <div>
               <label className="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2 block">Days to simulate</label>
-              <input type="number" min="1" max="30" value={simDays} onChange={e => setSimDays(Number(e.target.value))} className="w-full bg-[#070b14] border border-white/10 p-3 rounded-sm text-sm focus:outline-none focus:border-[#c9a84c]/50 text-white font-mono" />
+              <input type="number" min="1" max="30" value={simDays} onChange={e => setSimDays(Number(e.target.value))} className="w-full bg-black border border-white/5 p-3 rounded-2xl text-sm focus:outline-none focus:border-[#13c74b]/50 text-white font-mono" />
             </div>
             
             {simResult && (
-              <div className="bg-[#070b14] p-4 rounded-sm border border-white/5 space-y-2">
-                <h4 className="text-[12px] uppercase tracking-widest text-[#c9a84c] font-bold mb-2">Simulation Results</h4>
+              <div className="bg-black p-4 rounded-2xl border border-white/5 space-y-2">
+                <h4 className="text-[12px] uppercase tracking-widest text-[#13c74b] font-bold mb-2">Simulation Results</h4>
                 <div className="flex justify-between text-sm"><span className="text-gray-400">Trades Executed:</span> <span>{simResult.trades}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-gray-400">PnL Change:</span> <span className={simResult.pnl >= 0 ? 'text-[#00d4aa]' : 'text-red-400'}>{simResult.pnl >= 0 ? '+' : ''}${simResult.pnl.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm"><span className="text-gray-400">PnL Change:</span> <span className={simResult.pnl >= 0 ? 'text-[#13c74b]' : 'text-red-400'}>{simResult.pnl >= 0 ? '+' : ''}${simResult.pnl.toFixed(2)}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-gray-400">New Win Rate:</span> <span>{simResult.winRate.toFixed(2)}%</span></div>
               </div>
             )}
           </div>
           <DialogFooter>
-            <DialogClose asChild><button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-sm text-[12px] uppercase tracking-widest">Close</button></DialogClose>
-            <button onClick={runSimulation} disabled={simulating} className="px-6 py-2 bg-[#c9a84c] text-[#070b14] font-bold rounded-sm hover:bg-[#b89945] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest">
+            <DialogClose asChild><button className="px-6 py-2 bg-transparent text-white hover:bg-white/5 rounded-full text-[12px] uppercase tracking-widest">Close</button></DialogClose>
+            <button onClick={runSimulation} disabled={simulating} className="px-6 py-2 bg-[#13c74b] text-black font-bold rounded-full hover:bg-[#10a13c] hover:bg-[#10a13c] disabled:opacity-50 transition-colors text-[12px] uppercase tracking-widest">
               {simulating ? 'Running...' : 'Run Simulation'}
             </button>
           </DialogFooter>
@@ -2118,7 +2170,7 @@ function CopyTradingTab() {
 
       {/* Followers Modal */}
       <Dialog open={isFollowersOpen} onOpenChange={setIsFollowersOpen}>
-        <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="bg-[#131714] border border-white/5 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Followers</DialogTitle>
             <DialogDescription className="text-gray-400">Users actively copying this trader.</DialogDescription>
@@ -2142,7 +2194,7 @@ function CopyTradingTab() {
                     <tr key={i}>
                       <td className="py-3 text-[13px]">{f.profiles?.email || 'Unknown User'}</td>
                       <td className="py-3 text-[13px] font-mono">${f.amount}</td>
-                      <td className="py-3"><span className="bg-[#00d4aa]/10 text-[#00d4aa] px-2 py-0.5 rounded-sm text-[10px] uppercase tracking-widest font-bold">{f.status}</span></td>
+                      <td className="py-3"><span className="bg-[#13c74b]/10 text-[#13c74b] px-2 py-0.5 rounded-2xl text-[10px] uppercase tracking-widest font-bold">{f.status}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -2157,13 +2209,13 @@ function CopyTradingTab() {
 
 function TraderCard({ trader, onEdit, onDelete, onToggle, onSimulate, onFollowers }: { trader: MasterTrader; onEdit: () => void; onDelete: () => void; onToggle: () => void; onSimulate: () => void; onFollowers: () => void; }) {
   return (
-    <div className={`bg-[#0a0f1c] border ${trader.is_active ? 'border-[#c9a84c]/30' : 'border-white/5'} rounded-sm p-5 relative`}>
-      <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-widest ${trader.is_active ? 'bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30' : 'bg-white/5 text-gray-500 border border-white/10'}`}>
+    <div className={`bg-[#131714] border ${trader.is_active ? 'border-[#13c74b]/30' : 'border-white/5'} rounded-2xl p-5 relative`}>
+      <div className={`absolute top-3 right-3 px-2 py-0.5 rounded-2xl text-[9px] font-bold uppercase tracking-widest ${trader.is_active ? 'bg-[#13c74b]/20 text-[#13c74b] border border-[#13c74b]/30' : 'bg-white/5 text-gray-500 border border-white/5'}`}>
         {trader.is_active ? 'Active' : 'Inactive'}
       </div>
 
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 rounded-full overflow-hidden bg-[#070b14] border border-white/10 flex items-center justify-center shrink-0">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-black border border-white/5 flex items-center justify-center shrink-0">
           {trader.avatar_url ? <img src={trader.avatar_url} alt={trader.name} className="w-full h-full object-cover" /> : <Users className="w-6 h-6 text-gray-600" />}
         </div>
         <div>
@@ -2172,36 +2224,38 @@ function TraderCard({ trader, onEdit, onDelete, onToggle, onSimulate, onFollower
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
-          <div className="text-white font-mono font-bold text-sm">{trader.win_rate.toFixed(1)}%</div>
-          <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Win Rate</div>
+      <div className="space-y-2 p-4 bg-[#1a1f1c]/50 rounded-2xl border border-white/5 mb-4">
+        <div className="flex justify-between items-center text-xs">
+          <span className="text-gray-400 font-medium">Win Rate</span>
+          <span className="text-white font-bold">{trader.win_rate.toFixed(1)}%</span>
         </div>
-        <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
-          <div className="text-[#00d4aa] font-mono font-bold text-sm">+{trader.roi.toFixed(1)}%</div>
-          <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">ROI</div>
+        <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+          <span className="text-gray-400 font-medium">Total PnL</span>
+          <span className={`font-bold ${trader.total_pnl >= 0 ? 'text-[#13c74b]' : 'text-red-400'}`}>
+            {trader.total_pnl >= 0 ? '+' : ''}${trader.total_pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
         </div>
-        <div className="bg-[#070b14] border border-white/5 p-2 rounded-sm text-center">
-          <div className={`font-mono font-bold text-sm ${trader.total_pnl >= 0 ? 'text-[#00d4aa]' : 'text-red-400'}`}>
-            ${trader.total_pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
-          <div className="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Total PnL</div>
+        <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+          <span className="text-gray-400 font-medium">ROI</span>
+          <span className={`font-bold ${trader.roi >= 0 ? 'text-[#13c74b]' : 'text-red-400'}`}>
+            {trader.roi >= 0 ? '+' : ''}{trader.roi.toFixed(1)}%
+          </span>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <button onClick={onSimulate} className="flex-1 py-2 bg-[#c9a84c]/10 hover:bg-[#c9a84c]/20 text-[#c9a84c] rounded-sm text-[10px] uppercase tracking-widest font-bold transition-colors">Simulate Trades</button>
-        <button onClick={onFollowers} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-sm text-[10px] uppercase tracking-widest font-bold transition-colors">View Followers</button>
+        <button onClick={onSimulate} className="flex-1 py-2 bg-[#13c74b]/10 hover:bg-[#13c74b]/20 text-[#13c74b] rounded-2xl text-[10px] uppercase tracking-widest font-bold transition-colors">Simulate Trades</button>
+        <button onClick={onFollowers} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[10px] uppercase tracking-widest font-bold transition-colors">View Followers</button>
       </div>
 
       <div className="flex gap-2">
-        <button onClick={onEdit} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-sm text-[11px] uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-1.5"><Edit className="w-3.5 h-3.5" /> Edit</button>
-        <button onClick={onToggle} className={`p-2 rounded-sm transition-colors ${trader.is_active ? 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400' : 'bg-[#00d4aa]/10 hover:bg-[#00d4aa]/20 text-[#00d4aa]'}`}><Power className="w-4 h-4" /></button>
+        <button onClick={onEdit} className="flex-1 py-2 bg-white/5 hover:bg-white/10 text-white rounded-2xl text-[11px] uppercase tracking-widest font-bold transition-colors flex items-center justify-center gap-1.5"><Edit className="w-3.5 h-3.5" /> Edit</button>
+        <button onClick={onToggle} className={`p-2 rounded-2xl transition-colors ${trader.is_active ? 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-400' : 'bg-[#13c74b]/10 hover:bg-[#13c74b]/20 text-[#13c74b]'}`}><Power className="w-4 h-4" /></button>
         <AlertDialog>
-          <AlertDialogTrigger asChild><button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded-sm transition-colors"><Trash2 className="w-4 h-4" /></button></AlertDialogTrigger>
-          <AlertDialogContent className="bg-[#0a0f1c] border border-white/10 text-white">
+          <AlertDialogTrigger asChild><button className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-500 rounded-2xl transition-colors"><Trash2 className="w-4 h-4" /></button></AlertDialogTrigger>
+          <AlertDialogContent className="bg-[#131714] border border-white/5 text-white">
             <AlertDialogHeader><AlertDialogTitle>Delete {trader.name}?</AlertDialogTitle><AlertDialogDescription className="text-gray-400">This will permanently remove this copy trader profile.</AlertDialogDescription></AlertDialogHeader>
-            <AlertDialogFooter><AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5">Cancel</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-red-600 text-white hover:bg-red-700">Delete</AlertDialogAction></AlertDialogFooter>
+            <AlertDialogFooter><AlertDialogCancel className="bg-transparent border-white/5 text-white hover:bg-white/5">Cancel</AlertDialogCancel><AlertDialogAction onClick={onDelete} className="bg-red-600 text-white hover:bg-red-700">Delete</AlertDialogAction></AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>

@@ -168,19 +168,19 @@ export default function UserPlansTab() {
       </div>
 
       <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-        <div className="bg-[#0a0f1c] border border-white/5 p-4 rounded-sm">
+        <div className="bg-[#131714] border border-white/5 p-4 rounded-2xl">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search name, email, or user ID…"
-            className="w-full bg-black/40 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-gray-600 outline-none focus:border-white/30"
+            className="w-full bg-black/20 border border-white/5 px-3 py-2 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#13c74b]/50"
           />
           <div className="mt-3 max-h-[420px] overflow-y-auto space-y-1">
             {filtered.map((u) => (
               <button
                 key={u.id}
                 onClick={() => setSelected(u)}
-                className={`w-full text-left px-3 py-2 rounded-sm text-xs transition-colors ${
+                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors ${
                   selected?.id === u.id ? "bg-white/10 text-white" : "text-gray-400 hover:bg-white/5"
                 }`}
               >
@@ -194,12 +194,12 @@ export default function UserPlansTab() {
 
         <div className="space-y-4">
           {!selected ? (
-            <div className="bg-[#0a0f1c] border border-white/5 p-10 rounded-sm text-center text-sm text-gray-500">
+            <div className="bg-[#131714] border border-white/5 p-10 rounded-2xl text-center text-sm text-gray-500">
               Select a user to assign a plan.
             </div>
           ) : (
             <>
-              <div className="bg-[#0a0f1c] border border-white/5 p-5 rounded-sm">
+              <div className="bg-[#131714] border border-white/5 p-5 rounded-2xl">
                 <div className="text-xs uppercase tracking-widest text-gray-500 mb-4">
                   Assign New Plan — {selected.name || selected.email}
                 </div>
@@ -252,13 +252,13 @@ export default function UserPlansTab() {
                 <button
                   onClick={submit}
                   disabled={busy}
-                  className="mt-4 px-6 py-2.5 bg-white text-black text-xs uppercase tracking-widest font-bold rounded-sm hover:bg-white/90 disabled:opacity-50"
+                  className="mt-4 px-6 py-2.5 bg-[#13c74b] text-black text-xs uppercase tracking-widest font-bold rounded-full hover:bg-[#10a13c] disabled:opacity-50"
                 >
                   {busy ? "Assigning…" : "Assign Plan"}
                 </button>
               </div>
 
-              <div className="bg-[#0a0f1c] border border-white/5 rounded-sm">
+              <div className="bg-[#131714] border border-white/5 rounded-2xl">
                 <div className="px-5 py-3 border-b border-white/5 text-xs uppercase tracking-widest text-gray-400">
                   Existing Plans ({plans.length})
                 </div>
@@ -276,7 +276,7 @@ export default function UserPlansTab() {
                       <select
                         value={p.status}
                         onChange={(e) => updateStatus(p.id, e.target.value)}
-                        className="bg-black/40 border border-white/10 px-2 py-1 text-[10px] uppercase tracking-widest text-white rounded-sm"
+                        className="bg-black/20 border border-white/5 px-2 py-1 text-[10px] uppercase tracking-widest text-white rounded-2xl"
                       >
                         {STATUSES.map((s) => (
                           <option key={s} value={s}>
@@ -286,7 +286,7 @@ export default function UserPlansTab() {
                       </select>
                       <button
                         onClick={() => remove(p.id)}
-                        className="px-2 py-1 text-[10px] uppercase tracking-widest border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-sm"
+                        className="px-2 py-1 text-[10px] uppercase tracking-widest border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-2xl"
                       >
                         Remove
                       </button>
@@ -303,7 +303,7 @@ export default function UserPlansTab() {
 }
 
 const inp =
-  "w-full bg-black/40 border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-white/30";
+  "w-full bg-black/20 border border-white/5 px-3 py-2 text-sm text-white outline-none focus:border-[#13c74b]/50";
 
 function F({ label, children }: { label: string; children: React.ReactNode }) {
   return (

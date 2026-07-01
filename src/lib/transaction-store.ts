@@ -130,6 +130,34 @@ export function useTransactionStore() {
         p_amount: amountToAdd
       });
       if (rpcError) console.error('Error incrementing balance:', rpcError);
+
+      // Insert in-app notification for the user
+      const fmtAmt = `$${amountToAdd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      await supabase.from('notifications').insert([{
+        user_id: tx.userId,
+        title: 'Deposit Approved ✅',
+        message: `Your deposit of ${fmtAmt} ${tx.asset || ''} has been approved and credited to your balance.`,
+        is_read: false,
+      }]);
+
+    } else if (status === 'rejected' && tx.type === 'deposit') {
+      const fmtAmt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      await supabase.from('notifications').insert([{
+        user_id: tx.userId,
+        title: 'Deposit Rejected ❌',
+        message: `Your deposit of ${fmtAmt} ${tx.asset || ''} was not approved. Please contact support for assistance.`,
+        is_read: false,
+      }]);
+
+    } else if (status === 'approved' && tx.type === 'withdrawal') {
+      const fmtAmt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      await supabase.from('notifications').insert([{
+        user_id: tx.userId,
+        title: 'Withdrawal Sent 💸',
+        message: `Your withdrawal of ${fmtAmt} ${tx.asset || ''} has been processed and sent to your wallet.`,
+        is_read: false,
+      }]);
+
     } else if (status === 'rejected' && tx.type === 'withdrawal') {
       // Refund balance if withdrawal is rejected by admin
       const { error: rpcError } = await supabase.rpc('increment_balance', {
@@ -137,6 +165,14 @@ export function useTransactionStore() {
         p_amount: Number(tx.amount)
       });
       if (rpcError) console.error('Error refunding balance:', rpcError);
+
+      const fmtAmt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      await supabase.from('notifications').insert([{
+        user_id: tx.userId,
+        title: 'Withdrawal Rejected ❌',
+        message: `Your withdrawal of ${fmtAmt} ${tx.asset || ''} was rejected. Your balance has been refunded. Contact support for help.`,
+        is_read: false,
+      }]);
     }
   };
 

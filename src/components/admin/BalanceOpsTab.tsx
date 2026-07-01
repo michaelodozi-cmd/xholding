@@ -137,6 +137,22 @@ export default function BalanceOpsTab() {
       toast.error("Balance update failed: " + rpcErr.message);
       return;
     }
+
+    // Insert in-app notification for the user
+    const fmtAmt = `$${amt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const notifTitle = direction === "credit"
+      ? `${category} Received 🎉`
+      : `Balance Adjustment`;
+    const notifMsg = direction === "credit"
+      ? `You received a ${fmtAmt} ${category.toLowerCase()}${note ? ` — ${note}` : ''}. It has been credited to your account balance.`
+      : `A debit of ${fmtAmt} has been applied to your account${note ? ` — ${note}` : ''}.`;
+    await supabase.from("notifications").insert([{
+      user_id: selected.id,
+      title: notifTitle,
+      message: notifMsg,
+      is_read: false,
+    }]);
+
     toast.success(`${direction === "credit" ? "Credited" : "Debited"} $${amt.toFixed(2)} ${category}`);
     setAmount("");
     setNote("");
@@ -180,14 +196,14 @@ export default function BalanceOpsTab() {
 
       <div className="grid lg:grid-cols-[350px_1fr] gap-6">
         {/* User picker */}
-        <div className="bg-[#0a0f1c] border border-white/5 p-5 rounded-sm flex flex-col h-[600px]">
+        <div className="bg-[#131714] border border-white/5 p-5 rounded-2xl flex flex-col h-[600px]">
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search users..."
-              className="w-full bg-[#070b14] border border-white/10 pl-9 pr-3 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#00d4aa]/50 transition-colors rounded-sm"
+              className="w-full bg-black border border-white/5 pl-9 pr-3 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#13c74b]/50 transition-colors rounded-2xl"
             />
           </div>
           <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
@@ -195,14 +211,14 @@ export default function BalanceOpsTab() {
               <button
                 key={u.id}
                 onClick={() => setSelected(u)}
-                className={`w-full text-left px-4 py-3 rounded-sm text-xs transition-all border ${
+                className={`w-full text-left px-4 py-3 rounded-xl text-xs transition-all border ${
                   selected?.id === u.id 
-                    ? "bg-[#00d4aa]/10 border-[#00d4aa]/30 text-white shadow-[0_0_15px_rgba(0,212,170,0.1)]" 
-                    : "bg-transparent border-transparent text-gray-400 hover:bg-white/5 hover:border-white/10"
+                    ? "bg-[#13c74b]/10 border-[#13c74b]/30 text-white shadow-[0_0_15px_rgba(0,212,170,0.1)]" 
+                    : "bg-transparent border-transparent text-gray-400 hover:bg-white/5 hover:border-white/5"
                 }`}
               >
                 <div className="flex justify-between items-start mb-1">
-                  <div className={`font-medium truncate ${selected?.id === u.id ? 'text-[#00d4aa]' : 'text-white'}`}>
+                  <div className={`font-medium truncate ${selected?.id === u.id ? 'text-[#13c74b]' : 'text-white'}`}>
                     {u.name || 'Unnamed User'}
                   </div>
                   <div className={`text-[10px] font-mono ${selected?.id === u.id ? 'text-white' : 'text-gray-500'}`}>
@@ -224,24 +240,24 @@ export default function BalanceOpsTab() {
         {/* Form + history */}
         <div className="space-y-6">
           {!selected ? (
-            <div className="bg-[#0a0f1c] border border-white/5 p-12 rounded-sm flex flex-col items-center justify-center text-gray-500 min-h-[300px]">
+            <div className="bg-[#131714] border border-white/5 p-12 rounded-2xl flex flex-col items-center justify-center text-gray-500 min-h-[300px]">
               <Wallet className="w-12 h-12 mb-4 opacity-20" />
               <div className="text-sm tracking-wide">Select a user to manage their balance</div>
             </div>
           ) : (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-linear-to-br from-[#0a0f1c] to-[#070b14] border border-[#00d4aa]/20 p-6 rounded-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#00d4aa]/5 blur-2xl rounded-full" />
+              <div className="bg-linear-to-br from-[#131714] to-black border border-[#13c74b]/20 p-6 rounded-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#13c74b]/5 blur-2xl rounded-full" />
                 <div className="flex items-baseline justify-between mb-6 relative z-10">
                   <div>
-                    <div className="text-[10px] uppercase tracking-widest text-[#00d4aa] font-bold mb-1">Current Balance</div>
+                    <div className="text-[10px] uppercase tracking-widest text-[#13c74b] font-bold mb-1">Current Balance</div>
                     <div className="text-3xl font-light text-white font-mono">
                       ${Number(selected.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-[11px] text-gray-400 mb-1">{selected.name || 'User'}</div>
-                    <div className="text-[10px] text-gray-600 font-mono bg-black/40 px-2 py-1 rounded-sm border border-white/5">
+                    <div className="text-[10px] text-gray-600 font-mono bg-black/20 px-2 py-1 rounded-2xl border border-white/5">
                       {selected.id.slice(0, 12)}…
                     </div>
                   </div>
@@ -252,7 +268,7 @@ export default function BalanceOpsTab() {
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as Category)}
-                      className="w-full bg-[#070b14] border border-white/10 px-4 py-3 text-sm text-white outline-none focus:border-[#00d4aa]/50 transition-colors rounded-sm"
+                      className="w-full bg-black border border-white/5 px-4 py-3 text-sm text-white outline-none focus:border-[#13c74b]/50 transition-colors rounded-2xl"
                     >
                       {CATEGORIES.map((c) => (
                         <option key={c} value={c}>{c}</option>
@@ -265,12 +281,12 @@ export default function BalanceOpsTab() {
                         <button
                           key={d}
                           onClick={() => setDirection(d)}
-                          className={`flex-1 px-4 py-3 text-xs uppercase tracking-widest rounded-sm border transition-all font-bold ${
+                          className={`flex-1 px-4 py-3 text-xs uppercase tracking-widest rounded-2xl border transition-all font-bold ${
                             direction === d
                               ? d === "credit"
-                                ? "border-[#00d4aa]/50 bg-[#00d4aa]/10 text-[#00d4aa] shadow-[0_0_10px_rgba(0,212,170,0.1)]"
+                                ? "border-[#13c74b]/50 bg-[#13c74b]/10 text-[#13c74b] shadow-[0_0_10px_rgba(0,212,170,0.1)]"
                                 : "border-red-500/50 bg-red-500/10 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.1)]"
-                              : "border-white/10 text-gray-500 hover:bg-white/5 hover:border-white/20"
+                              : "border-white/5 text-gray-500 hover:bg-white/5 hover:border-white/20"
                           }`}
                         >
                           <div className="flex items-center justify-center gap-2">
@@ -291,7 +307,7 @@ export default function BalanceOpsTab() {
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-[#070b14] border border-white/10 pl-8 pr-4 py-3 text-sm text-white outline-none focus:border-[#00d4aa]/50 transition-colors rounded-sm font-mono"
+                        className="w-full bg-black border border-white/5 pl-8 pr-4 py-3 text-sm text-white outline-none focus:border-[#13c74b]/50 transition-colors rounded-2xl font-mono"
                       />
                     </div>
                   </Field>
@@ -301,7 +317,7 @@ export default function BalanceOpsTab() {
                       onChange={(e) => setNote(e.target.value)}
                       placeholder="e.g. VIP deposit bonus"
                       maxLength={160}
-                      className="w-full bg-[#070b14] border border-white/10 px-4 py-3 text-sm text-white outline-none focus:border-[#00d4aa]/50 transition-colors rounded-sm"
+                      className="w-full bg-black border border-white/5 px-4 py-3 text-sm text-white outline-none focus:border-[#13c74b]/50 transition-colors rounded-2xl"
                     />
                   </Field>
                 </div>
@@ -310,12 +326,12 @@ export default function BalanceOpsTab() {
                   <button
                     onClick={submit}
                     disabled={busy || !amount || Number(amount) <= 0}
-                    className={`flex-1 w-full sm:w-auto px-6 py-3.5 text-[12px] uppercase tracking-widest font-bold rounded-sm transition-all flex items-center justify-center gap-2 ${
+                    className={`flex-1 w-full sm:w-auto px-6 py-3.5 text-[12px] uppercase tracking-widest font-bold rounded-full transition-all flex items-center justify-center gap-2 ${
                       !amount || Number(amount) <= 0 || busy
                         ? 'bg-white/5 text-gray-500 cursor-not-allowed'
                         : direction === 'credit'
-                          ? 'bg-[#00d4aa] text-[#070b14] hover:bg-[#00b38f] shadow-[0_0_15px_rgba(0,212,170,0.3)]'
-                          : 'bg-red-500 text-white hover:bg-red-600 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                          ? 'bg-[#13c74b] text-black hover:bg-[#10a13c] rounded-full rounded-full shadow-[0_0_15px_rgba(0,212,170,0.3)]'
+                          : 'bg-red-500 text-white hover:bg-red-600 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.3)]'
                     }`}
                   >
                     {busy ? (
@@ -327,7 +343,7 @@ export default function BalanceOpsTab() {
                 </div>
               </div>
 
-              <div className="bg-[#0a0f1c] border border-white/5 rounded-sm">
+              <div className="bg-[#131714] border border-white/5 rounded-2xl">
                 <div className="px-5 py-3 border-b border-white/5 text-xs uppercase tracking-widest text-gray-400">
                   Admin Activity ({adminOps.length})
                 </div>
@@ -339,7 +355,7 @@ export default function BalanceOpsTab() {
                     <div key={tx.id} className="px-5 py-3 flex items-center gap-3 text-xs">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="px-1.5 py-0.5 text-[10px] uppercase tracking-widest bg-white/5 text-gray-300 rounded-sm">
+                          <span className="px-1.5 py-0.5 text-[10px] uppercase tracking-widest bg-white/5 text-gray-300 rounded-2xl">
                             {tx.asset}
                           </span>
                           <span
@@ -356,7 +372,7 @@ export default function BalanceOpsTab() {
                       {!tx.txid.includes("REVERSAL") && (
                         <button
                           onClick={() => reverse(tx)}
-                          className="px-3 py-1.5 text-[10px] uppercase tracking-widest border border-white/10 text-gray-300 hover:bg-white/5 rounded-sm"
+                          className="px-3 py-1.5 text-[10px] uppercase tracking-widest border border-white/5 text-gray-300 hover:bg-white/5 rounded-2xl"
                         >
                           Reverse
                         </button>

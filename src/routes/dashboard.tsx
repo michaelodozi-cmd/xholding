@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, Gift, User, Bell, Rocket, 
   Clock, CheckCircle2, Home, Copy, Shield, Smartphone, Monitor, ChevronRight,
@@ -49,6 +49,9 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState('home');
   const [profile, setProfile] = useState<any>(null);
   const [settings, setSettings] = useState<any>(null);
+  const [balanceFlash, setBalanceFlash] = useState(false);
+  const [liveToast, setLiveToast] = useState<{ show: boolean; amount: number; prev: number } | null>(null);
+  const prevBalanceRef = useRef<number | null>(null);
 
   useEffect(() => {
     let profileChannel: any = null;
@@ -84,7 +87,18 @@ function Dashboard() {
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
           (payload) => {
-            setProfile((prev: any) => ({ ...prev, ...payload.new }));
+            const newBalance = Number(payload.new?.balance || 0);
+            setProfile((prev: any) => {
+              const prevBal = Number(prev?.balance || 0);
+              if (newBalance !== prevBal) {
+                // Trigger flash + toast
+                setBalanceFlash(true);
+                setTimeout(() => setBalanceFlash(false), 1500);
+                setLiveToast({ show: true, amount: newBalance, prev: prevBal });
+                setTimeout(() => setLiveToast(null), 5000);
+              }
+              return { ...prev, ...payload.new };
+            });
           }
         )
         .subscribe();
@@ -189,12 +203,12 @@ function Dashboard() {
           <span className="font-semibold text-[22px] tracking-tight text-white font-['Inter']">XHoldings</span>
         </div>
         <div className="flex flex-col gap-1.5 grow">
-          <button onClick={() => setActiveTab('home')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'home' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Home className="w-[22px] h-[22px]"/> Portfolio</button>
-          <button onClick={() => setActiveTab('invest')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'invest' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><TrendingUp className="w-[22px] h-[22px]"/> Markets</button>
-          <button onClick={() => setActiveTab('copytrade')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'copytrade' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Users className="w-[22px] h-[22px]"/> Copy Trading</button>
-          <button onClick={() => setActiveTab('wallet')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'wallet' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Wallet className="w-[22px] h-[22px]"/> Deposit / Withdraw</button>
-          <button onClick={() => setActiveTab('history')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'history' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><List className="w-[22px] h-[22px]"/> Transactions</button>
-          <button onClick={() => setActiveTab('settings')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'settings' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Settings className="w-[22px] h-[22px]"/> Settings</button>
+          <button onClick={() => setActiveTab('home')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'home' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Home className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Portfolio</span></button>
+          <button onClick={() => setActiveTab('invest')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'invest' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><TrendingUp className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Markets</span></button>
+          <button onClick={() => setActiveTab('copytrade')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'copytrade' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Users className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Copy Trading</span></button>
+          <button onClick={() => setActiveTab('wallet')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'wallet' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Wallet className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Deposit / Withdraw</span></button>
+          <button onClick={() => setActiveTab('history')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'history' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><List className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Transactions</span></button>
+          <button onClick={() => setActiveTab('settings')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'settings' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Settings className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Settings</span></button>
           
           {profile?.role === 'admin' && (
             <Link to="/admin" className="flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors mt-8 text-red-400 hover:text-red-300 hover:bg-red-500/10 font-bold">
@@ -216,7 +230,7 @@ function Dashboard() {
           <span className="font-semibold text-lg tracking-tight text-white font-['Inter']">XHoldings</span>
         </div>
         <div className="flex items-center gap-3">
-          <NotificationBell transactions={userTransactions} hasFetched={hasFetched} />
+          <NotificationBell />
         </div>
       </header>
 
@@ -225,7 +239,7 @@ function Dashboard() {
         
         {/* Top Header Desktop */}
         <header className="hidden md:flex items-center justify-end gap-4 mb-8">
-          <NotificationBell transactions={userTransactions} hasFetched={hasFetched} />
+          <NotificationBell />
           <button className="flex items-center gap-2 pl-2 pr-4 py-1.5 rounded-full bg-[#1a221d] hover:bg-white/10 transition-colors ml-2" onClick={() => setActiveTab('profile')}>
             <div className="w-8 h-8 rounded-full bg-[#ea580c] flex items-center justify-center text-white font-bold text-sm uppercase">
               {profile?.name ? profile.name.charAt(0) : 'U'}
@@ -235,7 +249,7 @@ function Dashboard() {
           </button>
         </header>
 
-        {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} profile={profile} />}
+        {activeTab === 'home' && <HomeTab setActiveTab={setActiveTab} profile={profile} balanceFlash={balanceFlash} />}
         {activeTab === 'invest' && <InvestTab profile={profile} />}
         {activeTab === 'copytrade' && <CopyTradeTab profile={profile} />}
         {activeTab === 'wallet' && <WalletTab profile={profile} settings={settings} />}
@@ -244,6 +258,39 @@ function Dashboard() {
         {activeTab === 'settings' && <ProfileTab profile={profile} setActiveTab={setActiveTab} />}
         {activeTab === 'profile' && <ProfileTab profile={profile} setActiveTab={setActiveTab} />}
       </main>
+
+      {/* Live Balance Update Toast */}
+      {liveToast && (
+        <div className="fixed bottom-28 md:bottom-8 right-4 md:right-8 z-[9999] animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="bg-[#06120b] border border-[#13c74b]/40 rounded-2xl shadow-[0_8px_32px_rgba(19,199,75,0.2)] p-4 min-w-[280px] max-w-[340px]">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#13c74b]/15 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-5 h-5 text-[#13c74b]" />
+              </div>
+              <div className="flex-1">
+                <div className="text-[13px] font-bold text-white mb-0.5">Balance Updated</div>
+                <div className="text-[12px] text-gray-400">
+                  {liveToast.amount > liveToast.prev ? (
+                    <span className="text-[#13c74b] font-semibold">
+                      +${(liveToast.amount - liveToast.prev).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} credited
+                    </span>
+                  ) : (
+                    <span className="text-red-400 font-semibold">
+                      -${(liveToast.prev - liveToast.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} debited
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-gray-500 mt-1">
+                  New balance: <span className="text-white font-semibold">${liveToast.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+              <button onClick={() => setLiveToast(null)} className="text-gray-600 hover:text-white mt-0.5">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Bottom Navigation Bar - 5 items */}
       <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#050806]/95 backdrop-blur-lg px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-3 flex justify-around items-center z-50">
@@ -454,18 +501,22 @@ function CopyTradeTab({ profile }: { profile?: any }) {
                     {trader.description || 'Professional quantitative trader.'}
                   </p>
 
-                  <div className="grid grid-cols-3 gap-2 p-3 bg-[#1a1f1c] rounded-xl">
-                    <div className="text-center">
-                      <div className="text-[10px] text-gray-500 font-medium mb-1">Win Rate</div>
-                      <div className="text-[14px] text-white font-bold">{Number(trader.win_rate).toFixed(1)}%</div>
+                  <div className="space-y-2 p-4 bg-[#1a1f1c]/50 rounded-2xl border border-white/5">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-400 font-medium">Win Rate</span>
+                      <span className="text-white font-bold">{Number(trader.win_rate).toFixed(1)}%</span>
                     </div>
-                    <div className="text-center border-x border-white/5">
-                      <div className="text-[10px] text-gray-500 font-medium mb-1">Total PnL</div>
-                      <div className="text-[14px] text-[#13c74b] font-bold">+${Number(trader.total_pnl).toLocaleString()}</div>
+                    <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+                      <span className="text-gray-400 font-medium">Total PnL</span>
+                      <span className={`font-bold ${Number(trader.total_pnl) >= 0 ? 'text-[#13c74b]' : 'text-red-400'}`}>
+                        {Number(trader.total_pnl) >= 0 ? '+' : ''}${Number(trader.total_pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
                     </div>
-                    <div className="text-center">
-                      <div className="text-[10px] text-gray-500 font-medium mb-1">ROI</div>
-                      <div className="text-[14px] text-white font-bold">+{Number(trader.roi).toFixed(1)}%</div>
+                    <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+                      <span className="text-gray-400 font-medium">ROI</span>
+                      <span className={`font-bold ${Number(trader.roi) >= 0 ? 'text-[#13c74b]' : 'text-red-400'}`}>
+                        {Number(trader.roi) >= 0 ? '+' : ''}{Number(trader.roi).toFixed(1)}%
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -542,7 +593,7 @@ function CopyTradeTab({ profile }: { profile?: any }) {
 
 // ---- TAB COMPONENTS ----
 
-function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => void, profile?: any }) {
+function HomeTab({ setActiveTab, profile, balanceFlash }: { setActiveTab: (tab: string) => void, profile?: any, balanceFlash?: boolean }) {
   const { transactions } = useTransactionStore();
   const { investments } = useInvestmentStore();
   
@@ -598,9 +649,15 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
             <div className="flex items-center gap-2 text-gray-400 text-[15px] mb-2">
               Total Balance <Eye className="w-4 h-4 cursor-pointer hover:text-white" />
             </div>
-            <div className="text-[40px] md:text-[52px] text-white font-bold tracking-tight leading-none">
+            <div
+              className={`text-[40px] md:text-[52px] font-bold tracking-tight leading-none transition-colors duration-700 ${balanceFlash ? 'text-[#13c74b]' : 'text-white'}`}
+              style={balanceFlash ? { textShadow: '0 0 30px rgba(19,199,75,0.5)' } : {}}
+            >
               ${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </div>
+            {balanceFlash && (
+              <div className="mt-1 text-[12px] text-[#13c74b] font-semibold animate-pulse">● Live update received</div>
+            )}
           </div>
           
           <div className="flex items-center flex-wrap gap-3 sm:gap-6">
@@ -726,11 +783,58 @@ function HomeTab({ setActiveTab, profile }: { setActiveTab: (tab: string) => voi
 
 
 
+interface Plan {
+  id: string;
+  name: string;
+  daily_roi: number;
+  duration_days: number;
+  min_amount: number;
+  max_amount: number | null;
+  is_active: boolean;
+  image_url: string | null;
+  description: string | null;
+  created_at: string;
+}
+
 function InvestTab({ profile }: { profile?: any }) {
   const { investments } = useInvestmentStore();
   const [amount, setAmount] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
   const [alertState, setAlertState] = useState({ open: false, title: '', message: '' });
+  
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setLoadingPlans(true);
+      setFetchError(null);
+      const { data, error } = await supabase
+        .from('investment_plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('min_amount', { ascending: true });
+      if (error) {
+        console.error("Error fetching investment plans:", error);
+        setFetchError(error.message);
+      } else if (data) {
+        setPlans(data as Plan[]);
+        if (data.length > 0) {
+          setSelectedPlan(data[0] as Plan);
+        }
+      }
+      setLoadingPlans(false);
+    };
+    fetchPlans();
+  }, []);
+
+  const getNormalizedRoi = (plan: Plan | null) => {
+    if (!plan) return 0;
+    const roi = Number(plan.daily_roi);
+    return roi > 0.5 ? roi / 100 : roi;
+  };
 
   const roiEarned = investments.reduce((acc, inv) => {
     const daysPassed = (Date.now() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24);
@@ -742,28 +846,38 @@ function InvestTab({ profile }: { profile?: any }) {
     setAlertState({ open: true, title, message });
   };
   
-  const dailyROI = amount ? (Number(amount) * 0.032).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
-  const profit = amount ? (Number(amount) * 0.032 * 60).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
-  const totalReturn = amount ? (Number(amount) * 0.032 * 60 + Number(amount)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
+  const dailyROI = amount && selectedPlan ? (Number(amount) * getNormalizedRoi(selectedPlan)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
+  const profit = amount && selectedPlan ? (Number(amount) * getNormalizedRoi(selectedPlan) * selectedPlan.duration_days).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
+  const totalReturn = amount && selectedPlan ? (Number(amount) * getNormalizedRoi(selectedPlan) * selectedPlan.duration_days + Number(amount)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
 
   const handleInvest = async () => {
+    if (!selectedPlan) return;
     if (!amount || amount <= 0) return;
     if (amount > totalBalance) {
       showAlert("Insufficient Balance", "You cannot invest more than your available total balance.");
       return;
     }
+    if (amount < Number(selectedPlan.min_amount)) {
+      showAlert("Minimum Investment Required", `The minimum investment amount for this plan is $${Number(selectedPlan.min_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}.`);
+      return;
+    }
+    if (selectedPlan.max_amount && amount > Number(selectedPlan.max_amount)) {
+      showAlert("Maximum Investment Exceeded", `The maximum investment amount for this plan is $${Number(selectedPlan.max_amount).toLocaleString(undefined, {minimumFractionDigits: 2})}.`);
+      return;
+    }
+
     setLoading(true);
     const { error } = await supabase.rpc('create_investment', {
-      p_plan_name: 'Growth Plan',
+      p_plan_name: selectedPlan.name,
       p_amount: amount,
-      p_daily_roi: 0.032,
-      p_duration: 60
+      p_daily_roi: getNormalizedRoi(selectedPlan),
+      p_duration: selectedPlan.duration_days
     });
     setLoading(false);
     if (error) {
       showAlert("Investment Failed", error.message);
     } else {
-      showAlert("Investment Successful", "Your investment plan has been activated. You will start earning daily returns.");
+      showAlert("Investment Successful", `Your investment in ${selectedPlan.name} has been activated. You will start earning daily returns.`);
       setAmount('');
     }
   };
@@ -790,61 +904,128 @@ function InvestTab({ profile }: { profile?: any }) {
         <h1 className="text-xl md:text-2xl text-white font-bold hidden md:block">Markets</h1>
       </div>
 
-      <div className="bg-[#1a1f1c]/60 border border-transparent p-6 md:p-8 rounded-3xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <h2 className="text-[28px] md:text-[32px] text-white font-bold mb-3 tracking-tight">Growth Plan</h2>
-            <div className="flex flex-wrap gap-2 text-[12px] font-bold">
-              <span className="bg-[#13c74b]/10 text-[#13c74b] px-3 py-1.5 rounded-full">3.2% Daily ROI</span>
-              <span className="bg-white/5 text-gray-300 px-3 py-1.5 rounded-full">60 Days Duration</span>
-              <span className="bg-white/5 text-gray-300 px-3 py-1.5 flex items-center gap-1.5 rounded-full"><ShieldCheck className="w-3.5 h-3.5 text-[#13c74b]"/> Verified Asset</span>
-            </div>
-          </div>
-          <div className="text-right w-full md:w-auto">
-            <div className="text-sm text-gray-400 font-medium mb-1">Available Balance</div>
-            <div className="text-xl text-white font-bold">${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-          </div>
+      {loadingPlans ? (
+        <div className="bg-[#1a1f1c]/60 border border-transparent p-12 rounded-3xl flex items-center justify-center min-h-[300px]">
+          <div className="w-8 h-8 border-4 border-[#13c74b] border-t-transparent rounded-full animate-spin"></div>
         </div>
-
-        <div className="space-y-6 max-w-2xl">
-          <div>
-            <label className="text-sm text-gray-400 font-medium mb-2 block">Investment Amount ($)</label>
-            <div className="relative">
-              <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
-              <input 
-                type="number" 
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                placeholder="0.00" 
-                className="w-full bg-[#131714] border border-white/5 text-white pl-10 pr-4 py-4 rounded-2xl focus:outline-none focus:border-[#13c74b]/50 transition-colors text-xl font-bold placeholder-gray-600"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
-              <div className="text-[12px] text-gray-500 font-medium mb-1">Daily ROI</div>
-              <div className="text-lg text-[#13c74b] font-bold truncate" title={`+$${dailyROI}`}>+${dailyROI}</div>
-            </div>
-            <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
-              <div className="text-[12px] text-gray-500 font-medium mb-1">Duration</div>
-              <div className="text-lg text-white font-bold truncate">60 Days</div>
-            </div>
-            <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
-              <div className="text-[12px] text-gray-500 font-medium mb-1">Total Profit</div>
-              <div className="text-lg text-[#13c74b] font-bold truncate" title={`$${profit}`}>${profit}</div>
-            </div>
-            <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
-              <div className="text-[12px] text-gray-500 font-medium mb-1">Total Return</div>
-              <div className="text-lg text-white font-bold truncate" title={`$${totalReturn}`}>${totalReturn}</div>
-            </div>
-          </div>
-
-          <button disabled={loading} onClick={handleInvest} className="w-full bg-[#13c74b] hover:bg-[#10a83f] text-black py-4 font-bold text-[15px] transition-colors rounded-full flex items-center justify-center gap-2 mt-4 shadow-[0_0_20px_rgba(19,199,75,0.2)]">
-            {loading ? 'Processing...' : 'Confirm Investment'} <ArrowRight className="w-5 h-5" />
-          </button>
+      ) : plans.length === 0 ? (
+        <div className="bg-[#1a1f1c]/60 border border-transparent p-12 rounded-3xl flex flex-col items-center justify-center text-gray-500 text-center min-h-[300px]">
+          <ShieldCheck className="w-12 h-12 mb-4 opacity-20 text-[#13c74b]" />
+          <h3 className="text-white font-bold text-lg mb-2">No Active Plans</h3>
+          <p className="text-sm text-gray-400">
+            {fetchError ? `Database error: ${fetchError}` : "There are no active investment plans available right now."}
+          </p>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col gap-6">
+          {/* Plan Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            {plans.map(p => {
+              const isSelected = selectedPlan?.id === p.id;
+              const normalizedRoi = getNormalizedRoi(p);
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPlan(p)}
+                  className={`text-left p-6 rounded-3xl border transition-all duration-300 relative overflow-hidden flex flex-col justify-between min-h-[180px] ${
+                    isSelected
+                      ? "bg-[#13c74b]/10 border-[#13c74b] shadow-[0_0_20px_rgba(19,199,75,0.1)]"
+                      : "bg-[#131714] border-white/5 hover:border-[#13c74b]/30 hover:bg-[#1a1f1c]"
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="absolute top-4 right-4 bg-[#13c74b] text-black w-5 h-5 rounded-full flex items-center justify-center">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                  
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-2 pr-6 truncate">{p.name}</h3>
+                    {p.description && (
+                      <p className="text-[12px] text-gray-400 line-clamp-2 mb-4 font-medium leading-relaxed">
+                        {p.description}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="flex justify-between items-end mt-auto pt-3 border-t border-white/5">
+                    <div>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Daily ROI</div>
+                      <div className="text-[14px] text-[#13c74b] font-bold">{(normalizedRoi * 100).toFixed(1)}%</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Duration</div>
+                      <div className="text-[14px] text-white font-bold">{p.duration_days} Days</div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Investment Details Form */}
+          {selectedPlan && (
+            <div className="bg-[#1a1f1c]/60 border border-transparent p-6 md:p-8 rounded-3xl relative overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                  <h2 className="text-[28px] md:text-[32px] text-white font-bold mb-3 tracking-tight">{selectedPlan.name}</h2>
+                  <div className="flex flex-wrap gap-2 text-[12px] font-bold">
+                    <span className="bg-[#13c74b]/10 text-[#13c74b] px-3 py-1.5 rounded-full">{(getNormalizedRoi(selectedPlan) * 100).toFixed(1)}% Daily ROI</span>
+                    <span className="bg-white/5 text-gray-300 px-3 py-1.5 rounded-full">{selectedPlan.duration_days} Days Duration</span>
+                    <span className="bg-white/5 text-gray-300 px-3 py-1.5 flex items-center gap-1.5 rounded-full"><ShieldCheck className="w-3.5 h-3.5 text-[#13c74b]"/> Verified Asset</span>
+                  </div>
+                </div>
+                <div className="text-right w-full md:w-auto">
+                  <div className="text-sm text-gray-400 font-medium mb-1">Available Balance</div>
+                  <div className="text-xl text-white font-bold">${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                </div>
+              </div>
+
+              <div className="space-y-6 max-w-2xl">
+                <div>
+                  <label className="text-sm text-gray-400 font-medium mb-2 block">Investment Amount ($)</label>
+                  <div className="relative">
+                    <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
+                    <input 
+                      type="number" 
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="0.00" 
+                      className="w-full bg-[#131714] border border-white/5 text-white pl-10 pr-4 py-4 rounded-2xl focus:outline-none focus:border-[#13c74b]/50 transition-colors text-xl font-bold placeholder-gray-600"
+                    />
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2 font-medium">
+                    Min. investment: ${Number(selectedPlan.min_amount).toLocaleString()} {selectedPlan.max_amount && `· Max. investment: $${Number(selectedPlan.max_amount).toLocaleString()}`}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
+                    <div className="text-[12px] text-gray-500 font-medium mb-1">Daily ROI</div>
+                    <div className="text-lg text-[#13c74b] font-bold truncate" title={`+$${dailyROI}`}>+${dailyROI}</div>
+                  </div>
+                  <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
+                    <div className="text-[12px] text-gray-500 font-medium mb-1">Duration</div>
+                    <div className="text-lg text-white font-bold truncate">{selectedPlan.duration_days} Days</div>
+                  </div>
+                  <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
+                    <div className="text-[12px] text-gray-500 font-medium mb-1">Total Profit</div>
+                    <div className="text-lg text-[#13c74b] font-bold truncate" title={`$${profit}`}>${profit}</div>
+                  </div>
+                  <div className="bg-[#131714] rounded-2xl p-4 overflow-hidden">
+                    <div className="text-[12px] text-gray-500 font-medium mb-1">Total Return</div>
+                    <div className="text-lg text-white font-bold truncate" title={`$${totalReturn}`}>${totalReturn}</div>
+                  </div>
+                </div>
+
+                <button disabled={loading} onClick={handleInvest} className="w-full bg-[#13c74b] hover:bg-[#10a83f] text-black py-4 font-bold text-[15px] transition-colors rounded-full flex items-center justify-center gap-2 mt-4 shadow-[0_0_20px_rgba(19,199,75,0.2)]">
+                  {loading ? 'Processing...' : 'Confirm Investment'} <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {investments.length > 0 && (
         <div className="mt-8">
@@ -915,25 +1096,36 @@ function InvestTab({ profile }: { profile?: any }) {
   )
 }
 
-function CryptoSelector({ focusColor, value, onChange }: { focusColor: string, value?: string, onChange?: (v: string) => void }) {
+// Comprehensive crypto logo map for all 20 top cryptos
+export const getCryptoLogo = (id: string) => {
+  const map: Record<string, string> = {
+    btc:  'https://cryptologos.cc/logos/bitcoin-btc-logo.svg',
+    eth:  'https://cryptologos.cc/logos/ethereum-eth-logo.svg',
+    usdt: 'https://cryptologos.cc/logos/tether-usdt-logo.svg',
+    bnb:  'https://cryptologos.cc/logos/bnb-bnb-logo.svg',
+    sol:  'https://cryptologos.cc/logos/solana-sol-logo.svg',
+    usdc: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg',
+    xrp:  'https://cryptologos.cc/logos/xrp-xrp-logo.svg',
+    doge: 'https://cryptologos.cc/logos/dogecoin-doge-logo.svg',
+    ton:  'https://cryptologos.cc/logos/toncoin-ton-logo.svg',
+    ada:  'https://cryptologos.cc/logos/cardano-ada-logo.svg',
+    trx:  'https://cryptologos.cc/logos/tron-trx-logo.svg',
+    avax: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg',
+    shib: 'https://cryptologos.cc/logos/shiba-inu-shib-logo.svg',
+    link: 'https://cryptologos.cc/logos/chainlink-link-logo.svg',
+    dot:  'https://cryptologos.cc/logos/polkadot-new-dot-logo.svg',
+    ltc:  'https://cryptologos.cc/logos/litecoin-ltc-logo.svg',
+    uni:  'https://cryptologos.cc/logos/uniswap-uni-logo.svg',
+    matic:'https://cryptologos.cc/logos/polygon-matic-logo.svg',
+    xlm:  'https://cryptologos.cc/logos/stellar-xlm-logo.svg',
+    xmr:  'https://cryptologos.cc/logos/monero-xmr-logo.svg',
+  };
+  return map[id.toLowerCase()] || null;
+};
+
+function CryptoSelector({ focusColor, value, onChange, cryptoPrices, pricesLoading }: { focusColor: string, value?: string, onChange?: (v: string) => void, cryptoPrices?: Record<string, number>, pricesLoading?: boolean }) {
   const { cryptos } = useCryptoStore();
   const activeCryptos = cryptos.filter(c => c.active);
-
-  const getCryptoLogo = (id: string) => {
-    const map: Record<string, string> = {
-      btc: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg',
-      eth: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg',
-      usdt: 'https://cryptologos.cc/logos/tether-usdt-logo.svg',
-      bnb: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg',
-      sol: 'https://cryptologos.cc/logos/solana-sol-logo.svg',
-      usdc: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg',
-      xrp: 'https://cryptologos.cc/logos/xrp-xrp-logo.svg',
-      doge: 'https://cryptologos.cc/logos/dogecoin-doge-logo.svg',
-      ton: 'https://cryptologos.cc/logos/toncoin-ton-logo.svg',
-      ada: 'https://cryptologos.cc/logos/cardano-ada-logo.svg'
-    };
-    return map[id.toLowerCase()] || null;
-  };
 
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -950,18 +1142,25 @@ function CryptoSelector({ focusColor, value, onChange }: { focusColor: string, v
         <button className={`w-full flex items-center justify-between bg-[#06120b] border border-white/5 text-white p-3.5 h-auto rounded-xl focus:outline-none focus:ring-1 focus:ring-offset-0 focus:ring-offset-transparent ${focusColor} hover:bg-white/5 transition-colors shadow-none`}>
           {selectedCryptoData ? (
             <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full border border-white/5 flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden" style={!getCryptoLogo(selectedCryptoData.id) ? { backgroundColor: `${selectedCryptoData.color}15`, color: selectedCryptoData.color } : {}}>
+              <div className="w-7 h-7 rounded-full border border-white/5 flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden" style={!getCryptoLogo(selectedCryptoData.id) ? { backgroundColor: `${selectedCryptoData.color}15`, color: selectedCryptoData.color } : {}}>
                 {getCryptoLogo(selectedCryptoData.id) ? <img src={getCryptoLogo(selectedCryptoData.id)!} alt={selectedCryptoData.name} className="w-full h-full object-cover p-0.5" /> : (selectedCryptoData.symbol || '?').substring(0, 1)}
               </div>
               <div className="flex flex-col items-start">
                 <span className="text-[13px] font-bold leading-tight mb-0.5">{selectedCryptoData.name}</span>
-                <span className="text-[10px] text-gray-400 font-medium leading-tight">{selectedCryptoData.symbol}</span>
+                <span className="text-[10px] text-gray-400 font-medium leading-tight">{selectedCryptoData.symbol} · {selectedCryptoData.network}</span>
               </div>
             </div>
           ) : (
             <span className="text-gray-400 text-sm">Select Crypto</span>
           )}
-          <ChevronDown className="w-4 h-4 opacity-50 shrink-0" />
+          <div className="flex items-center gap-2">
+            {selectedCryptoData && cryptoPrices && !pricesLoading && (
+              <span className="text-[11px] text-[#13c74b] font-bold">
+                ${(cryptoPrices[selectedCryptoData.symbol.toUpperCase()] || 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
+              </span>
+            )}
+            <ChevronDown className="w-4 h-4 opacity-50 shrink-0" />
+          </div>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-[#131714] border-white/5 text-white rounded-xl shadow-xl shadow-black/50" align="start">
@@ -970,17 +1169,18 @@ function CryptoSelector({ focusColor, value, onChange }: { focusColor: string, v
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search asset or network..."
+            placeholder="Search by name or symbol..."
             className="w-full bg-transparent border-none text-sm text-white focus:outline-none focus:ring-0 py-3 placeholder:text-gray-500"
           />
         </div>
-        <div className="max-h-[300px] overflow-y-auto p-1 custom-scrollbar">
+        <div className="max-h-[320px] overflow-y-auto p-1 custom-scrollbar">
           {filteredCryptos.length === 0 ? (
             <div className="p-4 text-center text-sm text-gray-500">No assets found.</div>
           ) : (
             filteredCryptos.map(crypto => {
               const logo = getCryptoLogo(crypto.id);
               const isSelected = value === crypto.id;
+              const price = cryptoPrices?.[crypto.symbol.toUpperCase()];
               return (
                 <button
                   key={crypto.id}
@@ -989,18 +1189,25 @@ function CryptoSelector({ focusColor, value, onChange }: { focusColor: string, v
                     setOpen(false);
                     setSearchQuery('');
                   }}
-                  className={`w-full flex items-center justify-between cursor-pointer p-3 rounded-lg my-0.5 transition-colors ${isSelected ? 'bg-[#13c74b]/10' : 'hover:bg-white/5'}`}
+                  className={`w-full flex items-center justify-between cursor-pointer p-3 rounded-lg my-0.5 transition-colors ${isSelected ? 'bg-[#13c74b]/10 border border-[#13c74b]/20' : 'hover:bg-white/5'}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full border border-white/5 flex items-center justify-center text-[11px] font-bold shrink-0 overflow-hidden" style={!logo ? { backgroundColor: `${crypto.color}15`, color: crypto.color } : {}}>
-                      {logo ? <img src={logo} alt={crypto.name} className="w-full h-full object-cover p-0.5" /> : (crypto.symbol || '?').substring(0, 1)}
+                    <div className="w-8 h-8 rounded-full border border-white/5 flex items-center justify-center text-[11px] font-bold shrink-0 overflow-hidden" style={!logo ? { backgroundColor: `${crypto.color}15`, color: crypto.color } : {}}>
+                      {logo ? <img src={logo} alt={crypto.name} className="w-full h-full object-cover p-0.5" /> : (crypto.symbol || '?').substring(0, 2)}
                     </div>
                     <div className="flex flex-col items-start">
-                      <span className="text-[14px] font-bold leading-tight mb-0.5 text-white">{crypto.name}</span>
-                      <span className="text-[11px] text-gray-400 font-medium leading-tight">{crypto.symbol}</span>
+                      <span className="text-[13px] font-bold leading-tight text-white">{crypto.name}</span>
+                      <span className="text-[10px] text-gray-500 font-medium">{crypto.symbol} · {crypto.network}</span>
                     </div>
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-[#13c74b]" />}
+                  <div className="flex flex-col items-end gap-0.5">
+                    {price && !pricesLoading ? (
+                      <span className="text-[12px] text-white font-bold">${price.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                    ) : (
+                      <span className="text-[11px] text-gray-600">—</span>
+                    )}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#13c74b]" />}
+                  </div>
                 </button>
               );
             })
@@ -1011,19 +1218,21 @@ function CryptoSelector({ focusColor, value, onChange }: { focusColor: string, v
   );
 }
 
-// Map from our crypto symbol to CoinGecko ID
+// Expanded CoinGecko ID map for all 20 top cryptos
 const COINGECKO_IDS: Record<string, string> = {
   BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', XRP: 'ripple',
   USDT: 'tether', USDC: 'usd-coin', BNB: 'binancecoin', ADA: 'cardano',
   DOGE: 'dogecoin', LTC: 'litecoin', DOT: 'polkadot', MATIC: 'matic-network',
   AVAX: 'avalanche-2', LINK: 'chainlink', UNI: 'uniswap', TRX: 'tron',
+  TON: 'the-open-network', SHIB: 'shiba-inu', XLM: 'stellar', XMR: 'monero',
 };
 
 function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   const [mode, setMode] = useState('deposit');
   const [copied, setCopied] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState('btc');
-  const [amount, setAmount] = useState('');
+  // USD is now the PRIMARY input — user enters dollar amount
+  const [usdAmount, setUsdAmount] = useState('');
   const [txid, setTxid] = useState('');
   const [cryptoPrices, setCryptoPrices] = useState<Record<string, number>>({});
   const [pricesLoading, setPricesLoading] = useState(true);
@@ -1061,8 +1270,12 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
 
   const selectedSymbol = selectedCryptoData?.symbol?.toUpperCase() || '';
   const selectedPrice = cryptoPrices[selectedSymbol] || null;
-  const amountNum = parseFloat(amount) || 0;
-  const usdValue = selectedPrice ? amountNum * selectedPrice : null;
+  // USD is the primary value; compute how much crypto that equals
+  const usdAmountNum = parseFloat(usdAmount) || 0;
+  // For stablecoins 1:1; for others divide by price
+  const cryptoEquivalent = selectedPrice && usdAmountNum > 0
+    ? (selectedSymbol === 'USDT' || selectedSymbol === 'USDC' ? usdAmountNum : usdAmountNum / selectedPrice)
+    : null;
 
   const roiEarned = investments.reduce((acc, inv) => {
     // Floor the days passed to prevent the balance from artificially 'counting up' in real-time
@@ -1090,8 +1303,13 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   };
 
   const handleDepositSubmit = async () => {
-    if (!amount || !screenshotFile) {
+    if (!usdAmount || !screenshotFile) {
       showModal("Missing Information", "Please enter the amount and upload a screenshot as proof of payment.", 'error');
+      return;
+    }
+    const parsedUsd = parseFloat(usdAmount);
+    if (isNaN(parsedUsd) || parsedUsd <= 0) {
+      showModal("Invalid Amount", "Please enter a valid USD amount greater than zero.", 'error');
       return;
     }
     setDepositLoading(true);
@@ -1101,16 +1319,18 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       const fileExt = screenshotFile.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const { data, error } = await supabase.storage
-        .from('deposit-proofs')
+        .from('images')
         .upload(fileName, screenshotFile);
 
       if (error) throw error;
       
-      const { data: publicData } = supabase.storage
-        .from('deposit-proofs')
-        .getPublicUrl(fileName);
+      // Since 'images' is a private bucket, generate a long-lived signed URL
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from('images')
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365 * 10); // 10 years
         
-      screenshotUrl = publicData.publicUrl;
+      if (signedError) throw signedError;
+      screenshotUrl = signedData.signedUrl;
     } catch (err: any) {
       console.error('Upload error:', err);
       showModal("Upload Failed", "There was an error uploading your screenshot. Please try again.", 'error');
@@ -1118,32 +1338,26 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       return;
     }
 
-    // Convert crypto amount to USD using live price
+    // Amount is already in USD — compute crypto equivalent for display
     const sym = selectedCryptoData?.symbol?.toUpperCase() || '';
     const livePrice = cryptoPrices[sym];
-    const cryptoAmt = parseFloat(amount);
-    
-    if (!livePrice && sym !== 'USDT' && sym !== 'USDC') {
-      showModal("Network Error", "Unable to securely fetch live crypto prices. Please wait a few seconds and try again, or use a stablecoin.", 'error');
-      setDepositLoading(false);
-      return;
-    }
-
-    const usdAmount = livePrice ? cryptoAmt * livePrice : cryptoAmt;
+    const cryptoAmt = livePrice ? parsedUsd / livePrice : parsedUsd;
+    const cryptoDisplay = livePrice
+      ? `${cryptoAmt.toFixed(6)} ${sym}`
+      : `${parsedUsd.toFixed(2)} ${sym}`;
 
     await addTransaction({
       type: 'deposit',
-      amount: usdAmount,
-      asset: `(${cryptoAmt} ${selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase()})`,
+      amount: parsedUsd,
+      asset: `(${cryptoDisplay})`,
       txid,
       screenshotUrl
     } as any);
     setDepositLoading(false);
-    setAmount('');
+    setUsdAmount('');
     setTxid('');
     setScreenshotFile(null);
-    const usdNote = livePrice ? ` (~$${usdAmount.toLocaleString(undefined, {maximumFractionDigits: 2})})` : '';
-    showModal("Deposit Submitted!", `Your ${cryptoAmt} ${sym}${usdNote} deposit has been submitted. Our team will verify and credit your balance within 24 hours.`, 'deposit');
+    showModal("Deposit Submitted!", `Your deposit of $${parsedUsd.toLocaleString(undefined, {minimumFractionDigits: 2})} (${cryptoDisplay}) has been submitted. Our team will verify and credit your balance within 24 hours.`, 'deposit');
   };
 
   const handleWithdrawSubmit = async () => {
@@ -1151,40 +1365,40 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       showModal("Withdrawals Halted", "Withdrawals are temporarily suspended due to network maintenance. Please try again later.", 'error');
       return;
     }
-    if (!amount || !withdrawAddress) {
+    if (!usdAmount || !withdrawAddress) {
       showModal("Missing Information", "Please enter both the amount and your receiving wallet address.", 'error');
+      return;
+    }
+    const parsedUsd = parseFloat(usdAmount);
+    if (isNaN(parsedUsd) || parsedUsd <= 0) {
+      showModal("Invalid Amount", "Please enter a valid USD amount greater than zero.", 'error');
+      return;
+    }
+    
+    if (parsedUsd > totalBalance) {
+      showModal("Insufficient Funds", `You do not have enough available balance for this withdrawal. (Requested: $${parsedUsd.toLocaleString(undefined, {maximumFractionDigits: 2})})`, 'error');
       return;
     }
     
     const sym = selectedCryptoData?.symbol?.toUpperCase() || '';
     const livePrice = cryptoPrices[sym];
-    const cryptoAmt = parseFloat(amount);
-    
-    if (!livePrice && sym !== 'USDT' && sym !== 'USDC') {
-      showModal("Network Error", "Unable to securely fetch live crypto prices. Please wait a few seconds and try again, or use a stablecoin.", 'error');
-      return;
-    }
+    const cryptoAmt = livePrice ? parsedUsd / livePrice : parsedUsd;
+    const cryptoDisplay = livePrice
+      ? `${cryptoAmt.toFixed(6)} ${sym}`
+      : `${parsedUsd.toFixed(2)} ${sym}`;
 
-    const usdAmount = livePrice ? cryptoAmt * livePrice : cryptoAmt;
-
-    if (usdAmount > totalBalance) {
-      showModal("Insufficient Funds", `You do not have enough available balance for this withdrawal. (${cryptoAmt} ${sym} ≈ $${usdAmount.toLocaleString(undefined, {maximumFractionDigits: 2})})`, 'error');
-      return;
-    }
-    
     setWithdrawLoading(true);
     await addTransaction({
       type: 'withdrawal',
-      amount: usdAmount,
-      asset: `(${cryptoAmt} ${selectedCryptoData ? selectedCryptoData.symbol : selectedAsset.toUpperCase()})`,
+      amount: parsedUsd,
+      asset: `(${cryptoDisplay})`,
       txid: withdrawAddress
     });
     setWithdrawLoading(false);
-    setAmount('');
+    setUsdAmount('');
     setWithdrawAddress('');
     
-    const usdNote = livePrice ? ` (~$${usdAmount.toLocaleString(undefined, {maximumFractionDigits: 2})})` : '';
-    showModal("Withdrawal Requested!", `Your withdrawal of ${cryptoAmt} ${sym}${usdNote} has been submitted and is pending approval. You'll be notified once it's processed.`, 'withdrawal');
+    showModal("Withdrawal Requested!", `Your withdrawal of $${parsedUsd.toLocaleString(undefined, {minimumFractionDigits: 2})} (${cryptoDisplay}) has been submitted and is pending approval.`, 'withdrawal');
   };
 
   return (
@@ -1285,59 +1499,86 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       {mode === 'deposit' && (
         <div className="space-y-6">
           <div className="bg-[#06120b]/50 border border-white/5 p-6 md:p-8 rounded-2xl">
-            <h2 className="text-xl text-white font-bold mb-6">Fund Your Account</h2>
+            <h2 className="text-xl text-white font-bold mb-1">Fund Your Account</h2>
+            <p className="text-[13px] text-gray-500 mb-6">All amounts are in USD. We'll show you the exact crypto equivalent.</p>
             
             <div className="mb-6">
               <label className="text-xs text-gray-400 font-semibold mb-3 block">Choose Crypto Asset</label>
-              <CryptoSelector focusColor="focus:border-[#13c74b]/50 focus:ring-[#13c74b]/50" value={selectedAsset} onChange={setSelectedAsset} />
+              <CryptoSelector focusColor="focus:border-[#13c74b]/50 focus:ring-[#13c74b]/50" value={selectedAsset} onChange={(v) => { setSelectedAsset(v); setUsdAmount(''); }} cryptoPrices={cryptoPrices} pricesLoading={pricesLoading} />
             </div>
 
-            <div className="p-6 bg-black/40 border border-white/10 rounded-xl mb-6">
+            <div className="p-5 bg-black/40 border border-white/10 rounded-xl mb-6">
               <div className="flex justify-between items-center mb-3">
-                <label className="text-xs text-gray-400 font-semibold block">{selectedCryptoData?.symbol || 'BTC'} Wallet Address</label>
+                <label className="text-xs text-gray-400 font-semibold block">{selectedCryptoData?.symbol || 'BTC'} Platform Wallet Address</label>
                 <span className="text-[10px] text-[#13c74b] font-bold bg-[#13c74b]/10 px-2 py-1 rounded-full">Network: {selectedCryptoData?.network || 'N/A'}</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-2">
-                <input readOnly value={selectedCryptoData?.address || "Address not configured"} className="w-full bg-[#06120b] border border-white/5 text-white p-3.5 rounded-xl text-sm font-mono focus:outline-none select-all overflow-hidden text-ellipsis" />
+                <input readOnly value={selectedCryptoData?.address || 'Address not configured'} className="w-full bg-[#06120b] border border-white/5 text-white p-3.5 rounded-xl text-sm font-mono focus:outline-none select-all overflow-hidden text-ellipsis" />
                 <button onClick={() => handleCopy(selectedCryptoData?.address || '')} className="px-5 py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold transition-colors shrink-0">
                   {copied ? <Check className="w-4 h-4 text-[#13c74b]" /> : <Copy className="w-4 h-4" />}
                   {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
+              <p className="text-[11px] text-gray-500 mt-3">Send <span className="text-white font-bold">{selectedCryptoData?.symbol}</span> to this address on the <span className="text-white font-bold">{selectedCryptoData?.network}</span> network, then fill in the form below as proof.</p>
+            </div>
+
+            {/* USD-first amount entry */}
+            <div className="mb-6">
+              <label className="text-xs text-gray-400 font-semibold mb-2 block">Amount You're Sending (USD)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] text-gray-400 font-bold">$</span>
+                <input
+                  type="number"
+                  value={usdAmount}
+                  onChange={(e) => setUsdAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full bg-[#06120b] border border-transparent text-white pl-8 pr-20 py-4 rounded-xl text-[18px] font-bold focus:outline-none focus:border-[#13c74b] border transition-colors"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-500 font-bold">USD</span>
+              </div>
+              {/* Live crypto equivalent */}
+              <div className="mt-3 p-4 bg-black/30 border border-white/5 rounded-xl">
+                {pricesLoading ? (
+                  <div className="flex items-center gap-2">
+                    <svg className="w-3.5 h-3.5 animate-spin text-gray-500" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <span className="text-[12px] text-gray-500">Fetching live price...</span>
+                  </div>
+                ) : cryptoEquivalent !== null ? (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] text-gray-500 uppercase tracking-widest block mb-1">You will send approximately</span>
+                      <span className="text-[20px] font-bold text-white">{cryptoEquivalent.toFixed(selectedSymbol === 'USDT' || selectedSymbol === 'USDC' ? 2 : 6)}</span>
+                      <span className="text-[15px] text-[#13c74b] font-bold ml-2">{selectedSymbol}</span>
+                    </div>
+                    {selectedPrice && (
+                      <div className="text-right">
+                        <span className="text-[10px] text-gray-500 block">Live rate</span>
+                        <span className="text-[12px] text-gray-300 font-semibold">1 {selectedSymbol} = ${selectedPrice.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : usdAmountNum > 0 ? (
+                  <span className="text-[12px] text-gray-500">Price unavailable — please try again shortly</span>
+                ) : (
+                  <span className="text-[12px] text-gray-600">Enter USD amount above to see the {selectedSymbol} equivalent</span>
+                )}
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="text-xs text-gray-400 font-semibold mb-2 block">
-                  Amount Sent ({selectedSymbol || 'Crypto'})
-                </label>
-                <div className="relative">
-                  <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 0.5" className="w-full bg-[#06120b] border-transparent text-white p-3.5 rounded-xl focus:outline-none focus:border-[#13c74b] border pr-16" />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-500 font-bold">{selectedSymbol}</span>
-                </div>
-                {amountNum > 0 && (
-                  <div className="mt-1.5 flex items-center gap-1">
-                    {pricesLoading ? (
-                      <span className="text-[11px] text-gray-600">Fetching price...</span>
-                    ) : usdValue ? (
-                      <span className="text-[12px] text-[#00d4aa] font-semibold">≈ ${usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} USD</span>
-                    ) : (
-                      <span className="text-[11px] text-gray-500">Price unavailable</span>
-                    )}
-                    {selectedPrice && !pricesLoading && (
-                      <span className="text-[10px] text-gray-600 ml-1">· 1 {selectedSymbol} = ${selectedPrice.toLocaleString()}</span>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div>
                 <label className="text-xs text-gray-400 font-semibold mb-2 block">Transaction ID (TXID) <span className="text-gray-600 font-normal">(Optional)</span></label>
                 <input type="text" value={txid} onChange={(e) => setTxid(e.target.value)} placeholder="0x1a2b3c..." className="w-full bg-[#06120b] border-transparent text-white p-3.5 rounded-xl focus:outline-none focus:border-[#13c74b] border" />
+              </div>
+              <div className="flex flex-col justify-end">
+                <div className="p-3.5 bg-[#13c74b]/5 border border-[#13c74b]/10 rounded-xl">
+                  <p className="text-[11px] text-gray-400 leading-relaxed"><span className="text-[#13c74b] font-bold">ℹ</span> After sending crypto, upload a screenshot of your transaction as proof.</p>
+                </div>
               </div>
             </div>
 
             <div className="mb-8">
-              <label className="text-xs text-gray-400 font-semibold mb-2 block">Upload Screenshot (Evidence of Payment)</label>
+              <label className="text-xs text-gray-400 font-semibold mb-2 block">Upload Payment Screenshot</label>
               <div className="relative w-full border-2 border-dashed border-white/10 hover:border-[#13c74b]/50 rounded-xl p-6 text-center transition-colors cursor-pointer bg-[#06120b]">
                 <input 
                   type="file" 
@@ -1379,41 +1620,65 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       {mode === 'withdraw' && (
         <div className="space-y-6">
           <div className="bg-[#06120b]/50 border border-white/5 p-6 md:p-8 rounded-2xl">
-            <h2 className="text-xl text-white font-bold mb-2">Withdraw Funds</h2>
+            <h2 className="text-xl text-white font-bold mb-1">Withdraw Funds</h2>
             <p className="text-[13px] text-gray-400 mb-6">Processed within 24–48 hours after approval.</p>
             
-            <div className="p-6 bg-black/40 border border-white/5 rounded-xl mb-8 flex justify-between items-center">
+            <div className="p-5 bg-black/40 border border-white/5 rounded-xl mb-8 flex justify-between items-center">
               <div>
                 <div className="text-xs text-gray-400 font-semibold mb-1">Available to Withdraw</div>
                 <div className="text-3xl text-white font-bold tracking-tight">${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
               </div>
+              <div className="w-10 h-10 rounded-full bg-[#13c74b]/10 flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5 text-[#13c74b]" />
+              </div>
             </div>
 
             <div className="space-y-6 mb-8">
+              {/* USD-first amount entry */}
               <div>
-                <label className="text-xs text-gray-400 font-semibold mb-2 block">Amount ({selectedSymbol || 'Crypto'})</label>
+                <label className="text-xs text-gray-400 font-semibold mb-2 block">Withdrawal Amount (USD)</label>
                 <div className="relative">
-                  <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 0.5" className="w-full bg-[#06120b] border-transparent text-white p-3.5 rounded-xl focus:outline-none focus:border-[#13c74b] border pr-16" />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-500 font-bold">{selectedSymbol}</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] text-gray-400 font-bold">$</span>
+                  <input
+                    type="number"
+                    value={usdAmount}
+                    onChange={(e) => setUsdAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full bg-[#06120b] border border-transparent text-white pl-8 pr-20 py-4 rounded-xl text-[18px] font-bold focus:outline-none focus:border-[#13c74b] border transition-colors"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-gray-500 font-bold">USD</span>
                 </div>
-                {amountNum > 0 && (
-                  <div className="mt-1.5 flex items-center gap-1">
-                    {pricesLoading ? (
-                      <span className="text-[11px] text-gray-600">Fetching price...</span>
-                    ) : usdValue ? (
-                      <span className="text-[12px] text-[#00d4aa] font-semibold">≈ ${usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} USD</span>
-                    ) : (
-                      <span className="text-[11px] text-gray-500">Price unavailable</span>
-                    )}
-                    {selectedPrice && !pricesLoading && (
-                      <span className="text-[10px] text-gray-600 ml-1">· 1 {selectedSymbol} = ${selectedPrice.toLocaleString()}</span>
-                    )}
-                  </div>
-                )}
+                {/* Live crypto equivalent */}
+                <div className="mt-3 p-4 bg-black/30 border border-white/5 rounded-xl">
+                  {pricesLoading ? (
+                    <div className="flex items-center gap-2">
+                      <svg className="w-3.5 h-3.5 animate-spin text-gray-500" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                      <span className="text-[12px] text-gray-500">Fetching live price...</span>
+                    </div>
+                  ) : cryptoEquivalent !== null ? (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-[11px] text-gray-500 uppercase tracking-widest block mb-1">You will receive approximately</span>
+                        <span className="text-[20px] font-bold text-white">{cryptoEquivalent.toFixed(selectedSymbol === 'USDT' || selectedSymbol === 'USDC' ? 2 : 6)}</span>
+                        <span className="text-[15px] text-[#13c74b] font-bold ml-2">{selectedSymbol}</span>
+                      </div>
+                      {selectedPrice && (
+                        <div className="text-right">
+                          <span className="text-[10px] text-gray-500 block">Live rate</span>
+                          <span className="text-[12px] text-gray-300 font-semibold">1 {selectedSymbol} = ${selectedPrice.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : usdAmountNum > 0 ? (
+                    <span className="text-[12px] text-gray-500">Price unavailable — please try again shortly</span>
+                  ) : (
+                    <span className="text-[12px] text-gray-600">Enter USD amount above to see the {selectedSymbol} equivalent</span>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="text-xs text-gray-400 font-semibold mb-2 block">Withdrawal Method</label>
-                <CryptoSelector focusColor="focus:border-[#13c74b]/50 focus:ring-[#13c74b]/50" value={selectedAsset} onChange={setSelectedAsset} />
+                <CryptoSelector focusColor="focus:border-[#13c74b]/50 focus:ring-[#13c74b]/50" value={selectedAsset} onChange={(v) => { setSelectedAsset(v); setUsdAmount(''); }} cryptoPrices={cryptoPrices} pricesLoading={pricesLoading} />
               </div>
               <div>
                 <label className="text-xs text-gray-400 font-semibold mb-2 block">Your Receiving Address</label>
@@ -1779,225 +2044,274 @@ function RewardsTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
 
 // ─── Notification Bell Component ─────────────────────────────────────────────
 
-type NotifItem = {
-  id: string;
-  title: string;
-  body: string;
-  time: number;
-  read: boolean;
-  type: 'deposit' | 'withdrawal' | 'info';
-  status: 'approved' | 'rejected' | 'pending';
-  iconType: string;
-};
-
-function NotificationBell({ transactions, hasFetched, align = 'right' }: { transactions: any[], hasFetched: boolean, align?: 'left' | 'right' }) {
+function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
   const [open, setOpen] = useState(false);
-  const [notifs, setNotifs] = useState<NotifItem[]>([]);
+  const { notifications, unreadCount, markAsRead, latestNotif, dismissLatest } = useNotificationStore();
+  const [toastQueue, setToastQueue] = useState<Array<{ id: string; notif: typeof latestNotif }>>([]);
   const [permGranted, setPermGranted] = useState(
     typeof window !== 'undefined' && 'Notification' in window
       ? Notification.permission === 'granted'
       : false
   );
-  const prevStatuses = useRef<Record<string, string>>({});
 
-  const [seeded, setSeeded] = useState(false);
+  // When a new notification arrives, push it into the toast queue
+  useEffect(() => {
+    if (!latestNotif) return;
+    const key = latestNotif.id + Date.now();
+    setToastQueue(prev => [...prev, { id: key, notif: latestNotif }]);
+    dismissLatest();
+    // Auto-remove after 5.5s
+    setTimeout(() => {
+      setToastQueue(prev => prev.filter(t => t.id !== key));
+    }, 5500);
+  }, [latestNotif]);
 
-  const getNotificationContent = (tx: any, currStatus: string) => {
-    const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    if (currStatus === 'approved') {
-      if (tx.asset === 'PROFIT') return { title: 'Profit Added', body: `Your account was credited with ${amt} in profit.`, iconType: 'profit' };
-      if (tx.asset === 'BONUS') return { title: 'Bonus Received', body: `You received a ${amt} bonus!`, iconType: 'bonus' };
-      if (tx.asset === 'ADJUSTMENT' && tx.type === 'deposit') return { title: 'Balance Adjusted', body: `Your balance was increased by ${amt}.`, iconType: 'adjustment-up' };
-      if (tx.asset === 'ADJUSTMENT' && tx.type === 'withdrawal') return { title: 'Balance Adjusted', body: `Your balance was reduced by ${amt}.`, iconType: 'adjustment-down' };
-      if (tx.asset === 'MANUAL DEPOSIT') return { title: 'Deposit Credited', body: `Your deposit of ${amt} has been credited by Admin.`, iconType: 'deposit' };
-      if (tx.type === 'deposit') return { title: 'Deposit Approved', body: `Your deposit of ${amt} ${tx.asset || ''} has been credited.`, iconType: 'deposit' };
-      if (tx.type === 'withdrawal') return { title: 'Withdrawal Sent', body: `Your withdrawal of ${amt} ${tx.asset || ''} has been sent.`, iconType: 'withdrawal' };
-    } else if (currStatus === 'rejected') {
-      if (tx.type === 'deposit') return { title: 'Deposit Rejected', body: `Your deposit of ${amt} ${tx.asset || ''} was not approved.`, iconType: 'rejected' };
-      if (tx.type === 'withdrawal') return { title: 'Withdrawal Rejected', body: `Your withdrawal of ${amt} ${tx.asset || ''} was rejected.`, iconType: 'rejected' };
-    }
-    return { title: '', body: '', iconType: 'info' };
+  const removeToast = (id: string) => setToastQueue(prev => prev.filter(t => t.id !== id));
+
+  const getIconType = (title: string) => {
+    const t = title.toLowerCase();
+    if (t.includes('profit'))    return 'profit';
+    if (t.includes('bonus'))     return 'bonus';
+    if (t.includes('adjusted'))  return 'adjustment-up';
+    if (t.includes('deposit') && (t.includes('credited') || t.includes('approved'))) return 'deposit';
+    if (t.includes('deposit') && t.includes('rejected'))    return 'rejected';
+    if (t.includes('withdrawal') && (t.includes('sent') || t.includes('approved'))) return 'withdrawal';
+    if (t.includes('withdrawal') && t.includes('rejected')) return 'rejected';
+    if (t.includes('deposit'))   return 'deposit';
+    if (t.includes('withdrawal')) return 'withdrawal';
+    if (t.includes('credit'))    return 'deposit';
+    return 'info';
   };
 
-  // Build notification list from transaction changes
-  useEffect(() => {
-    if (!seeded) return; // Wait for initial seeding
+  const getToastAccent = (type: string) => {
+    if (type === 'rejected') return { border: 'border-red-500/50', bar: 'bg-red-500', icon: 'bg-red-500/15 text-red-400' };
+    if (type === 'withdrawal') return { border: 'border-orange-400/50', bar: 'bg-orange-400', icon: 'bg-orange-400/15 text-orange-300' };
+    return { border: 'border-[#13c74b]/50', bar: 'bg-[#13c74b]', icon: 'bg-[#13c74b]/15 text-[#13c74b]' };
+  };
 
-    transactions.forEach(tx => {
-      const prev = prevStatuses.current[tx.id];
-      const curr = tx.status;
-      
-      const isNewAdminAction = prev === undefined && curr === 'approved' && ['PROFIT', 'BONUS', 'ADJUSTMENT', 'MANUAL DEPOSIT'].includes(tx.asset);
-      const isStatusChange = prev !== undefined && prev !== curr;
+  const getIcon = (type: string, size = 'w-4 h-4') => {
+    switch (type) {
+      case 'profit':        return <TrendingUp className={`${size} text-[#13c74b]`} />;
+      case 'bonus':         return <Gift className={`${size} text-[#13c74b]`} />;
+      case 'adjustment-up': return <ArrowUpRight className={`${size} text-[#13c74b]`} />;
+      case 'adjustment-down': return <ArrowDownLeft className={`${size} text-red-400`} />;
+      case 'deposit':       return <ArrowDownLeft className={`${size} text-[#13c74b]`} />;
+      case 'withdrawal':    return <ArrowUpRight className={`${size} text-orange-400`} />;
+      case 'rejected':      return <X className={`${size} text-red-400`} />;
+      default:              return <Bell className={`${size} text-gray-400`} />;
+    }
+  };
 
-      if (isStatusChange || isNewAdminAction) {
-        const { title, body, iconType } = getNotificationContent(tx, curr);
-        if (title) {
-          setNotifs(prevNotifs => [{
-            id: `${tx.id}-${curr}`,
-            title,
-            body,
-            time: Date.now(),
-            read: false,
-            type: tx.type,
-            status: curr,
-            iconType,
-          }, ...prevNotifs].slice(0, 20));
-        }
-      }
-      prevStatuses.current[tx.id] = curr;
-    });
-  }, [transactions, seeded]);
-
-  // Seed with most recent transactions on first load
-  useEffect(() => {
-    if (seeded || !hasFetched) return;
-
-    const initial: NotifItem[] = transactions
-      .filter(tx => tx.status !== 'pending')
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 5)
-      .map(tx => {
-        const { title, body, iconType } = getNotificationContent(tx, tx.status);
-        return { id: tx.id, title, body, time: tx.timestamp, read: true, type: tx.type, status: tx.status, iconType };
-      })
-      .filter(n => n.title !== '');
-    
-    setNotifs(initial);
-    transactions.forEach(tx => { prevStatuses.current[tx.id] = tx.status; });
-    setSeeded(true);
-  }, [transactions, hasFetched, seeded]);
-
-  const unread = notifs.filter(n => !n.read).length;
-
-  const markAllRead = () => setNotifs(prev => prev.map(n => ({ ...n, read: true })));
+  const getIconBg = (type: string) => {
+    switch (type) {
+      case 'profit': case 'bonus': case 'adjustment-up': case 'deposit': case 'credit':
+        return 'bg-[#13c74b]/10 border-[#13c74b]/20';
+      case 'withdrawal': return 'bg-orange-400/10 border-orange-400/20';
+      case 'rejected': case 'adjustment-down': return 'bg-red-500/10 border-red-500/20';
+      default: return 'bg-white/5 border-white/10';
+    }
+  };
 
   const handleEnable = async () => {
     try {
       const granted = await requestNotificationPermission();
-      setPermGranted(granted);
-      
-      if (!granted) {
-        if ('Notification' in window && Notification.permission === 'denied') {
-          alert("Notifications are blocked by your browser. Please allow them in your site settings to receive alerts.");
-        }
-        // Hide the prompt since we can't do anything else programmatically
-        setPermGranted(true);
-      }
-    } catch (err) {
-      console.error("Notification request error:", err);
-      setPermGranted(true); // Hide prompt on error
-    }
+      setPermGranted(granted || true);
+    } catch { setPermGranted(true); }
   };
 
-  const formatTime = (ts: number) => {
-    const m = Math.floor((Date.now() - ts) / 60000);
+  const formatTime = (timeStr: string) => {
+    const m = Math.floor((Date.now() - new Date(timeStr).getTime()) / 60000);
     if (m < 1) return 'Just now';
     if (m < 60) return `${m}m ago`;
     if (m < 1440) return `${Math.floor(m / 60)}h ago`;
     return `${Math.floor(m / 1440)}d ago`;
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'profit': return <TrendingUp className="w-4 h-4 text-[#00d4aa]" />;
-      case 'bonus': return <Gift className="w-4 h-4 text-[#00d4aa]" />;
-      case 'adjustment-up': return <ArrowUpRight className="w-4 h-4 text-[#00d4aa]" />;
-      case 'adjustment-down': return <ArrowDownLeft className="w-4 h-4 text-red-400" />;
-      case 'deposit': return <ArrowDownLeft className="w-4 h-4 text-[#00d4aa]" />;
-      case 'withdrawal': return <ArrowUpRight className="w-4 h-4 text-white" />;
-      case 'rejected': return <X className="w-4 h-4 text-red-500" />;
-      default: return <Bell className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  const getIconBg = (type: string) => {
-    switch (type) {
-      case 'profit': return 'bg-[#00d4aa]/10 border-[#00d4aa]/20';
-      case 'bonus': return 'bg-[#00d4aa]/10 border-[#00d4aa]/20';
-      case 'adjustment-up': return 'bg-[#00d4aa]/10 border-[#00d4aa]/20';
-      case 'adjustment-down': return 'bg-red-500/10 border-red-500/20';
-      case 'deposit': return 'bg-[#00d4aa]/10 border-[#00d4aa]/20';
-      case 'withdrawal': return 'bg-white/5 border-white/10';
-      case 'rejected': return 'bg-red-500/10 border-red-500/20';
-      default: return 'bg-white/5 border-white/10';
-    }
-  };
-
   return (
-    <div className="relative">
-      <button
-        onClick={() => { setOpen(o => !o); if (!open) markAllRead(); }}
-        className="w-11 h-11 rounded-full bg-[#1a221d] flex items-center justify-center text-gray-400 hover:text-white transition-colors relative"
-      >
-        <Bell className="w-5 h-5" />
-        {unread > 0 && (
-          <span className="absolute top-2 right-2 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-[#00d4aa] text-[#070b14] text-[9px] font-bold px-1 ring-2 ring-[#1a221d]">
-            {unread > 9 ? '9+' : unread}
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <>
-          {/* Backdrop */}
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-
-          {/* Dropdown Panel */}
-          <div className={`absolute top-14 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-[#06120b] border border-white/10 rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.8)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${align === 'left' ? 'left-0' : 'right-0'}`}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-white/2">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-[#00d4aa]" />
-                <span className="text-[14px] text-white font-semibold">Notifications</span>
+    <>
+      {/* ── Facebook/X-style popup toasts – fixed top-right ──────────────── */}
+      <div className="fixed top-4 right-4 z-[99999] flex flex-col gap-3 pointer-events-none" style={{ maxWidth: 380 }}>
+        {toastQueue.map(({ id, notif }) => {
+          if (!notif) return null;
+          const type = getIconType(notif.title);
+          const accent = getToastAccent(type);
+          return (
+            <div
+              key={id}
+              className={`pointer-events-auto w-[360px] max-w-[calc(100vw-2rem)] bg-[#0d1f12] border ${accent.border} rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.7)] overflow-hidden`}
+              style={{ animation: 'notif-slide-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both' }}
+            >
+              {/* Progress bar */}
+              <div className="h-[3px] w-full bg-white/5">
+                <div
+                  className={`h-full ${accent.bar} origin-left`}
+                  style={{ animation: 'notif-shrink 5s linear forwards' }}
+                />
               </div>
-              {notifs.length > 0 && (
-                <button onClick={markAllRead} className="text-[12px] text-[#00d4aa] hover:text-white transition-colors font-medium">
-                  Mark all read
-                </button>
-              )}
-            </div>
 
-            {/* Enable push prompt */}
-            {!permGranted && (
-              <div className="px-5 py-3.5 bg-[#00d4aa]/10 border-b border-[#00d4aa]/20 flex items-center justify-between gap-3">
-                <p className="text-[12px] text-[#00d4aa] leading-snug">Enable push notifications to get alerts even when the app is in the background.</p>
-                <button onClick={handleEnable} className="shrink-0 px-3 py-1.5 bg-[#00d4aa] text-[#06120b] text-[11px] font-bold rounded-md hover:bg-[#00b38f] transition-colors">
-                  Enable
-                </button>
-              </div>
-            )}
-
-            {/* Notification list */}
-            <div className="max-h-[400px] overflow-y-auto divide-y divide-white/5 custom-scrollbar">
-              {notifs.length === 0 ? (
-                <div className="text-center py-12 flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-3">
-                    <Bell className="w-8 h-8 text-gray-600" />
-                  </div>
-                  <span className="text-[14px] text-gray-400 font-medium">No notifications yet</span>
+              <div className="flex items-start gap-3 p-4">
+                {/* Icon */}
+                <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${accent.icon}`}>
+                  {getIcon(type, 'w-5 h-5')}
                 </div>
-              ) : (
-                notifs.map(n => (
-                  <div key={n.id} className={`px-5 py-4 flex gap-4 transition-colors relative group ${n.read ? 'opacity-60 hover:opacity-100' : 'bg-white/2 hover:bg-white/4'}`}>
-                    {!n.read && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00d4aa] rounded-r-full" />}
-                    <div className={`w-10 h-10 rounded-full border shrink-0 flex items-center justify-center ${getIconBg(n.iconType)}`}>
-                      {getIcon(n.iconType)}
-                    </div>
-                    <div className="flex-1 min-w-0 pt-0.5">
-                      <div className="text-[14px] text-white font-medium mb-0.5">{n.title}</div>
-                      <div className="text-[12px] text-gray-400 leading-snug">{n.body}</div>
-                      <div className="text-[11px] text-gray-500 mt-2 font-medium">{formatTime(n.time)}</div>
-                    </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <div className="flex items-start justify-between gap-2 mb-0.5">
+                    <span className="text-[13px] font-bold text-white leading-snug">{notif.title}</span>
+                    <button
+                      onClick={() => removeToast(id)}
+                      className="shrink-0 w-5 h-5 flex items-center justify-center rounded-full text-gray-600 hover:text-white hover:bg-white/10 transition-colors mt-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
                   </div>
-                ))
-              )}
+                  <p className="text-[12px] text-gray-300 leading-snug mb-2">{notif.message}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-gray-600 font-medium">{formatTime(notif.created_at)}</span>
+                    <span className="text-[10px] font-bold text-[#13c74b] bg-[#13c74b]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">XHoldings</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </>
-      )}
-    </div>
+          );
+        })}
+      </div>
+
+      {/* ── Bell button + dropdown ────────────────────────────────────────── */}
+      <div className="relative">
+        <button
+          onClick={() => { setOpen(o => !o); if (!open) markAsRead(); }}
+          className="w-11 h-11 rounded-full bg-[#1a221d] flex items-center justify-center text-gray-400 hover:text-white transition-colors relative"
+        >
+          <Bell className={`w-5 h-5 ${unreadCount > 0 ? 'text-[#13c74b]' : ''}`} />
+          {unreadCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 min-w-[17px] h-[17px] flex items-center justify-center rounded-full bg-[#13c74b] text-black text-[9px] font-bold px-1 ring-2 ring-black animate-pulse">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </button>
+
+        {open && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className={`absolute top-14 z-50 w-[380px] max-w-[calc(100vw-2rem)] bg-[#080f0a] border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${align === 'left' ? 'left-0' : 'right-0'}`}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-[#13c74b]" />
+                  <span className="text-[15px] text-white font-bold">Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="text-[10px] font-bold bg-[#13c74b] text-black px-1.5 py-0.5 rounded-full">{unreadCount}</span>
+                  )}
+                </div>
+                {notifications.length > 0 && (
+                  <button onClick={() => markAsRead()} className="text-[12px] text-[#13c74b] hover:text-white transition-colors font-medium">
+                    Mark all read
+                  </button>
+                )}
+              </div>
+
+              {!permGranted && (
+                <div className="px-5 py-3.5 bg-[#13c74b]/8 border-b border-[#13c74b]/15 flex items-center justify-between gap-3">
+                  <p className="text-[12px] text-[#13c74b] leading-snug">Enable push notifications to get alerts in the background.</p>
+                  <button onClick={handleEnable} className="shrink-0 px-3 py-1.5 bg-[#13c74b] text-black text-[11px] font-bold rounded-lg hover:bg-[#10a13c] transition-colors">
+                    Enable
+                  </button>
+                </div>
+              )}
+
+              <div className="max-h-[440px] overflow-y-auto divide-y divide-white/5">
+                {notifications.length === 0 ? (
+                  <div className="text-center py-16 flex flex-col items-center">
+                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                      <Bell className="w-8 h-8 text-gray-700" />
+                    </div>
+                    <span className="text-[14px] text-gray-500 font-medium">No notifications yet</span>
+                  </div>
+                ) : (
+                  notifications.map(n => {
+                    const iconType = getIconType(n.title);
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => markAsRead(n.id)}
+                        className={`px-5 py-4 flex gap-4 transition-all cursor-pointer relative group ${n.is_read ? 'opacity-50 hover:opacity-80' : 'bg-[#13c74b]/3 hover:bg-white/3'}`}
+                      >
+                        {!n.is_read && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#13c74b] rounded-r-full" />}
+                        <div className={`w-10 h-10 rounded-full border shrink-0 flex items-center justify-center ${getIconBg(iconType)}`}>
+                          {getIcon(iconType)}
+                        </div>
+                        <div className="flex-1 min-w-0 pt-0.5">
+                          <div className="text-[13px] text-white font-semibold mb-0.5">{n.title}</div>
+                          <div className="text-[12px] text-gray-400 leading-snug">{n.message}</div>
+                          <div className="text-[11px] text-gray-600 mt-1.5 font-medium">{formatTime(n.created_at)}</div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
+}
+
+// ── Sanitize admin-internal transaction fields before showing to the user ──────
+const ADMIN_ASSETS = ['PROFIT', 'BONUS', 'MANUAL DEPOSIT', 'ADJUSTMENT', 'LOSS', 'MANUAL WITHDRAWAL'];
+const ADMIN_TXID_PREFIX = '[ADMIN]';
+
+function cleanTxDisplay(tx: any): {
+  label: string;
+  assetDisplay: string;
+  txidDisplay: string | null;
+  isAdminCredit: boolean;
+  message: string;
+} {
+  const rawAsset: string = (tx.asset || '').toUpperCase().trim();
+  const rawTxid: string  = tx.txid || '';
+  const isAdminCredit = ADMIN_ASSETS.includes(rawAsset) || rawTxid.toUpperCase().startsWith(ADMIN_TXID_PREFIX);
+  const fmtAmt = `$${Number(tx.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  let label = tx.type === 'withdrawal' ? 'Withdrawal' : 'Deposit';
+  let assetDisplay = tx.asset || '';
+  let message = '';
+
+  if (isAdminCredit) {
+    if (rawAsset === 'PROFIT') {
+      label       = 'Trading Profit';
+      assetDisplay = 'Account Credit';
+      message     = `Your account has been credited with ${fmtAmt} in trading profit.`;
+    } else if (rawAsset === 'BONUS') {
+      label       = 'Bonus Reward';
+      assetDisplay = 'Account Credit';
+      message     = `Congratulations! A bonus of ${fmtAmt} has been added to your account.`;
+    } else if (rawAsset === 'LOSS') {
+      label       = 'Trading Loss';
+      assetDisplay = 'Account Debit';
+      message     = `A trading loss of ${fmtAmt} has been applied to your account.`;
+    } else if (rawAsset === 'ADJUSTMENT') {
+      label       = 'Account Adjustment';
+      assetDisplay = 'Account Credit';
+      message     = `Your account balance has been adjusted by ${fmtAmt}.`;
+    } else {
+      label       = 'Platform Credit';
+      assetDisplay = 'Account Credit';
+      message     = `Your account has been credited with ${fmtAmt}.`;
+    }
+  } else if (tx.type === 'deposit') {
+    message = `Your deposit of ${fmtAmt} has been ${tx.status === 'approved' ? 'approved and credited to your balance' : tx.status === 'rejected' ? 'rejected' : 'received and is pending review'}.`;
+  } else if (tx.type === 'withdrawal') {
+    message = `Your withdrawal of ${fmtAmt} has been ${tx.status === 'approved' ? 'processed and sent to your wallet' : tx.status === 'rejected' ? 'rejected and your balance refunded' : 'submitted and is pending approval'}.`;
+  }
+
+  // Hide [ADMIN] txids entirely
+  const txidDisplay = rawTxid.toUpperCase().startsWith(ADMIN_TXID_PREFIX) ? null : rawTxid || null;
+
+  return { label, assetDisplay, txidDisplay, isAdminCredit, message };
 }
 
 function TransactionsTab({ profile }: { profile?: any }) {
@@ -2107,7 +2421,8 @@ function TransactionsTab({ profile }: { profile?: any }) {
             <div className="space-y-0 flex-1">
               {visibleTransactions.map((tx: any) => {
                 const timeAgo = Math.floor((Date.now() - tx.timestamp) / 60000);
-                const timeStr = timeAgo < 60 ? `${timeAgo} mins ago` : `${Math.floor(timeAgo/60)} hours ago`;
+                const timeStr = timeAgo < 1 ? 'Just now' : timeAgo < 60 ? `${timeAgo}m ago` : timeAgo < 1440 ? `${Math.floor(timeAgo/60)}h ago` : `${Math.floor(timeAgo/1440)}d ago`;
+                const { label, assetDisplay, txidDisplay, isAdminCredit, message } = cleanTxDisplay(tx);
                 
                 return (
                   <div 
@@ -2117,20 +2432,21 @@ function TransactionsTab({ profile }: { profile?: any }) {
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                        tx.type === 'withdrawal' ? 'bg-orange-500/10 text-orange-400' : 'bg-[#13c74b]/10 text-[#13c74b]'
+                        tx.type === 'withdrawal' ? 'bg-orange-500/10 text-orange-400' : isAdminCredit ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : 'bg-[#13c74b]/10 text-[#13c74b]'
                       }`}>
-                        {tx.type === 'withdrawal' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownLeft className="w-5 h-5" />}
+                        {tx.type === 'withdrawal' ? <ArrowUpRight className="w-5 h-5" /> : isAdminCredit ? <Gift className="w-5 h-5" /> : <ArrowDownLeft className="w-5 h-5" />}
                       </div>
                       <div>
-                        <div className="text-[15px] text-white font-bold mb-0.5 capitalize">{tx.type}</div>
-                        <div className="text-[12px] text-gray-500 font-medium flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" /> {timeStr}
-                          <span className="opacity-50">•</span>
-                          {tx.asset || 'USDT'}
-                          {tx.txid && (
+                        <div className="text-[15px] text-white font-bold mb-0.5">{label}</div>
+                        {message && (
+                          <div className="text-[12px] text-gray-400 mb-1 max-w-[260px] leading-snug">{message}</div>
+                        )}
+                        <div className="text-[11px] text-gray-600 font-medium flex items-center gap-1.5">
+                          <Clock className="w-3 h-3" /> {timeStr}
+                          {!isAdminCredit && txidDisplay && (
                             <>
                               <span className="opacity-50">•</span>
-                              <span className="font-mono text-gray-600">TXID: {tx.txid.substring(0, 8)}...</span>
+                              <span className="font-mono">TXID: {txidDisplay.substring(0, 10)}...</span>
                             </>
                           )}
                         </div>
@@ -2138,7 +2454,9 @@ function TransactionsTab({ profile }: { profile?: any }) {
                     </div>
                     
                     <div className="text-left md:text-right flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center">
-                      <div className="text-[16px] text-white font-bold mb-1">
+                      <div className={`text-[16px] font-bold mb-1 ${
+                        tx.type === 'withdrawal' ? 'text-orange-400' : 'text-white'
+                      }`}>
                         {tx.type === 'withdrawal' ? '-' : '+'}${(tx.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
                       </div>
                       <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full w-fit ${
@@ -2171,75 +2489,65 @@ function TransactionsTab({ profile }: { profile?: any }) {
       {/* Transaction Details Modal */}
       <Dialog open={!!selectedTx} onOpenChange={(open) => !open && setSelectedTx(null)}>
         <DialogContent className="bg-[#0a0f1c] border border-white/10 text-white sm:max-w-md p-0 overflow-hidden">
-          {selectedTx && (
-            <div className="flex flex-col">
-              <div className="p-6 border-b border-white/5 flex flex-col items-center justify-center text-center">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 mb-4 ${
-                  selectedTx.type === 'withdrawal' ? 'bg-orange-500/10 text-orange-400' : 'bg-[#13c74b]/10 text-[#13c74b]'
-                }`}>
-                  {selectedTx.type === 'withdrawal' ? <ArrowUpRight className="w-8 h-8" /> : <ArrowDownLeft className="w-8 h-8" />}
+          {selectedTx && (() => {
+            const { label, assetDisplay, txidDisplay, isAdminCredit, message } = cleanTxDisplay(selectedTx);
+            return (
+              <div className="flex flex-col">
+                <div className="p-6 border-b border-white/5 flex flex-col items-center justify-center text-center">
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 mb-4 ${
+                    selectedTx.type === 'withdrawal' ? 'bg-orange-500/10 text-orange-400' : isAdminCredit ? 'bg-[#00d4aa]/10 text-[#00d4aa]' : 'bg-[#13c74b]/10 text-[#13c74b]'
+                  }`}>
+                    {selectedTx.type === 'withdrawal' ? <ArrowUpRight className="w-8 h-8" /> : isAdminCredit ? <Gift className="w-8 h-8" /> : <ArrowDownLeft className="w-8 h-8" />}
+                  </div>
+                  <h2 className="text-3xl font-bold mb-1">
+                    {selectedTx.type === 'withdrawal' ? '-' : '+'}${(selectedTx.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                  </h2>
+                  <p className="text-[13px] font-semibold text-gray-300 mb-2">{label}</p>
+                  {message && (
+                    <p className="text-[12px] text-gray-400 leading-relaxed mb-3 px-4 max-w-[300px]">{message}</p>
+                  )}
+                  <div className={`text-[11px] uppercase tracking-wider font-bold px-3 py-1 rounded-full ${
+                    selectedTx.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' : 
+                    selectedTx.status === 'approved' ? 'bg-[#13c74b]/10 text-[#13c74b]' : 
+                    'bg-red-500/10 text-red-400'
+                  }`}>
+                    {selectedTx.status}
+                  </div>
                 </div>
-                <h2 className="text-3xl font-bold mb-3">
-                  {selectedTx.type === 'withdrawal' ? '-' : '+'}${(selectedTx.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
-                </h2>
-                <div className={`text-[11px] uppercase tracking-wider font-bold px-3 py-1 rounded-full ${
-                  selectedTx.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' : 
-                  selectedTx.status === 'approved' ? 'bg-[#13c74b]/10 text-[#13c74b]' : 
-                  'bg-red-500/10 text-red-400'
-                }`}>
-                  {selectedTx.status}
-                </div>
-              </div>
-              
-              <div className="p-6 space-y-1">
-                <div className="flex justify-between items-center py-3 border-b border-white/5">
-                  <span className="text-gray-400 text-[14px]">Asset</span>
-                  <span className="font-bold text-[15px]">{selectedTx.asset || 'USDT'}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/5">
-                  <span className="text-gray-400 text-[14px]">Type</span>
-                  <span className="font-bold capitalize text-[15px]">{selectedTx.type}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/5">
-                  <span className="text-gray-400 text-[14px]">Date & Time</span>
-                  <span className="font-bold text-right text-[15px]">
-                    {new Date(selectedTx.timestamp).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/5">
-                  <span className="text-gray-400 text-[14px]">Transaction ID</span>
-                  <span className="font-mono text-[14px] text-[#13c74b] break-all text-right max-w-[200px]">
-                    {selectedTx.txid || 'N/A'}
-                  </span>
-                </div>
-                {selectedTx.address && (
+                
+                <div className="p-6 space-y-1">
                   <div className="flex justify-between items-center py-3 border-b border-white/5">
-                    <span className="text-gray-400 text-[14px]">Wallet Address</span>
-                    <span className="font-mono text-[14px] break-all text-right max-w-[200px]">
-                      {selectedTx.address}
+                    <span className="text-gray-400 text-[14px]">Category</span>
+                    <span className="font-bold text-[15px]">{assetDisplay}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-white/5">
+                    <span className="text-gray-400 text-[14px]">Type</span>
+                    <span className="font-bold capitalize text-[15px]">{label}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-3 border-b border-white/5">
+                    <span className="text-gray-400 text-[14px]">Date &amp; Time</span>
+                    <span className="font-bold text-right text-[15px]">
+                      {new Date(selectedTx.timestamp).toLocaleString()}
                     </span>
                   </div>
-                )}
-                {selectedTx.network && (
-                  <div className="flex justify-between items-center py-3 border-b border-white/5">
-                    <span className="text-gray-400 text-[14px]">Network</span>
-                    <span className="font-bold uppercase text-[15px]">
-                      {selectedTx.network}
+                  {txidDisplay && (
+                    <div className="flex justify-between items-start py-3 border-b border-white/5">
+                      <span className="text-gray-400 text-[14px]">Transaction ID</span>
+                      <span className="font-mono text-[13px] text-[#13c74b] break-all text-right max-w-[200px]">
+                        {txidDisplay}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-gray-400 text-[14px]">Amount</span>
+                    <span className="font-bold text-[15px] text-white">
+                      ${(selectedTx.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </span>
                   </div>
-                )}
+                </div>
               </div>
-              
-              <div className="p-6 pt-2">
-                <button 
-                  onClick={() => setSelectedTx(null)}
-                  className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 font-bold transition-colors text-white"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>

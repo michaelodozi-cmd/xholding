@@ -439,4 +439,14 @@ div.uppercase.tracking-widest {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #12b744;
 }
+
+@keyframes notif-slide-in {
+  0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes notif-shrink {
+  0% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
 
