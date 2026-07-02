@@ -20,7 +20,7 @@ function Login() {
 
   // On mount, load saved email if "Keep me signed in" was previously used
   useEffect(() => {
-    const savedEmail = localStorage.getItem("xholdings_remember_email");
+    const savedEmail = localStorage.getItem("fedility_holdings_remember_email");
     if (savedEmail) {
       setEmail(savedEmail);
       setRememberMe(true);
@@ -45,9 +45,9 @@ function Login() {
 
     // Handle "Keep me signed in"
     if (rememberMe) {
-      localStorage.setItem("xholdings_remember_email", email);
+      localStorage.setItem("fedility_holdings_remember_email", email);
     } else {
-      localStorage.removeItem("xholdings_remember_email");
+      localStorage.removeItem("fedility_holdings_remember_email");
     }
 
     // Execute necessary database checks concurrently to reduce redirect latency

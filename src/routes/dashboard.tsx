@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, Gift, User, Bell, Rocket, 
@@ -117,7 +117,7 @@ function Dashboard() {
   // Whether we have seeded the initial snapshot (prevents firing on first load)
   const isSeeded = useRef(false);
 
-  // Request OS notification permission on first load — do it proactively
+  // Request OS notification permission on first load â€” do it proactively
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => {});
@@ -181,7 +181,7 @@ function Dashboard() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-['Outfit'] font-bold mb-1">Confirm Logout</AlertDialogTitle>
             <AlertDialogDescription className="text-gray-400 text-[15px] leading-relaxed">
-              Are you sure you want to securely log out of your XHoldings account? You will need to re-enter your credentials to access your portfolio.
+              Are you sure you want to securely log out of your Fedility Holdings account? You will need to re-enter your credentials to access your portfolio.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-3 sm:gap-0">
@@ -653,7 +653,7 @@ function HomeTab({ setActiveTab, profile, balanceFlash }: { setActiveTab: (tab: 
               ${totalBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </div>
             {balanceFlash && (
-              <div className="mt-1 text-[12px] text-[#13c74b] font-semibold animate-pulse">● Live update received</div>
+              <div className="mt-1 text-[12px] text-[#13c74b] font-semibold animate-pulse">â— Live update received</div>
             )}
           </div>
           
@@ -992,7 +992,7 @@ function InvestTab({ profile }: { profile?: any }) {
                     />
                   </div>
                   <div className="text-xs text-gray-500 mt-2 font-medium">
-                    Min. investment: ${Number(selectedPlan.min_amount).toLocaleString()} {selectedPlan.max_amount && `· Max. investment: $${Number(selectedPlan.max_amount).toLocaleString()}`}
+                    Min. investment: ${Number(selectedPlan.min_amount).toLocaleString()} {selectedPlan.max_amount && `Â· Max. investment: $${Number(selectedPlan.max_amount).toLocaleString()}`}
                   </div>
                 </div>
 
@@ -1144,7 +1144,7 @@ function CryptoSelector({ focusColor, value, onChange, cryptoPrices, pricesLoadi
               </div>
               <div className="flex flex-col items-start">
                 <span className="text-[13px] font-bold leading-tight mb-0.5">{selectedCryptoData.name}</span>
-                <span className="text-[10px] text-gray-400 font-medium leading-tight">{selectedCryptoData.symbol} · {selectedCryptoData.network}</span>
+                <span className="text-[10px] text-gray-400 font-medium leading-tight">{selectedCryptoData.symbol} Â· {selectedCryptoData.network}</span>
               </div>
             </div>
           ) : (
@@ -1194,14 +1194,14 @@ function CryptoSelector({ focusColor, value, onChange, cryptoPrices, pricesLoadi
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="text-[13px] font-bold leading-tight text-white">{crypto.name}</span>
-                      <span className="text-[10px] text-gray-500 font-medium">{crypto.symbol} · {crypto.network}</span>
+                      <span className="text-[10px] text-gray-500 font-medium">{crypto.symbol} Â· {crypto.network}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-0.5">
                     {price && !pricesLoading ? (
                       <span className="text-[12px] text-white font-bold">${price.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
                     ) : (
-                      <span className="text-[11px] text-gray-600">—</span>
+                      <span className="text-[11px] text-gray-600">â€”</span>
                     )}
                     {isSelected && <Check className="w-3.5 h-3.5 text-[#13c74b]" />}
                   </div>
@@ -1228,7 +1228,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
   const [mode, setMode] = useState('deposit');
   const [copied, setCopied] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState('btc');
-  // USD is now the PRIMARY input — user enters dollar amount
+  // USD is now the PRIMARY input â€” user enters dollar amount
   const [usdAmount, setUsdAmount] = useState('');
   const [txid, setTxid] = useState('');
   const [cryptoPrices, setCryptoPrices] = useState<Record<string, number>>({});
@@ -1335,7 +1335,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
       return;
     }
 
-    // Amount is already in USD — compute crypto equivalent for display
+    // Amount is already in USD â€” compute crypto equivalent for display
     const sym = selectedCryptoData?.symbol?.toUpperCase() || '';
     const livePrice = cryptoPrices[sym];
     const cryptoAmt = livePrice ? parsedUsd / livePrice : parsedUsd;
@@ -1463,7 +1463,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
             {alertState.type === 'withdrawal' && (
               <div className="flex items-center justify-center gap-2 bg-[#00d4aa]/10 border border-[#00d4aa]/20 rounded-sm px-4 py-2 mb-6">
                 <span className="w-2 h-2 rounded-full bg-[#00d4aa] animate-pulse" />
-                <span className="text-[11px] text-[#00d4aa] uppercase tracking-widest font-bold">Processing · 24–48 hrs</span>
+                <span className="text-[11px] text-[#00d4aa] uppercase tracking-widest font-bold">Processing Â· 24â€“48 hrs</span>
               </div>
             )}
 
@@ -1555,7 +1555,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
                     )}
                   </div>
                 ) : usdAmountNum > 0 ? (
-                  <span className="text-[12px] text-gray-500">Price unavailable — please try again shortly</span>
+                  <span className="text-[12px] text-gray-500">Price unavailable â€” please try again shortly</span>
                 ) : (
                   <span className="text-[12px] text-gray-600">Enter USD amount above to see the {selectedSymbol} equivalent</span>
                 )}
@@ -1569,7 +1569,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
               </div>
               <div className="flex flex-col justify-end">
                 <div className="p-3.5 bg-[#13c74b]/5 border border-[#13c74b]/10 rounded-xl">
-                  <p className="text-[11px] text-gray-400 leading-relaxed"><span className="text-[#13c74b] font-bold">ℹ</span> After sending crypto, upload a screenshot of your transaction as proof.</p>
+                  <p className="text-[11px] text-gray-400 leading-relaxed"><span className="text-[#13c74b] font-bold">â„¹</span> After sending crypto, upload a screenshot of your transaction as proof.</p>
                 </div>
               </div>
             </div>
@@ -1618,7 +1618,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
         <div className="space-y-6">
           <div className="bg-[#06120b]/50 border border-white/5 p-6 md:p-8 rounded-2xl">
             <h2 className="text-xl text-white font-bold mb-1">Withdraw Funds</h2>
-            <p className="text-[13px] text-gray-400 mb-6">Processed within 24–48 hours after approval.</p>
+            <p className="text-[13px] text-gray-400 mb-6">Processed within 24â€“48 hours after approval.</p>
             
             <div className="p-5 bg-black/40 border border-white/5 rounded-xl mb-8 flex justify-between items-center">
               <div>
@@ -1667,7 +1667,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
                       )}
                     </div>
                   ) : usdAmountNum > 0 ? (
-                    <span className="text-[12px] text-gray-500">Price unavailable — please try again shortly</span>
+                    <span className="text-[12px] text-gray-500">Price unavailable â€” please try again shortly</span>
                   ) : (
                     <span className="text-[12px] text-gray-600">Enter USD amount above to see the {selectedSymbol} equivalent</span>
                   )}
@@ -1683,7 +1683,7 @@ function WalletTab({ profile, settings }: { profile?: any, settings?: any }) {
               </div>
             </div>
 
-            <p className="text-[12px] text-gray-500 mb-6 flex gap-2"><span className="text-[#13c74b]">⚠</span> Early withdrawal from active plans may incur a 10% processing fee. Only matured plan balances are instantly withdrawable.</p>
+            <p className="text-[12px] text-gray-500 mb-6 flex gap-2"><span className="text-[#13c74b]">âš </span> Early withdrawal from active plans may incur a 10% processing fee. Only matured plan balances are instantly withdrawable.</p>
 
             <button disabled={withdrawLoading} onClick={handleWithdrawSubmit} className="w-full bg-[#13c74b] text-black py-4 font-bold text-[15px] hover:bg-[#10b042] transition-colors rounded-full disabled:opacity-60 flex items-center justify-center gap-3">
               {withdrawLoading ? (
@@ -1986,7 +1986,7 @@ function RewardsTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0">
-              <span className="text-orange-400 text-lg">📩</span>
+              <span className="text-orange-400 text-lg">ðŸ“©</span>
             </div>
             <div>
               <div className="text-[13px] text-gray-400 font-medium mb-0.5">Your referral code</div>
@@ -2039,7 +2039,7 @@ function RewardsTab({ profile, setActiveTab }: { profile?: any, setActiveTab?: a
   )
 }
 
-// ─── Notification Bell Component ─────────────────────────────────────────────
+// â”€â”€â”€ Notification Bell Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
   const [open, setOpen] = useState(false);
@@ -2126,7 +2126,7 @@ function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
 
   return (
     <>
-      {/* ── Facebook/X-style popup toasts – fixed top-right ──────────────── */}
+      {/* â”€â”€ Facebook/X-style popup toasts â€“ fixed top-right â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="fixed top-4 right-4 z-[99999] flex flex-col gap-3 pointer-events-none" style={{ maxWidth: 380 }}>
         {toastQueue.map(({ id, notif }) => {
           if (!notif) return null;
@@ -2175,7 +2175,7 @@ function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
         })}
       </div>
 
-      {/* ── Bell button + dropdown ────────────────────────────────────────── */}
+      {/* â”€â”€ Bell button + dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="relative">
         <button
           onClick={() => { setOpen(o => !o); if (!open) markAsRead(); }}
@@ -2257,7 +2257,7 @@ function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
   );
 }
 
-// ── Sanitize admin-internal transaction fields before showing to the user ──────
+// â”€â”€ Sanitize admin-internal transaction fields before showing to the user â”€â”€â”€â”€â”€â”€
 const ADMIN_ASSETS = ['PROFIT', 'BONUS', 'MANUAL DEPOSIT', 'ADJUSTMENT', 'LOSS', 'MANUAL WITHDRAWAL'];
 const ADMIN_TXID_PREFIX = '[ADMIN]';
 
@@ -2349,7 +2349,7 @@ function TransactionsTab({ profile }: { profile?: any }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'xholdings_transactions.csv');
+    link.setAttribute('download', 'fedility_holdings_transactions.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2442,7 +2442,7 @@ function TransactionsTab({ profile }: { profile?: any }) {
                           <Clock className="w-3 h-3" /> {timeStr}
                           {!isAdminCredit && txidDisplay && (
                             <>
-                              <span className="opacity-50">•</span>
+                              <span className="opacity-50">â€¢</span>
                               <span className="font-mono">TXID: {txidDisplay.substring(0, 10)}...</span>
                             </>
                           )}
