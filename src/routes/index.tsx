@@ -116,7 +116,7 @@ function Landing() {
       </nav>
 
       {/* Hero Section — Professional Institutional Design */}
-      <section className="relative pt-36 pb-24 lg:pt-48 lg:pb-36 overflow-hidden flex flex-col items-center justify-center min-h-[95vh]">
+      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-28 overflow-hidden flex flex-col items-center justify-center min-h-[95vh]">
         {/* Background radial glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[#13c74b]/8 blur-[180px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#13c74b]/5 blur-[120px] rounded-full pointer-events-none" />
