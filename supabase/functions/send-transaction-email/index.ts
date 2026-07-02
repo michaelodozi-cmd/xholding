@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+﻿import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   try {
     // 1. Verify Webhook Secret
     const requestSecret = req.headers.get("x-webhook-secret");
-    const configuredSecret = Deno.env.get("WEBHOOK_SECRET") || "xholdings-webhook-secret-2026";
+    const configuredSecret = Deno.env.get("WEBHOOK_SECRET") || "Fedility Holdings-webhook-secret-2026";
     
     if (requestSecret !== configuredSecret) {
       console.warn("Unauthorized request received. Secret did not match.");
@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
     if (type === 'INSERT') {
       if (txType === 'withdrawal') {
         shouldSend = true;
-        subject = "Withdrawal Request Pending - XHoldings";
+        subject = "Withdrawal Request Pending - Fedility Holdings";
         html = `
           <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1a202c;">
             <h2 style="color: #ea580c; border-bottom: 2px solid #ea580c; padding-bottom: 10px; margin-top: 0;">Withdrawal Request Submitted</h2>
@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
             </table>
             <p style="margin-bottom: 25px;">You will receive another email once your request has been processed.</p>
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 20px;" />
-            <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from XHoldings. Please do not reply directly to this email.</p>
+            <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from Fedility Holdings. Please do not reply directly to this email.</p>
           </div>
         `;
       } else if (txType === 'deposit') {
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         if (['PROFIT', 'BONUS', 'ADJUSTMENT'].includes(asset)) {
           // Admin balance operation
           const actionName = asset === 'PROFIT' ? 'Profit Added' : asset === 'BONUS' ? 'Bonus Credited' : 'Account Balance Adjusted';
-          subject = `${actionName} - XHoldings`;
+          subject = `${actionName} - Fedility Holdings`;
           html = `
             <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1a202c;">
               <h2 style="color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 10px; margin-top: 0;">${actionName}</h2>
@@ -96,12 +96,12 @@ Deno.serve(async (req) => {
               </table>
               <p style="margin-bottom: 25px;">The funds are immediately available in your balance.</p>
               <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 20px;" />
-              <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from XHoldings. Please do not reply directly to this email.</p>
+              <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from Fedility Holdings. Please do not reply directly to this email.</p>
             </div>
           `;
         } else {
           // Standard crypto deposit
-          subject = "Deposit Request Received - XHoldings";
+          subject = "Deposit Request Received - Fedility Holdings";
           html = `
             <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1a202c;">
               <h2 style="color: #3b82f6; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-top: 0;">Deposit Request Received</h2>
@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
               </table>
               <p style="margin-bottom: 25px;">Once our team verifies the on-chain transaction hash, your account balance will be credited.</p>
               <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 20px;" />
-              <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from XHoldings. Please do not reply directly to this email.</p>
+              <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from Fedility Holdings. Please do not reply directly to this email.</p>
             </div>
           `;
         }
@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
         const statusColor = isApproved ? "#10b981" : "#ef4444";
         const headerColor = isApproved ? "#10b981" : "#ef4444";
         
-        subject = `${capitalizedType} Request ${isApproved ? 'Approved' : 'Rejected'} - XHoldings`;
+        subject = `${capitalizedType} Request ${isApproved ? 'Approved' : 'Rejected'} - Fedility Holdings`;
         html = `
           <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; color: #1a202c;">
             <h2 style="color: ${headerColor}; border-bottom: 2px solid ${headerColor}; padding-bottom: 10px; margin-top: 0;">${capitalizedType} Request ${isApproved ? 'Approved' : 'Rejected'}</h2>
@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
                 : `If this was a withdrawal, your funds have been refunded to your account balance.`}
             </p>
             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 20px;" />
-            <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from XHoldings. Please do not reply directly to this email.</p>
+            <p style="font-size: 13px; color: #718096; text-align: center; margin: 0;">This is an automated message from Fedility Holdings. Please do not reply directly to this email.</p>
           </div>
         `;
       }
@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
             "Authorization": `Bearer ${resendApiKey}`
           },
           body: JSON.stringify({
-            from: `XHoldings <${senderEmail}>`,
+            from: `Fedility Holdings <${senderEmail}>`,
             to: [userEmail],
             subject: subject,
             html: html
