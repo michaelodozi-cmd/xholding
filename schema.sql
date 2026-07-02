@@ -471,6 +471,7 @@ begin
   delete from public.transactions;
   delete from public.notifications;
   delete from public.push_subscriptions;
+  delete from public.support_messages;
   update public.profiles set balance = 0;
 end;
 $$;
@@ -526,3 +527,41 @@ insert into public.investment_plans (id, name, daily_roi, duration_days, min_amo
 ('732616a6-b139-4f44-b433-7a238486ba5c', 'SPACEXIPO', 4.0, 20, 1000, true, null, 'KDDSHVUSD', 10000000),
 ('403298c5-7d4f-4f2c-bafd-93a9ae203e3f', 'Growth Plan', 0.032, 60, 50, true, null, null, null)
 on conflict (id) do nothing;
+
+-- ==========================================
+-- 14. Support Messages Table
+-- ==========================================
+create table if not exists public.support_messages (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  sender_id uuid references public.profiles(id) on delete cascade not null,
+  message text not null,
+  attachment_url text,
+  is_read boolean default false not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS for support_messages
+alter table public.support_messages enable row level security;
+
+-- Policies for support_messages
+create policy "Users can view their own support messages"
+  on public.support_messages for select
+  to authenticated
+  using ((select auth.uid()) = user_id);
+
+create policy "Users can insert support messages for themselves"
+  on public.support_messages for insert
+  to authenticated
+  with check ((select auth.uid()) = user_id and (select auth.uid()) = sender_id);
+
+create policy "Users can update their own support messages"
+  on public.support_messages for update
+  to authenticated
+  using ((select auth.uid()) = user_id);
+
+create policy "Admins have full access to support messages"
+  on public.support_messages for all
+  to authenticated
+  using (public.is_admin((select auth.uid())));
+

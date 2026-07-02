@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, TrendingUp, Gift, User, Bell, Rocket, 
@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Popover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
+import ActiveInvestmentsChart from "../components/dashboard/ActiveInvestmentsChart";
 
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
@@ -39,6 +40,8 @@ import {
 } from "../components/ui/dialog";
 
 import { supabase } from "../lib/supabase";
+import { SupportTab } from "../components/SupportTab";
+import { FloatingSupportWidget } from "../components/FloatingSupportWidget";
 
 
 export const Route = createFileRoute("/dashboard")({
@@ -208,6 +211,7 @@ function Dashboard() {
           <button onClick={() => setActiveTab('wallet')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'wallet' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Wallet className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Deposit / Withdraw</span></button>
           <button onClick={() => setActiveTab('history')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'history' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><List className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Transactions</span></button>
           <button onClick={() => setActiveTab('settings')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'settings' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Settings className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Settings</span></button>
+          <button onClick={() => setActiveTab('support')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'support' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><HeadphonesIcon className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Support / Chat</span></button>
           
           {profile?.role === 'admin' && (
             <Link to="/admin" className="flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors mt-8 text-red-400 hover:text-red-300 hover:bg-red-500/10 font-bold">
@@ -254,6 +258,7 @@ function Dashboard() {
         {activeTab === 'rewards' && <RewardsTab profile={profile} setActiveTab={setActiveTab} />}
         {activeTab === 'settings' && <ProfileTab profile={profile} setActiveTab={setActiveTab} />}
         {activeTab === 'profile' && <ProfileTab profile={profile} setActiveTab={setActiveTab} />}
+        {activeTab === 'support' && <SupportTab profile={profile} />}
       </main>
 
       {/* Live Balance Update Toast */}
@@ -307,6 +312,7 @@ function Dashboard() {
           <Settings className={`w-6 h-6 ${activeTab === 'settings' ? 'fill-current' : ''}`} />
         </button>
       </div>
+      <FloatingSupportWidget profile={profile} setActiveTab={setActiveTab} />
     </div>
   );
 }
@@ -1026,6 +1032,7 @@ function InvestTab({ profile }: { profile?: any }) {
 
       {investments.length > 0 && (
         <div className="mt-8">
+          <ActiveInvestmentsChart investments={investments} />
           <h2 className="text-xl md:text-2xl text-white font-bold mb-6">Active Investments</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {investments.map((inv, idx) => {
