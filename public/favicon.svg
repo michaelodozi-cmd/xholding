@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="18" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#061209"/>
+      <stop offset="50%" stop-color="#0b2212"/>
+      <stop offset="100%" stop-color="#040e07"/>
+    </linearGradient>
+    <linearGradient id="border" x1="18" y1="18" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#13c74b"/>
+      <stop offset="50%" stop-color="#12b744"/>
+      <stop offset="100%" stop-color="#0f8232"/>
+    </linearGradient>
+    <linearGradient id="letter" x1="32" y1="32" x2="64" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#eefcf1"/>
+      <stop offset="100%" stop-color="#13c74b"/>
+    </linearGradient>
+  </defs>
+  <!-- Rotated diamond card -->
+  <rect x="18" y="18" width="64" height="64" rx="16" transform="rotate(45 50 50)"
+        fill="url(#bg)" stroke="url(#border)" stroke-width="3"/>
+  <!-- Stylised F lettermark -->
+  <path d="M40 32H64V40H40V48H58V56H40V68H32V32H40Z" fill="url(#letter)"/>
+</svg>

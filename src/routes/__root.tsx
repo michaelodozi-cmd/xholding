@@ -1,4 +1,4 @@
-﻿import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -77,20 +77,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, maximum-scale=1" },
-      { title: "Fedility Holdings" },
-      { name: "description", content: "Aurora Prime merges broker and admin platforms into a premium private investment experience." },
-      { name: "author", content: "Lovable" },
+      { title: "Fedility Holdings — Institutional Private Wealth Platform" },
+      { name: "description", content: "Fedility Holdings gives you access to institutional-grade investment plans, automated copy trading, and real-time portfolio management — all in one secure platform." },
+      { name: "author", content: "Fedility Holdings" },
       { property: "og:title", content: "Fedility Holdings" },
-      { property: "og:description", content: "Aurora Prime merges broker and admin platforms into a premium private investment experience." },
+      { property: "og:description", content: "Build lasting generational wealth with precision. Institutional-grade investments, copy trading, and daily yield plans." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Fedility Holdings" },
-      { name: "twitter:description", content: "Aurora Prime merges broker and admin platforms into a premium private investment experience." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/766a9fb3-8e9c-43db-8ef0-624835ac17f3/id-preview-6c39b27b--9387c1da-78a7-4794-a696-a0165d70c179.lovable.app-1780917809196.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/766a9fb3-8e9c-43db-8ef0-624835ac17f3/id-preview-6c39b27b--9387c1da-78a7-4794-a696-a0165d70c179.lovable.app-1780917809196.png" },
+      { name: "twitter:description", content: "Build lasting generational wealth with precision. Institutional-grade investments, copy trading, and daily yield plans." },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "shortcut icon", href: "/favicon.svg" },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
