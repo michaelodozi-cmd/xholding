@@ -126,12 +126,6 @@ function Landing() {
 
             {/* Left: Headline + CTAs + Stats */}
             <div className="flex flex-col items-start">
-              {/* Badge */}
-              <div className="flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-[#13c74b]/30 bg-[#13c74b]/10">
-                <div className="w-2 h-2 rounded-full bg-[#13c74b] animate-pulse" />
-                <span className="text-[#13c74b] text-xs font-semibold tracking-widest uppercase">Institutional Private Wealth</span>
-              </div>
-
               {/* Headline */}
               <h1 className="text-[44px] md:text-[56px] lg:text-[62px] font-bold tracking-tight leading-[1.08] mb-6 font-['Outfit'] text-white">
                 Build Lasting<br />
