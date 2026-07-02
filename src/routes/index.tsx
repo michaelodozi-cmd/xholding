@@ -124,7 +124,7 @@ function Landing() {
           
           {/* Main Headline & Subhead */}
           <h1 className="text-[56px] md:text-[72px] lg:text-[84px] font-bold tracking-tight leading-none mb-8 font-['Inter'] uppercase">
-            Fedility Holdings IS YOUR<br/>PRIVATE WEALTH APP
+            Fedility Holdings<br/>IS YOUR PRIVATE WEALTH APP
           </h1>
           <p className="text-[17px] md:text-[20px] text-gray-300 mb-20 max-w-2xl font-medium leading-relaxed">
             Invest in daily-yield portfolios, automatically copy top master traders, and manage your digital assets on the simplest, safest platform.
