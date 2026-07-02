@@ -69,7 +69,7 @@ function ForgotPassword() {
           {success ? (
             <div className="mb-6 p-6 bg-[#12b744]/10 border border-[#12b744]/20 text-white rounded-xl text-center">
               <div className="text-[#12b744] mb-2 font-bold text-[16px]">Email Sent!</div>
-              <p className="text-[14px] text-gray-300">Check your inbox. We've sent password reset instructions to <strong className="text-white">{email}</strong>.</p>
+              <p className="text-[14px] text-gray-300">Check your inbox. We've sent password reset instructions to <strong className="text-white">{email}</strong> (check your spam or junk folder if you don't see it).</p>
               <button onClick={() => navigate({ to: "/login" })} className="w-full mt-6 py-4 text-[16px] rounded-full bg-white/5 hover:bg-white/10 text-white font-bold transition-all border border-white/10">
                 Return to Login
               </button>

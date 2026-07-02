@@ -77,7 +77,7 @@ function Register() {
     }
 
     if (data.session === null) {
-      showAlert("Registration Successful", "A confirmation email has been sent to your inbox. Please confirm your email.", () => navigate({ to: "/login" }));
+      showAlert("Registration Successful", "A confirmation email has been sent to your inbox. Please confirm your email (check your spam or junk folder if you don't see it).", () => navigate({ to: "/login" }));
     } else {
       navigate({ to: "/dashboard" });
     }
