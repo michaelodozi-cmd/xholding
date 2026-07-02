@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Logo, LogoText } from "../components/Logo";
 import { 
-  ArrowRight, ChevronDown, ShieldCheck, HeadphonesIcon, 
-  Lock, Wallet, BarChart3, Globe, Smartphone, Menu, X, 
-  Star, CheckCircle2, TrendingUp, CreditCard, Landmark,
-  ArrowUpRight, Users, PlayCircle, Rocket, QrCode
+  ArrowRight, ShieldCheck, HeadphonesIcon, 
+  Lock, Menu, X, 
+  CheckCircle2, TrendingUp, Landmark,
+  ArrowUpRight, Users
 } from "lucide-react";
 
 const LOGIN = "/login";
@@ -115,81 +115,132 @@ function Landing() {
         )}
       </nav>
 
-      {/* Hero Section - Centered with Card Grid */}
-      <section className="relative pt-40 pb-20 lg:pt-52 lg:pb-32 overflow-hidden flex flex-col items-center justify-center min-h-[90vh]">
-        {/* Subtle Background Glow */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-green-500/10 blur-[150px] rounded-full pointer-events-none" />
-        
-        <div className="max-w-[1000px] mx-auto px-6 md:px-8 relative z-10 text-center flex flex-col items-center w-full">
-          
-          {/* Main Headline & Subhead */}
-          <h1 className="text-[48px] md:text-[64px] lg:text-[76px] font-bold tracking-tight leading-[1.1] mb-8 font-['Outfit'] uppercase max-w-5xl mx-auto">
-            Fedility Holdings <br className="hidden md:block" />
-            <span className="text-[#12b744]">Your Private Wealth App</span>
-          </h1>
-          <p className="text-[17px] md:text-[20px] text-gray-300 mb-20 max-w-2xl font-medium leading-relaxed">
-            Invest in daily-yield portfolios, automatically copy top master traders, and manage your digital assets on the simplest, safest platform.
-          </p>
+      {/* Hero Section — Professional Institutional Design */}
+      <section className="relative pt-36 pb-24 lg:pt-48 lg:pb-36 overflow-hidden flex flex-col items-center justify-center min-h-[95vh]">
+        {/* Background radial glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-[#13c74b]/8 blur-[180px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#13c74b]/5 blur-[120px] rounded-full pointer-events-none" />
 
-          {/* Cards Row Container */}
-          <div className="w-full max-w-[1100px] hidden md:flex gap-4 md:gap-6 justify-center items-end h-[280px]">
-            
-            {/* Card 1: Large Green */}
-            <div className="bg-[#12b744] rounded-[32px] p-8 w-[320px] h-full flex flex-col justify-between shadow-2xl relative overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
-              <h2 className="text-white text-[56px] font-bold leading-none tracking-tight">$125k</h2>
-              <div className="flex justify-between items-center text-white/90 text-sm font-medium mt-auto">
-                <span>Date</span>
-                <span>Jan 20, 2026</span>
+        <div className="max-w-[1200px] mx-auto px-6 md:px-8 relative z-10 w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+            {/* Left: Headline + CTAs + Stats */}
+            <div className="flex flex-col items-start">
+              {/* Badge */}
+              <div className="flex items-center gap-2 mb-8 px-4 py-2 rounded-full border border-[#13c74b]/30 bg-[#13c74b]/10">
+                <div className="w-2 h-2 rounded-full bg-[#13c74b] animate-pulse" />
+                <span className="text-[#13c74b] text-xs font-semibold tracking-widest uppercase">Institutional Private Wealth</span>
               </div>
-            </div>
 
-            {/* Card 2: White Yield */}
-            <div className="bg-white rounded-[32px] p-6 w-[260px] h-[90%] flex flex-col relative shadow-2xl overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
-              <h3 className="text-black text-2xl font-bold leading-tight mb-2 text-center">
-                Up to 18%<br/>in interest
-              </h3>
-              {/* Illustration Placeholder (Using shapes to mimic 3D) */}
-              <div className="absolute bottom-0 left-0 w-full h-[120px] flex items-end justify-center">
-                <div className="w-[80%] h-[100px] bg-green-100 rounded-t-3xl relative border-4 border-green-200 shadow-inner">
-                  <div className="absolute -top-6 left-4 w-12 h-12 bg-yellow-400 rounded-full border-4 border-yellow-300 shadow-lg"></div>
-                  <div className="absolute -top-4 left-10 w-12 h-12 bg-yellow-400 rounded-full border-4 border-yellow-300 shadow-lg"></div>
-                  <div className="absolute bottom-2 right-4 w-6 h-16 bg-green-500 rounded shadow-md"></div>
-                  <div className="absolute bottom-2 right-12 w-6 h-10 bg-green-400 rounded shadow-md"></div>
+              {/* Headline */}
+              <h1 className="text-[44px] md:text-[56px] lg:text-[62px] font-bold tracking-tight leading-[1.08] mb-6 font-['Outfit'] text-white">
+                Build Lasting<br />
+                <span className="text-[#13c74b]">Generational Wealth</span><br />
+                with Precision.
+              </h1>
+
+              <p className="text-gray-400 text-[17px] leading-relaxed mb-10 max-w-lg">
+                Fedility Holdings gives you access to institutional-grade investment plans, automated copy trading, and real-time portfolio management — all in one secure platform.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-4 mb-14">
+                <Link to={REGISTER}>
+                  <button className="flex items-center gap-2 bg-[#13c74b] hover:bg-[#10b340] text-black font-bold px-7 py-3.5 rounded-xl text-[15px] transition-all duration-200 shadow-lg shadow-[#13c74b]/25">
+                    Open Account <ArrowRight className="w-4 h-4" />
+                  </button>
+                </Link>
+                <Link to={LOGIN}>
+                  <button className="flex items-center gap-2 border border-white/20 hover:border-white/40 text-white font-medium px-7 py-3.5 rounded-xl text-[15px] transition-all duration-200 hover:bg-white/5">
+                    Sign In
+                  </button>
+                </Link>
+              </div>
+
+              {/* Key Stats Row */}
+              <div className="flex items-center gap-10 border-t border-white/10 pt-8 w-full">
+                <div>
+                  <div className="text-2xl font-bold text-white font-['Outfit']">$2.4B+</div>
+                  <div className="text-xs text-gray-500 mt-0.5 font-medium uppercase tracking-wide">Assets Managed</div>
+                </div>
+                <div className="w-px h-10 bg-white/10" />
+                <div>
+                  <div className="text-2xl font-bold text-white font-['Outfit']">18%</div>
+                  <div className="text-xs text-gray-500 mt-0.5 font-medium uppercase tracking-wide">Max Annual Yield</div>
+                </div>
+                <div className="w-px h-10 bg-white/10" />
+                <div>
+                  <div className="text-2xl font-bold text-white font-['Outfit']">40K+</div>
+                  <div className="text-xs text-gray-500 mt-0.5 font-medium uppercase tracking-wide">Active Investors</div>
                 </div>
               </div>
             </div>
 
-            {/* Card 3: Purple / Pre-IPO */}
-            <div className="bg-[#6b52ff] rounded-[32px] p-6 w-[240px] h-[85%] flex flex-col justify-between shadow-2xl relative overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
-              <div className="flex justify-center mt-2">
-                <Rocket className="w-16 h-16 text-white drop-shadow-2xl fill-white/20" />
-              </div>
-              <h3 className="text-white text-xl font-bold leading-tight text-center">
-                Automated<br/>Copy Trading<br/><span className="text-sm font-normal text-white/80">for members</span>
-              </h3>
-            </div>
-
-            {/* Column for Cards 4 & 5 */}
-            <div className="flex flex-col justify-end h-full gap-4 md:gap-6">
-              {/* Card 4: QR Code */}
-              <div className="bg-[#8b5cf6] rounded-3xl w-[140px] h-[140px] flex items-center justify-center shadow-xl transform hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden">
-                <div className="w-24 h-24 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm p-2">
-                  <QrCode className="w-full h-full text-white" />
+            {/* Right: Professional Dashboard Panel */}
+            <div className="hidden lg:flex flex-col gap-4">
+              {/* Main panel */}
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest font-medium mb-1">Portfolio Value</p>
+                    <p className="text-3xl font-bold text-white font-['Outfit']">$284,920.<span className="text-gray-500 text-xl">48</span></p>
+                  </div>
+                  <span className="flex items-center gap-1.5 text-[#13c74b] text-sm font-semibold bg-[#13c74b]/10 border border-[#13c74b]/20 px-3 py-1.5 rounded-full">
+                    <TrendingUp className="w-3.5 h-3.5" /> +14.2%
+                  </span>
+                </div>
+                {/* Minimal chart */}
+                <div className="w-full h-20 mb-4">
+                  <svg viewBox="0 0 300 80" className="w-full h-full" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#13c74b" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#13c74b" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0 65 L30 58 L60 62 L90 45 L120 50 L150 35 L180 28 L210 32 L240 18 L270 12 L300 8" fill="none" stroke="#13c74b" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0 65 L30 58 L60 62 L90 45 L120 50 L150 35 L180 28 L210 32 L240 18 L270 12 L300 8 L300 80 L0 80Z" fill="url(#chartGrad)" />
+                  </svg>
+                </div>
+                {/* Allocation rows */}
+                <div className="space-y-3">
+                  {[
+                    { label: 'Fixed Yield Plan', pct: '55%', bar: 55, color: '#13c74b' },
+                    { label: 'Copy Trading', pct: '30%', bar: 30, color: '#c9a84c' },
+                    { label: 'Liquid Reserve', pct: '15%', bar: 15, color: '#60a5fa' },
+                  ].map((item) => (
+                    <div key={item.label}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-400">{item.label}</span>
+                        <span className="text-white font-medium">{item.pct}</span>
+                      </div>
+                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-1000" style={{ width: item.pct, backgroundColor: item.color }} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Card 5: Small Green Chart */}
-              <div className="bg-[#10b981] rounded-2xl w-[140px] h-[100px] p-4 flex flex-col justify-between shadow-xl transform hover:-translate-y-1 transition-transform duration-300">
-                <div className="text-white font-bold text-lg">36.7%</div>
-                <div className="w-full h-8 relative">
-                   <svg viewBox="0 0 100 30" className="w-full h-full stroke-white stroke-2 fill-none">
-                     <path d="M0 25 Q 20 10, 40 15 T 80 5 T 100 0" />
-                   </svg>
+              {/* Two smaller info cards */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Today's Return</p>
+                  <p className="text-xl font-bold text-[#13c74b] font-['Outfit']">+$412.80</p>
+                  <p className="text-xs text-gray-600 mt-1">Daily yield credited</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5">
+                  <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">Security</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <ShieldCheck className="w-5 h-5 text-[#13c74b]" />
+                    <p className="text-sm font-semibold text-white">Fully Secured</p>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">256-bit encryption</p>
                 </div>
               </div>
             </div>
+
           </div>
-
         </div>
       </section>
 
