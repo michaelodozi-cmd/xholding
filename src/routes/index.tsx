@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Logo, LogoText } from "../components/Logo";
@@ -123,8 +123,9 @@ function Landing() {
         <div className="max-w-[1000px] mx-auto px-6 md:px-8 relative z-10 text-center flex flex-col items-center w-full">
           
           {/* Main Headline & Subhead */}
-          <h1 className="text-[56px] md:text-[72px] lg:text-[84px] font-bold tracking-tight leading-none mb-8 font-['Inter'] uppercase">
-            Fedility Holdings<br/>IS YOUR PRIVATE WEALTH APP
+          <h1 className="text-[48px] md:text-[64px] lg:text-[76px] font-bold tracking-tight leading-[1.1] mb-8 font-['Outfit'] uppercase max-w-5xl mx-auto">
+            Fedility Holdings <br className="hidden md:block" />
+            <span className="text-[#12b744]">Your Private Wealth App</span>
           </h1>
           <p className="text-[17px] md:text-[20px] text-gray-300 mb-20 max-w-2xl font-medium leading-relaxed">
             Invest in daily-yield portfolios, automatically copy top master traders, and manage your digital assets on the simplest, safest platform.
