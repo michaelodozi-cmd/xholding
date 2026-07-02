@@ -1,4 +1,4 @@
-// XHoldings Service Worker — handles background push notifications
+﻿// Fedility Holdings Service Worker â€” handles background push notifications
 // This file MUST be served from the root (public/sw.js)
 
 self.addEventListener('install', () => {
@@ -16,21 +16,21 @@ self.addEventListener('push', event => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: 'XHoldings', body: event.data.text() };
+    payload = { title: 'Fedility Holdings', body: event.data.text() };
   }
 
   const options = {
     body: payload.body || '',
     icon: '/favicon.ico',
     badge: '/favicon.ico',
-    tag: payload.tag || 'xholdings-notification',
+    tag: payload.tag || 'Fedility Holdings-notification',
     data: { url: payload.url || '/' },
     requireInteraction: false,
     vibrate: [200, 100, 200],
   };
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || 'XHoldings', options)
+    self.registration.showNotification(payload.title || 'Fedility Holdings', options)
   );
 });
 
