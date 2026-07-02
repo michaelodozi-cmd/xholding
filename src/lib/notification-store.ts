@@ -77,8 +77,9 @@ export function useNotificationStore() {
 
       if (channelRef.current) supabase.removeChannel(channelRef.current);
 
+      const channelName = `notif-${user.id}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       const channel = supabase
-        .channel(`notif-${user.id}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },

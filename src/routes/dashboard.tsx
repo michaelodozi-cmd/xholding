@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Popover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
-import ActiveInvestmentsChart from "../components/dashboard/ActiveInvestmentsChart";
+import TradingViewMarketChart from "../components/dashboard/TradingViewMarketChart";
 
 import { useCryptoStore } from "../lib/crypto-store";
 import { useTransactionStore } from "../lib/transaction-store";
@@ -428,6 +428,13 @@ function CopyTradeTab({ profile }: { profile?: any }) {
       <div className="flex items-center gap-4 mb-2">
         <h1 className="text-xl md:text-2xl text-white font-bold hidden md:block">Copy Trading</h1>
       </div>
+
+      {/* Institutional Copy Trading Terminal */}
+      <TradingViewMarketChart
+        investments={investments}
+        copyTraders={traders}
+        copySubs={mySubs}
+      />
 
       <div className="bg-[#1a1f1c]/60 border border-transparent p-6 md:p-8 rounded-3xl relative overflow-hidden mb-6">
         <div className="mb-8">
@@ -904,8 +911,19 @@ function InvestTab({ profile }: { profile?: any }) {
       </AlertDialog>
 
       <div className="flex items-center gap-4 mb-2">
-        <h1 className="text-xl md:text-2xl text-white font-bold hidden md:block">Markets</h1>
+        <h1 className="text-xl md:text-2xl text-white font-bold hidden md:block">Markets & Trading Terminal</h1>
       </div>
+
+      {/* Industrial-Grade Institutional Wealth & Copy Trading Terminal */}
+      <TradingViewMarketChart
+        investments={investments}
+        plans={plans}
+        selectedPlan={selectedPlan}
+        onSelectPlan={(planAsset) => {
+          const found = plans.find(p => p.id === planAsset.id || p.name === planAsset.symbol);
+          if (found) setSelectedPlan(found);
+        }}
+      />
 
       {loadingPlans ? (
         <div className="bg-[#1a1f1c]/60 border border-transparent p-12 rounded-3xl flex items-center justify-center min-h-[300px]">
@@ -1032,7 +1050,6 @@ function InvestTab({ profile }: { profile?: any }) {
 
       {investments.length > 0 && (
         <div className="mt-8">
-          <ActiveInvestmentsChart investments={investments} />
           <h2 className="text-xl md:text-2xl text-white font-bold mb-6">Active Investments</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {investments.map((inv, idx) => {
