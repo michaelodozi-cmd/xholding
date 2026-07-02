@@ -1,5 +1,5 @@
 ﻿/**
- * Fedility Holding Web Push Subscription Service
+ * Fedility Holdings Web Push Subscription Service
  * 
  * Handles:
  * 1. Registering the Service Worker
@@ -84,4 +84,5 @@ export async function unregisterPushSubscription(): Promise<void> {
     console.error('[Push] Failed to unsubscribe:', err);
   }
 }
+
 

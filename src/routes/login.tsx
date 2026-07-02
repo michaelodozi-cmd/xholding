@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Sun, HeadphonesIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
@@ -161,8 +161,9 @@ function Login() {
 
       {/* Footer */}
       <footer className="absolute bottom-6 left-6 md:left-8 z-20 hidden sm:block">
-        <span className="text-[#52665a] text-[13px] font-medium">© Fedility Holding {new Date().getFullYear()}</span>
+        <span className="text-[#52665a] text-[13px] font-medium">Â© Fedility Holdings {new Date().getFullYear()}</span>
       </footer>
     </div>
   );
 }
+

@@ -1125,7 +1125,7 @@ function TransactionCard({ tx }: { tx: any }) {
     if (tx.type === 'deposit') {
       updateStatus(tx.id, 'approved', tx.amount);
       await sendPushToUser(
-        'âœ… Deposit Approved â€” Fedility Holding',
+        'âœ… Deposit Approved â€” Fedility Holdings',
         `Your deposit of ${amt} has been credited to your account.`,
         'deposit-approved'
       );
@@ -1135,7 +1135,7 @@ function TransactionCard({ tx }: { tx: any }) {
       }
       updateStatus(tx.id, 'approved');
       await sendPushToUser(
-        'ðŸ’¸ Withdrawal Sent â€” Fedility Holding',
+        'ðŸ’¸ Withdrawal Sent â€” Fedility Holdings',
         `Your withdrawal of ${amt} has been processed and sent.`,
         'withdrawal-approved'
       );
@@ -1147,7 +1147,7 @@ function TransactionCard({ tx }: { tx: any }) {
     const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${tx.asset || ''}`;
     updateStatus(tx.id, 'rejected');
     await sendPushToUser(
-      `âŒ ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Rejected â€” Fedility Holding`,
+      `âŒ ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Rejected â€” Fedility Holdings`,
       `Your ${tx.type} of ${amt} was not approved. Please contact support.`,
       `${tx.type}-rejected`
     );
@@ -2262,4 +2262,5 @@ function TraderCard({ trader, onEdit, onDelete, onToggle, onSimulate, onFollower
     </div>
   );
 }
+
 
