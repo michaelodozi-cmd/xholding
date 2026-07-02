@@ -1,5 +1,5 @@
-﻿/**
- * Fedility Holdings Web Push Subscription Service
+/**
+ * Fidelity Holdings Web Push Subscription Service
  * 
  * Handles:
  * 1. Registering the Service Worker

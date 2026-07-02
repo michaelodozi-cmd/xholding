@@ -138,7 +138,7 @@ export default function SupportAdminTab() {
       color: 'text-[#13c74b]',
       replies: [
         'Hello! I am reviewing your account details now with senior management.',
-        'Thank you for contacting Fedility Institutional Desk. How else can we assist today?',
+        'Thank you for contacting Fidelity Institutional Desk. How else can we assist today?',
         'We appreciate your patience while our technical team investigated this matter.',
       ],
     },

@@ -184,7 +184,7 @@ function Dashboard() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-['Outfit'] font-bold mb-1">Confirm Logout</AlertDialogTitle>
             <AlertDialogDescription className="text-gray-400 text-[15px] leading-relaxed">
-              Are you sure you want to securely log out of your Fedility Holdings account? You will need to re-enter your credentials to access your portfolio.
+              Are you sure you want to securely log out of your Fidelity Holdings account? You will need to re-enter your credentials to access your portfolio.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-8 gap-3 sm:gap-0">
@@ -2190,7 +2190,7 @@ function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
                   <p className="text-[12px] text-gray-300 leading-snug mb-2">{notif.message}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] text-gray-600 font-medium">{formatTime(notif.created_at)}</span>
-                    <span className="text-[10px] font-bold text-[#13c74b] bg-[#13c74b]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">FedilityHolding</span>
+                    <span className="text-[10px] font-bold text-[#13c74b] bg-[#13c74b]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">FidelityHoldings</span>
                   </div>
                 </div>
               </div>
@@ -2373,7 +2373,7 @@ function TransactionsTab({ profile }: { profile?: any }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'fedility_holdings_transactions.csv');
+    link.setAttribute('download', 'fidelity_holdings_transactions.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

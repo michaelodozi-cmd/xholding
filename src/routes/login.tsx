@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Sun, HeadphonesIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
@@ -20,7 +20,7 @@ function Login() {
 
   // On mount, load saved email if "Keep me signed in" was previously used
   useEffect(() => {
-    const savedEmail = localStorage.getItem("fedility_holdings_remember_email");
+    const savedEmail = localStorage.getItem("fidelity_holdings_remember_email");
     if (savedEmail) {
       setEmail(savedEmail);
       setRememberMe(true);
@@ -45,9 +45,9 @@ function Login() {
 
     // Handle "Keep me signed in"
     if (rememberMe) {
-      localStorage.setItem("fedility_holdings_remember_email", email);
+      localStorage.setItem("fidelity_holdings_remember_email", email);
     } else {
-      localStorage.removeItem("fedility_holdings_remember_email");
+      localStorage.removeItem("fidelity_holdings_remember_email");
     }
 
     // Execute necessary database checks concurrently to reduce redirect latency
@@ -161,7 +161,7 @@ function Login() {
 
       {/* Footer */}
       <footer className="absolute bottom-6 left-6 md:left-8 z-20 hidden sm:block">
-        <span className="text-[#52665a] text-[13px] font-medium">Â© Fedility Holdings {new Date().getFullYear()}</span>
+        <span className="text-[#52665a] text-[13px] font-medium">Â© Fidelity Holdings {new Date().getFullYear()}</span>
       </footer>
     </div>
   );

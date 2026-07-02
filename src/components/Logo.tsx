@@ -56,7 +56,7 @@ export function Logo({ className = "", size = 32 }: LogoProps) {
 export function LogoText({ className = "font-semibold text-2xl tracking-tight text-white font-['Outfit']" }: { className?: string }) {
   return (
     <span className={className}>
-      Fedility<span className="text-[#13c74b]">Holding</span>
+      Fidelity<span className="text-[#13c74b]">Holdings</span>
     </span>
   );
 }

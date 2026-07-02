@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, ChevronRight, ShieldCheck, Zap, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Logo, LogoText } from "../components/Logo";
@@ -102,7 +102,7 @@ function Company() {
               Create a business account <ArrowRight className="w-4 h-4" />
             </button>
           </Link>
-          <a href="mailto:support@fedilityholdings.com">
+          <a href="mailto:support@fidelityholdings.com">
             <button className="px-6 py-3 bg-transparent hover:bg-white/5 text-white border border-white/10 rounded-lg font-bold text-[15px] transition-all flex items-center justify-center gap-2">
               Speak to our team
             </button>
@@ -131,7 +131,7 @@ function Company() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 uppercase font-['Outfit'] tracking-tight">Built For <br/> Every Investor Strategy</h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              From everyday retail investors to massive corporate treasuries, Fedility Holdings provides the liquidity and yield generation needed to scale your wealth.
+              From everyday retail investors to massive corporate treasuries, Fidelity Holdings provides the liquidity and yield generation needed to scale your wealth.
             </p>
           </div>
 
@@ -284,7 +284,7 @@ function Company() {
             <div>
               <Zap className="w-8 h-8 text-[#12b744] mb-4" />
               <h3 className="text-xl font-bold text-white mb-3">Proof of Reserves</h3>
-              <p className="text-[#8e9a93] text-sm leading-relaxed">Fedility Holdings maintains a strict 1:1 asset backing. We never co-mingle funds, ensuring absolute solvency regardless of market volatility.</p>
+              <p className="text-[#8e9a93] text-sm leading-relaxed">Fidelity Holdings maintains a strict 1:1 asset backing. We never co-mingle funds, ensuring absolute solvency regardless of market volatility.</p>
             </div>
             <div>
               <ShieldCheck className="w-8 h-8 text-[#12b744] mb-4" />
@@ -312,7 +312,7 @@ function Company() {
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
               <div className="flex gap-1 text-[#12b744] mb-4">{"Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
-                "Fedility Holdings completely transformed my portfolio. Their fixed-yield plans provide incredible stability during market downturns, and the daily ROI is always on time."
+                "Fidelity Holdings completely transformed my portfolio. Their fixed-yield plans provide incredible stability during market downturns, and the daily ROI is always on time."
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
@@ -370,7 +370,7 @@ function Company() {
         <div className="max-w-[800px] mx-auto px-6 md:px-8 text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 uppercase font-['Outfit'] tracking-tight">Ready to compound <br/> your wealth?</h2>
           <p className="text-[#8e9a93] text-lg mb-10">
-            Join thousands of smart investors already building their financial future with Fedility Holdings.
+            Join thousands of smart investors already building their financial future with Fidelity Holdings.
           </p>
           <Link to="/register">
             <button className="px-10 py-4 bg-[#12b744] hover:bg-[#10a13c] text-black rounded-full font-bold text-[16px] transition-all">
@@ -384,7 +384,7 @@ function Company() {
       <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
-            <p>Ã‚Â© {new Date().getFullYear()} Fedility Holdings Inc. All rights reserved.</p>
+            <p>Ã‚Â© {new Date().getFullYear()} Fidelity Holdings Inc. All rights reserved.</p>
             <div className="flex gap-6 mt-4 md:mt-0 font-medium">
               <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
               <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>

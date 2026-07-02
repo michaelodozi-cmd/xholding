@@ -1,5 +1,5 @@
-﻿/**
- * Fedility Holdings Push Notification Service
+/**
+ * Fidelity Holdings Push Notification Service
  * Uses the Web Notifications API â€“ works as a native notification on:
  *  - Windows (Chrome/Edge/Firefox)
  *  - Android (Chrome)
@@ -53,11 +53,11 @@ export function sendPushNotification(payload: PushNotificationPayload): void {
   }
 }
 
-/** Convenience helpers for Fedility Holdings-specific events */
+/** Convenience helpers for Fidelity Holdings-specific events */
 
 export function notifyDepositApproved(amount: string, asset: string) {
   sendPushNotification({
-    title: 'âœ… Deposit Approved â€” Fedility Holdings',
+    title: 'âœ… Deposit Approved â€” Fidelity Holdings',
     body: `Your deposit of ${amount} ${asset} has been credited to your account.`,
     tag: 'deposit-approved',
   });
@@ -65,7 +65,7 @@ export function notifyDepositApproved(amount: string, asset: string) {
 
 export function notifyDepositRejected(amount: string, asset: string) {
   sendPushNotification({
-    title: 'âŒ Deposit Rejected â€” Fedility Holdings',
+    title: 'â Œ Deposit Rejected â€” Fidelity Holdings',
     body: `Your deposit of ${amount} ${asset} was not approved. Contact support for help.`,
     tag: 'deposit-rejected',
   });
@@ -73,7 +73,7 @@ export function notifyDepositRejected(amount: string, asset: string) {
 
 export function notifyWithdrawalApproved(amount: string, asset: string) {
   sendPushNotification({
-    title: 'ðŸ’¸ Withdrawal Sent â€” Fedility Holdings',
+    title: 'ðŸ’¸ Withdrawal Sent â€” Fidelity Holdings',
     body: `Your withdrawal of ${amount} ${asset} has been processed and sent.`,
     tag: 'withdrawal-approved',
   });
@@ -81,7 +81,7 @@ export function notifyWithdrawalApproved(amount: string, asset: string) {
 
 export function notifyWithdrawalRejected(amount: string, asset: string) {
   sendPushNotification({
-    title: 'âŒ Withdrawal Rejected â€” Fedility Holdings',
+    title: 'â Œ Withdrawal Rejected â€” Fidelity Holdings',
     body: `Your withdrawal of ${amount} ${asset} was rejected. Contact support.`,
     tag: 'withdrawal-rejected',
   });
@@ -89,10 +89,8 @@ export function notifyWithdrawalRejected(amount: string, asset: string) {
 
 export function notifyInvestmentROI(amount: string) {
   sendPushNotification({
-    title: 'ðŸ“ˆ ROI Credited â€” Fedility Holdings',
+    title: 'ðŸ“ˆ ROI Credited â€” Fidelity Holdings',
     body: `Daily return of $${amount} has been added to your balance.`,
     tag: 'roi-credit',
   });
 }
-
-

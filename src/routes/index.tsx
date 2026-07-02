@@ -134,7 +134,7 @@ function Landing() {
               </h1>
 
               <p className="text-gray-400 text-[17px] leading-relaxed mb-10 max-w-lg">
-                Fedility Holdings gives you access to institutional-grade investment plans, automated copy trading, and real-time portfolio management — all in one secure platform.
+                Fidelity Holdings gives you access to institutional-grade investment plans, automated copy trading, and real-time portfolio management — all in one secure platform.
               </p>
 
               {/* CTA Buttons */}
@@ -242,7 +242,7 @@ function Landing() {
       {/* Ticker / Brands Section */}
       <section className="py-10 border-y border-white/10 bg-[#000000]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="text-lg font-medium text-gray-300">Track <span className="text-white font-bold">real-time digital assets</span> on Fedility Holdings</div>
+          <div className="text-lg font-medium text-gray-300">Track <span className="text-white font-bold">real-time digital assets</span> on Fidelity Holdings</div>
           <div className="flex items-center gap-8 overflow-x-auto w-full md:w-auto pb-4 md:pb-0 scrollbar-hide">
             {marketData.map((crypto, i) => (
               <div key={i} className="flex flex-col min-w-max">
@@ -264,7 +264,7 @@ function Landing() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Master Your<br/>Portfolio</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Mirror the strategies of elite master traders and automate your market positions on Fedility Holdings's secure, institutional-grade platform.
+              Mirror the strategies of elite master traders and automate your market positions on Fidelity Holdings's secure, institutional-grade platform.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
@@ -288,7 +288,7 @@ function Landing() {
                   <h3 className="text-xl font-bold">Automate Your Strategy</h3>
                 </div>
                 <p className="text-black/80 font-medium">
-                  Mirror top algorithmic traders with proven win rates to capture market alpha effortlessly on Fedility Holdings.
+                  Mirror top algorithmic traders with proven win rates to capture market alpha effortlessly on Fidelity Holdings.
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
@@ -333,9 +333,9 @@ function Landing() {
       <section className="py-24 lg:py-32 bg-[#000000]">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Grow Your Wealth<br/>With Fedility Holdings</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white uppercase tracking-tight">Grow Your Wealth<br/>With Fidelity Holdings</h2>
             <p className="text-gray-400 text-lg mb-8">
-              Deploy your digital assets into high-yield structured plans designed to provide consistent daily returns and preserve capital on Fedility Holdings.
+              Deploy your digital assets into high-yield structured plans designed to provide consistent daily returns and preserve capital on Fidelity Holdings.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-2">
@@ -374,7 +374,7 @@ function Landing() {
                   <h3 className="text-xl font-bold">Consistent Daily Passive Returns</h3>
                 </div>
                 <p className="text-black/80 font-medium">
-                  Institutional yield opportunities available on Fedility Holdings with fully transparent performance metrics and real-time tracking.
+                  Institutional yield opportunities available on Fidelity Holdings with fully transparent performance metrics and real-time tracking.
                 </p>
               </div>
               <div className="bg-white/5 rounded-2xl p-6 text-white/70 hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/10">
@@ -415,7 +415,7 @@ function Landing() {
             <div>
               <Logo size={28} className="mb-6" />
               <p className="text-sm text-gray-500 max-w-[200px]">
-                Fedility Holdings is a leading digital asset provider, fully compliant for secure data protection and algorithmic investing.
+                Fidelity Holdings is a leading digital asset provider, fully compliant for secure data protection and algorithmic investing.
               </p>
             </div>
             
@@ -441,7 +441,7 @@ function Landing() {
             <div>
               <h4 className="font-semibold text-white mb-6">Company</h4>
               <ul className="space-y-4 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Fedility Holdings</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">About Fidelity Holdings</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
@@ -451,7 +451,7 @@ function Landing() {
 
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-xs text-gray-500 text-center md:text-left leading-relaxed max-w-3xl">
-              Â© {new Date().getFullYear()} Fedility Holdings. All rights reserved. By using this website, you consent to our Privacy Policy and Cookie Policy. Please read our full Risk Warning to understand the potential risks involved in investing.
+              Â© {new Date().getFullYear()} Fidelity Holdings. All rights reserved. By using this website, you consent to our Privacy Policy and Cookie Policy. Please read our full Risk Warning to understand the potential risks involved in investing.
             </p>
             <div className="flex gap-4">
                <div className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 cursor-pointer transition-colors" />
