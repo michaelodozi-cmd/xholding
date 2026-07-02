@@ -1,5 +1,5 @@
-/**
- * XHoldings Web Push Subscription Service
+﻿/**
+ * Fedility Holding Web Push Subscription Service
  * 
  * Handles:
  * 1. Registering the Service Worker
@@ -9,8 +9,8 @@
 
 import { supabase } from './supabase';
 
-// ─── VAPID Public Key ─────────────────────────────────────────────────────────
-// This is the PUBLIC key only — safe to expose in client code.
+// â”€â”€â”€ VAPID Public Key â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// This is the PUBLIC key only â€” safe to expose in client code.
 // The private key stays on the server (Supabase Edge Function secret).
 export const VAPID_PUBLIC_KEY = 'BFpA9qck6mVvXczwUS4uYnD1CClquj5hXJRtFG5Njw8EvCQAzJPcs97Kai2CDnVWkVV7uDJmXppiDAmDLhuSuew';
 
@@ -84,3 +84,4 @@ export async function unregisterPushSubscription(): Promise<void> {
     console.error('[Push] Failed to unsubscribe:', err);
   }
 }
+

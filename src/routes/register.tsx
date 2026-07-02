@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
+import { Logo, LogoText } from "../components/Logo";
 
 export const Route = createFileRoute("/register")({
   component: Register,
@@ -257,10 +258,8 @@ function Register() {
             </button>
           ) : (
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-[4px] bg-transparent border-2 border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-[12px] rotate-45">
-                <div className="-rotate-45">X</div>
-              </div>
-              <span className="font-semibold text-xl tracking-tight text-white font-['Outfit'] hidden sm:block">XHoldings</span>
+              <Logo size={26} />
+              <LogoText className="font-semibold text-xl tracking-tight text-white font-['Outfit'] hidden sm:block" />
             </Link>
           )}
         </div>
@@ -289,7 +288,7 @@ function Register() {
 
       {/* Footer */}
       <footer className="absolute bottom-6 left-6 md:left-8 z-20 hidden sm:block">
-        <span className="text-[#52665a] text-[13px] font-medium">© XHoldings {new Date().getFullYear()}</span>
+        <span className="text-[#52665a] text-[13px] font-medium">© Fedility Holding {new Date().getFullYear()}</span>
       </footer>
     </div>
   );

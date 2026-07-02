@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, ChevronRight, ShieldCheck, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Logo, LogoText } from "../components/Logo";
 
 export const Route = createFileRoute("/personal")({
   component: Personal,
@@ -22,10 +23,8 @@ function Personal() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-8 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded bg-transparent border-2 border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-sm rotate-45">
-                <div className="-rotate-45">X</div>
-              </div>
-              <span className="font-semibold text-2xl tracking-tight text-white font-['Outfit']">XHoldings</span>
+              <Logo size={28} />
+              <LogoText />
             </Link>
 
             <div className="hidden lg:flex items-center gap-8 ml-4">
@@ -57,7 +56,7 @@ function Personal() {
             BUILT FOR <br/> YOUR WEALTH
           </h1>
           <p className="text-gray-700 text-[18px] md:text-[20px] max-w-3xl mx-auto mb-16 leading-relaxed">
-            Whatever your financial goals, XHoldings provides the tools to power your growth, from saving in high-yield stablecoins to trading digital assets, or sending money to family globally.
+            Whatever your financial goals, Fedility Holding provides the tools to power your growth, from saving in high-yield stablecoins to trading digital assets, or sending money to family globally.
           </p>
 
 
@@ -202,7 +201,7 @@ function Personal() {
         <div className="max-w-[1100px] mx-auto px-6 md:px-8 text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 uppercase font-['Outfit'] tracking-tight">GO GLOBAL</h2>
           <p className="text-white/80 text-[15px] max-w-2xl mx-auto mb-6">
-            Open a USD account, shop anywhere with XHoldings debit cards, and earn instant cashback every time you spend in-app.
+            Open a USD account, shop anywhere with Fedility Holding debit cards, and earn instant cashback every time you spend in-app.
           </p>
           <div className="flex items-center justify-center gap-6 text-sm font-semibold text-[#fcd535]">
             <div className="flex items-center gap-2">
@@ -227,7 +226,7 @@ function Personal() {
                   </div>
                   <h4 className="text-[15px] font-bold text-black">Global USD Account</h4>
                 </div>
-                <p className="text-black/80 text-[14px] leading-relaxed">Open a USD account, shop anywhere with XHoldings debit cards, and earn instant cashback every time you spend in-app.</p>
+                <p className="text-black/80 text-[14px] leading-relaxed">Open a USD account, shop anywhere with Fedility Holding debit cards, and earn instant cashback every time you spend in-app.</p>
               </div>
               <div className="bg-[#5a2f2b] p-5 rounded-xl cursor-pointer hover:bg-[#6e3934] transition-colors border border-white/5">
                 <h4 className="text-[15px] font-bold text-white">Virtual & Physical Debit Cards</h4>
@@ -270,9 +269,9 @@ function Personal() {
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex gap-1 text-[#12b744] mb-4">{"★★★★★"}</div>
+              <div className="flex gap-1 text-[#12b744] mb-4">{"â˜…â˜…â˜…â˜…â˜…"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
-                "I used to keep my savings in a traditional bank earning almost nothing. Moving to XHoldings' Growth Plan has been the best financial decision I've made."
+                "I used to keep my savings in a traditional bank earning almost nothing. Moving to Fedility Holding' Growth Plan has been the best financial decision I've made."
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
@@ -286,7 +285,7 @@ function Personal() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex gap-1 text-[#12b744] mb-4">{"★★★★★"}</div>
+              <div className="flex gap-1 text-[#12b744] mb-4">{"â˜…â˜…â˜…â˜…â˜…"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
                 "The dashboard is incredibly easy to use. I can track my daily ROI directly from my phone and the withdrawals actually hit my personal wallet instantly."
               </p>
@@ -302,7 +301,7 @@ function Personal() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex gap-1 text-[#12b744] mb-4">{"★★★★★"}</div>
+              <div className="flex gap-1 text-[#12b744] mb-4">{"â˜…â˜…â˜…â˜…â˜…"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
                 "I appreciate the transparency. Being able to see exactly how much yield I'm generating every single day gives me massive peace of mind."
               </p>
@@ -344,7 +343,7 @@ function Personal() {
       <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
-            <p>© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>
+            <p>Â© {new Date().getFullYear()} Fedility Holding Inc. All rights reserved.</p>
             <div className="flex gap-6 mt-4 md:mt-0 font-medium">
               <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
               <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
@@ -356,3 +355,4 @@ function Personal() {
     </div>
   );
 }
+

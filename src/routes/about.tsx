@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Zap, Target, Briefcase, Users, Wallet, Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Logo, LogoText } from "../components/Logo";
 
 export const Route = createFileRoute("/about")({
   component: About,
@@ -23,10 +24,8 @@ function About() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-8 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded bg-transparent border-2 border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-sm rotate-45">
-                <div className="-rotate-45">X</div>
-              </div>
-              <span className="font-semibold text-2xl tracking-tight text-white font-['Outfit']">XHoldings</span>
+              <Logo size={28} />
+              <LogoText />
             </Link>
 
             <div className="hidden lg:flex items-center gap-8 ml-4">
@@ -85,7 +84,7 @@ function About() {
         <div className="max-w-[1300px] mx-auto grid md:grid-cols-2 gap-16 relative z-10 pt-16">
           <div>
             <h1 className="text-3xl md:text-[40px] font-bold leading-tight font-['Outfit'] max-w-[500px]">
-              Founded in 2019, XHoldings was born from a simple observation: the traditional financial system often excludes emerging and global markets from true efficiency.
+              Founded in 2019, Fedility Holding was born from a simple observation: the traditional financial system often excludes emerging and global markets from true efficiency.
             </h1>
           </div>
           <div className="space-y-6 text-[15px] font-medium text-gray-800 max-w-[500px] leading-relaxed">
@@ -93,10 +92,10 @@ function About() {
               People and businesses were locked out of global markets, trapped by inflation, and burdened with slow, expensive ways to move money.
             </p>
             <p>
-              XHoldings saw the opportunity that digital assets such as crypto, stablecoins, and tokenised RWAs provided; they weren't just investments. They were new financial rails, and XHoldings decided that everyone globally should have access to borderless finance.
+              Fedility Holding saw the opportunity that digital assets such as crypto, stablecoins, and tokenised RWAs provided; they weren't just investments. They were new financial rails, and Fedility Holding decided that everyone globally should have access to borderless finance.
             </p>
             <p>
-              XHoldings started by making crypto simple and safe to access. As proof of our commitment to trust and security, XHoldings built an institution-grade platform equipped for the modern era. But that was just the first step. Today, XHoldings is building the all-in-one platform for individuals to achieve true economic freedom and for businesses to operate in a new digital economy.
+              Fedility Holding started by making crypto simple and safe to access. As proof of our commitment to trust and security, Fedility Holding built an institution-grade platform equipped for the modern era. But that was just the first step. Today, Fedility Holding is building the all-in-one platform for individuals to achieve true economic freedom and for businesses to operate in a new digital economy.
             </p>
           </div>
         </div>
@@ -107,7 +106,7 @@ function About() {
         <div className="max-w-[800px] mx-auto mb-20">
           <h2 className="text-4xl md:text-[56px] font-bold font-['Outfit'] uppercase mb-6 tracking-tight leading-tight">BUILDING THE FUTURE <br/> OF GLOBAL MONEY</h2>
           <p className="text-gray-500 font-medium text-sm max-w-[600px] mx-auto">
-            The traditional financial system wasn't built for a borderless world. XHoldings is creating a new one where people and businesses access, save, move, and grow wealth globally.
+            The traditional financial system wasn't built for a borderless world. Fedility Holding is creating a new one where people and businesses access, save, move, and grow wealth globally.
           </p>
         </div>
         
@@ -123,7 +122,7 @@ function About() {
                  <h3 className="text-[32px] font-bold leading-[1.1] font-['Outfit']">Unlock Your Economic Prosperity</h3>
                </div>
                <p className="text-[13px] font-semibold text-black/80 mt-12 leading-relaxed pr-4">
-                 With XHoldings, we're giving you tools to save in stablecoins, invest in digital assets, and access new wealth-building opportunities.
+                 With Fedility Holding, we're giving you tools to save in stablecoins, invest in digital assets, and access new wealth-building opportunities.
                </p>
              </div>
           </div>
@@ -136,7 +135,7 @@ function About() {
                  <h3 className="text-[32px] font-bold leading-[1.1] font-['Outfit']">Power Your Financial Operations</h3>
                </div>
                <p className="text-[13px] font-semibold text-black/80 mt-12 leading-relaxed pr-4">
-                 XHoldings provides stablecoin infrastructure that helps your business manage treasury, make payments, and move money efficiently across the globe.
+                 Fedility Holding provides stablecoin infrastructure that helps your business manage treasury, make payments, and move money efficiently across the globe.
                </p>
              </div>
              <div className="flex-1 relative min-h-[250px]">
@@ -151,7 +150,7 @@ function About() {
         <div className="max-w-[600px] mx-auto mb-20">
           <h2 className="text-3xl md:text-[48px] font-bold font-['Outfit'] uppercase mb-6 tracking-tight">WE ARE HERE <br/> FOR YOU</h2>
           <p className="text-[#8e9a93] text-sm font-medium leading-relaxed max-w-[500px] mx-auto">
-            People around the world start their crypto journey with XHoldings. XHoldings puts customers first and focuses on making every step simple and enjoyable.
+            People around the world start their crypto journey with Fedility Holding. Fedility Holding puts customers first and focuses on making every step simple and enjoyable.
           </p>
         </div>
 
@@ -160,7 +159,7 @@ function About() {
               <Target className="w-6 h-6 text-white mb-4" />
               <div>
                 <h4 className="font-bold text-[15px] mb-2">Impact driven</h4>
-                <p className="text-[13px] text-[#8e9a93] font-medium leading-snug">XHoldings creates tools that make real change</p>
+                <p className="text-[13px] text-[#8e9a93] font-medium leading-snug">Fedility Holding creates tools that make real change</p>
               </div>
            </div>
            
@@ -216,7 +215,7 @@ function About() {
         <div className="max-w-[800px] mx-auto px-6 md:px-8 text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 uppercase font-['Outfit'] tracking-tight">Ready to scale <br/> your business?</h2>
           <p className="text-[#8e9a93] text-lg mb-10">
-            Join thousands of enterprises already building the future of finance with XHoldings.
+            Join thousands of enterprises already building the future of finance with Fedility Holding.
           </p>
           <Link to="/login">
             <button className="px-10 py-4 bg-white hover:bg-gray-200 text-black rounded-full font-bold text-[16px] transition-all">
@@ -230,7 +229,7 @@ function About() {
       <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
-            <p>© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>
+            <p>Â© {new Date().getFullYear()} Fedility Holding Inc. All rights reserved.</p>
             <div className="flex gap-6 mt-4 md:mt-0 font-medium">
               <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
               <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
@@ -242,3 +241,4 @@ function About() {
     </div>
   );
 }
+

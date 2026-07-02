@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Clock, Calendar, Linkedin, Twitter } from "lucide-react";
 import { Button } from "../components/ui/button";
 
@@ -44,7 +44,7 @@ const articlesData = {
         <div class="absolute top-0 right-0 w-32 h-32 bg-[#c9a84c]/10 rounded-full blur-3xl pointer-events-none"></div>
         <h4 class="text-xl text-[#e8c96a] font-['Outfit'] mb-4">Why Do Companies Offer Discounts Pre-IPO?</h4>
         <p class="text-gray-300 mb-4">Going public is an incredibly expensive and risky process. Investment banks (like Goldman Sachs or Morgan Stanley) charge millions in underwriting fees. If the market suddenly crashes before the IPO date, the company could fail to raise the money it needs.</p>
-        <p class="text-gray-300">To secure guaranteed cash, late-stage companies will offer a limited block of shares to private equity funds (like XHoldings) at a lower price. The company sacrifices some upside in exchange for immediate, guaranteed capital to fuel their final pre-public growth sprint.</p>
+        <p class="text-gray-300">To secure guaranteed cash, late-stage companies will offer a limited block of shares to private equity funds (like Fedility Holding) at a lower price. The company sacrifices some upside in exchange for immediate, guaranteed capital to fuel their final pre-public growth sprint.</p>
       </div>
 
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">The Risks Involved</h3>
@@ -55,10 +55,10 @@ const articlesData = {
         <li><strong>Valuation Compression:</strong> If a company goes public during a recession, the public market might value the company <em>lower</em> than the private market did.</li>
       </ul>
 
-      <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">How XHoldings Executes the Strategy</h3>
-      <p class="mb-6">We mitigate these risks through aggressive due diligence and structural advantages. When XHoldings targets a Pre-IPO company, we do not simply buy shares blindly.</p>
+      <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">How Fedility Holding Executes the Strategy</h3>
+      <p class="mb-6">We mitigate these risks through aggressive due diligence and structural advantages. When Fedility Holding targets a Pre-IPO company, we do not simply buy shares blindly.</p>
       <p class="mb-6">Our portfolio managers demand full access to the company's audited financials. We create a Special Purpose Vehicle (SPV) that pools our members' capital into a single entity. This allows us to write a $50 Million to $100 Million check, giving us the leverage to negotiate the steepest possible discount on the share price.</p>
-      <p class="mb-6">Once the company completes its IPO and the lock-up period expires, XHoldings programmatically distributes the public shares directly to our members' brokerage accounts, or liquidates the position and distributes the cash, depending on the member's preference.</p>
+      <p class="mb-6">Once the company completes its IPO and the lock-up period expires, Fedility Holding programmatically distributes the public shares directly to our members' brokerage accounts, or liquidates the position and distributes the cash, depending on the member's preference.</p>
     `
   },
   "tech-ipos-2026": {
@@ -87,7 +87,7 @@ const articlesData = {
       <p class="mb-6">LedgerCore processes over 14% of all digital transactions in Europe and North America, acting as the invisible middleman between merchants, banks, and consumer credit cards. With a profit margin exceeding 65%, their upcoming S-1 filing is expected to trigger a massive wave of institutional buying.</p>
 
       <div class="p-8 bg-[#0a0f1c] border border-white/10 my-10 border-l-4 border-l-[#c9a84c]">
-        <h4 class="text-xl text-white font-['Outfit'] mb-2">The XHoldings Position</h4>
+        <h4 class="text-xl text-white font-['Outfit'] mb-2">The Fedility Holding Position</h4>
         <p class="text-gray-400">Our Venture & Digital Assets fund has maintained active positions in 3 of the 4 companies listed above since their Series C funding rounds. We continue to monitor the market for optimal liquidity events as these companies transition to the public markets.</p>
       </div>
     `
@@ -118,7 +118,7 @@ const articlesData = {
 
       <div class="p-8 bg-[#0a0f1c] border border-white/10 my-10">
         <h4 class="text-xl text-[#c9a84c] font-bold uppercase tracking-widest text-[13px] mb-4">Strategic Positioning</h4>
-        <p class="text-gray-300">At XHoldings, we construct "all-weather" portfolios that do not rely on the Federal Reserve lowering rates. We utilize Private Credit strategies that issue floating-rate loans. This means when the Fed raises rates, the interest payments we collect from businesses automatically go up, turning high rates into an advantage for our members.</p>
+        <p class="text-gray-300">At Fedility Holding, we construct "all-weather" portfolios that do not rely on the Federal Reserve lowering rates. We utilize Private Credit strategies that issue floating-rate loans. This means when the Fed raises rates, the interest payments we collect from businesses automatically go up, turning high rates into an advantage for our members.</p>
       </div>
     `
   },
@@ -133,7 +133,7 @@ const articlesData = {
       
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">The "Pick and Shovel" Strategy</h3>
       <p class="mb-6">During the California Gold Rush of the 1840s, the vast majority of prospectors who went digging for gold went bankrupt. The few individuals who built generational wealth were the merchants selling the picks, shovels, and pickaxes to the miners.</p>
-      <p class="mb-6">XHoldings applies this exact historic strategy to the Artificial Intelligence revolution.</p>
+      <p class="mb-6">Fedility Holding applies this exact historic strategy to the Artificial Intelligence revolution.</p>
 
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">The True Cost of Artificial Intelligence</h3>
       <p class="mb-6">When you ask an AI chatbot a question, it feels like magic. But behind the scenes, it requires brutal industrial mechanics. There are two phases to AI:</p>
@@ -143,7 +143,7 @@ const articlesData = {
       </ol>
 
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">Investing in the Foundation</h3>
-      <p class="mb-6">Because of these extreme physical requirements, XHoldings completely avoids investing in AI software apps. Instead, we invest heavily in the physical infrastructure required to make AI exist in the first place.</p>
+      <p class="mb-6">Because of these extreme physical requirements, Fedility Holding completely avoids investing in AI software apps. Instead, we invest heavily in the physical infrastructure required to make AI exist in the first place.</p>
       <ul class="list-disc pl-6 mb-10 text-gray-300 space-y-4 marker:text-[#c9a84c]">
         <li><strong>Hyperscale Data Centers:</strong> We invest in Real Estate Investment Trusts (REITs) that build and manage the highly-secure, climate-controlled warehouses that house the supercomputers. They lock in 15-year leases with major tech companies.</li>
         <li><strong>Energy Generation:</strong> A single AI data center can consume as much electricity as a medium-sized city. We deploy capital into private nuclear operators (SMRs) and industrial-scale solar farms that sell power directly to these data centers under long-term Purchase Power Agreements (PPAs).</li>
@@ -159,7 +159,7 @@ const articlesData = {
     readTime: "8 Min Read",
     image: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?q=80&w=2000&auto=format&fit=crop",
     content: `
-      <p class="mb-6">A massive part of what we do at XHoldings is Private Equity—which simply means taking ownership stakes in businesses that are not listed on the public stock market. But out of millions of private companies globally, how does our investment committee decide which ones are safe enough for your money?</p>
+      <p class="mb-6">A massive part of what we do at Fedility Holding is Private Equityâ€”which simply means taking ownership stakes in businesses that are not listed on the public stock market. But out of millions of private companies globally, how does our investment committee decide which ones are safe enough for your money?</p>
       <p class="mb-6">We utilize a ruthless, 100-point underwriting process before deploying a single dollar. However, all of our decisions boil down to three unshakeable core principles.</p>
       
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">1. The "Mission-Critical" Requirement</h3>
@@ -168,11 +168,11 @@ const articlesData = {
       
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">2. Zero Reliance on Cheap Debt</h3>
       <p class="mb-6">During periods of low interest rates, many companies look wildly successful because they borrow millions of dollars to artificially inflate their growth. They operate at massive losses, assuming they can just borrow more money next year.</p>
-      <p class="mb-6">Our auditors aggressively strip out all the financial engineering to look at the pure "Free Cash Flow" of a business. If a company requires continuous debt just to keep the lights on and pay their employees, XHoldings immediately walks away. We only buy businesses that generate real, hard cash profit every single month.</p>
+      <p class="mb-6">Our auditors aggressively strip out all the financial engineering to look at the pure "Free Cash Flow" of a business. If a company requires continuous debt just to keep the lights on and pay their employees, Fedility Holding immediately walks away. We only buy businesses that generate real, hard cash profit every single month.</p>
 
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">3. Absolute Founder Alignment</h3>
-      <p class="mb-6">The greatest risk in investing is the "Principal-Agent Problem"—where the CEO managing the company doesn't care if it fails because they still get their multimillion-dollar salary regardless.</p>
-      <p class="mb-6">To solve this, we demand "Skin in the Game." We only invest in private companies where the founder and executive team have the vast majority of their own personal net worth tied directly to the equity of the business. If the business fails, the founder loses everything. This biological imperative guarantees that management will work tirelessly through nights and weekends to ensure the company succeeds—which inherently protects your investment.</p>
+      <p class="mb-6">The greatest risk in investing is the "Principal-Agent Problem"â€”where the CEO managing the company doesn't care if it fails because they still get their multimillion-dollar salary regardless.</p>
+      <p class="mb-6">To solve this, we demand "Skin in the Game." We only invest in private companies where the founder and executive team have the vast majority of their own personal net worth tied directly to the equity of the business. If the business fails, the founder loses everything. This biological imperative guarantees that management will work tirelessly through nights and weekends to ensure the company succeedsâ€”which inherently protects your investment.</p>
     `
   },
   "physical-assets": {
@@ -185,7 +185,7 @@ const articlesData = {
       <p class="mb-6">Inflation is the silent, mathematical thief of wealth. If inflation averages just 4% per year, and you leave your money sitting in a standard bank account, your money will literally lose half of its purchasing power in less than 18 years. You will have the same amount of money, but everything will cost twice as much.</p>
       
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">The Ultimate Shield Against Inflation</h3>
-      <p class="mb-6">Historically, the absolute best way to protect your wealth from inflation is to own physical, tangible things. Things you can touch, walk inside of, and put a lock on. At XHoldings, we categorize these as "Real Assets."</p>
+      <p class="mb-6">Historically, the absolute best way to protect your wealth from inflation is to own physical, tangible things. Things you can touch, walk inside of, and put a lock on. At Fedility Holding, we categorize these as "Real Assets."</p>
       <p class="mb-6">The mechanics are simple: when the cost of labor, materials, and living goes up (inflation), the cost to build a new building skyrockets. Because new buildings are suddenly too expensive to build, the existing buildings you already own become significantly more valuable. Furthermore, the rent you charge your tenants can be raised every year to match the inflation rate.</p>
 
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">What We Buy For You</h3>
@@ -205,21 +205,21 @@ const articlesData = {
     readTime: "8 Min Read",
     image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2000&auto=format&fit=crop",
     content: `
-      <p class="mb-6">For generations, financial advisors told retail investors to follow the "60/40 Rule"—put 60% of your money in the stock market for growth, and 40% in Government Bonds to keep your money safe while earning a small amount of interest.</p>
+      <p class="mb-6">For generations, financial advisors told retail investors to follow the "60/40 Rule"â€”put 60% of your money in the stock market for growth, and 40% in Government Bonds to keep your money safe while earning a small amount of interest.</p>
       <p class="mb-6">Today, that old advice is broken. In a high-inflation environment, traditional government and corporate bonds often fail to pay enough interest to preserve your purchasing power. If inflation is 4%, and your bond pays 3%, you are actively losing wealth.</p>
       
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">The Rise of Institutional Private Credit</h3>
-      <p class="mb-6">At XHoldings, we have largely replaced traditional bonds in our clients' portfolios with a powerful alternative: <strong>Private Credit</strong>.</p>
+      <p class="mb-6">At Fedility Holding, we have largely replaced traditional bonds in our clients' portfolios with a powerful alternative: <strong>Private Credit</strong>.</p>
       <p class="mb-6">The concept of Private Credit is remarkably simple. Normally, if a mid-sized, profitable company wants to build a new factory, they go to a massive bank for a loan. You put your savings in that bank (earning 1%), and the bank lends your money to the company (charging 9%), pocketing the massive 8% difference.</p>
-      <p class="mb-6">With Private Credit, we cut out the bank entirely. XHoldings uses our pooled investment fund to lend money directly to these highly successful, profitable mid-sized companies.</p>
+      <p class="mb-6">With Private Credit, we cut out the bank entirely. Fedility Holding uses our pooled investment fund to lend money directly to these highly successful, profitable mid-sized companies.</p>
 
       <h3 class="text-3xl text-white font-['Outfit'] mt-12 mb-6">Why is Private Credit Superior?</h3>
       <ul class="list-disc pl-6 mb-10 text-gray-300 space-y-4 marker:text-[#c9a84c]">
         <li><strong>Massively Higher Returns:</strong> Because we eliminate the bank acting as a middleman, 100% of the high-interest payments made by the company go directly back to our investors. This regularly results in yields that are 2x to 3x higher than standard government bonds.</li>
-        <li><strong>Senior Secured Status:</strong> Safety is paramount. If the company we lent money to ever runs into trouble and goes bankrupt, our Private Credit loans are legally "Senior Secured." This means we are legally first in line to be paid back—before any other investor, before the shareholders, and before the founders. We also legally attach the loan to their physical property (like a factory) as collateral.</li>
+        <li><strong>Senior Secured Status:</strong> Safety is paramount. If the company we lent money to ever runs into trouble and goes bankrupt, our Private Credit loans are legally "Senior Secured." This means we are legally first in line to be paid backâ€”before any other investor, before the shareholders, and before the founders. We also legally attach the loan to their physical property (like a factory) as collateral.</li>
         <li><strong>Floating Rates Protect Against Inflation:</strong> Traditional bonds pay a fixed rate. If inflation skyrockets, you are trapped. Our Private Credit loans use "floating rates." If the Federal Reserve raises interest rates to fight inflation, the interest payments we collect from the companies automatically go up in real-time.</li>
       </ul>
-      <p class="mb-6">By acting as the bank, XHoldings investors enjoy a highly effective, inflation-protected strategy that generates steady, predictable, double-digit cash flow.</p>
+      <p class="mb-6">By acting as the bank, Fedility Holding investors enjoy a highly effective, inflation-protected strategy that generates steady, predictable, double-digit cash flow.</p>
     `
   }
 };
@@ -246,7 +246,7 @@ function ArticlePage() {
             <div className="w-10 h-10 border border-[#c9a84c]/50 flex items-center justify-center font-bold text-[#e8c96a] font-['Outfit'] text-lg">
               X
             </div>
-            <span className="font-light text-2xl tracking-[0.15em] text-white font-['Outfit'] uppercase">XHoldings</span>
+            <span className="font-light text-2xl tracking-[0.15em] text-white font-['Outfit'] uppercase">Fedility Holding</span>
           </Link>
           <div className="flex items-center gap-6">
             <Link to="/publications" className="text-[13px] font-medium text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-2">
@@ -306,8 +306,9 @@ function ArticlePage() {
 
       {/* Footer (Simplified for reading page) */}
       <footer className="py-10 bg-[#0a0f1c] border-t border-white/5 text-center">
-        <p className="text-[11px] text-gray-600 font-light tracking-widest uppercase">© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>
+        <p className="text-[11px] text-gray-600 font-light tracking-widest uppercase">Â© {new Date().getFullYear()} Fedility Holding Inc. All rights reserved.</p>
       </footer>
     </div>
   )
 }
+

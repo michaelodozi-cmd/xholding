@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { 
@@ -152,7 +152,7 @@ function AdminDashboard() {
   );
 }
 
-// ─── Investment Plans Tab ─────────────────────────────────────────────────────
+// â”€â”€â”€ Investment Plans Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type Plan = {
   id: string;
@@ -357,7 +357,7 @@ function PlansTab() {
                 <label className="flex-1 cursor-pointer">
                   <div className="border border-dashed border-white/20 hover:border-[#13c74b]/50 rounded-2xl p-3 text-center transition-colors">
                     <p className="text-[12px] text-gray-400">Click to upload image</p>
-                    <p className="text-[10px] text-gray-600 mt-1">PNG, JPG, WEBP – max 5MB</p>
+                    <p className="text-[10px] text-gray-600 mt-1">PNG, JPG, WEBP â€“ max 5MB</p>
                   </div>
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
@@ -519,7 +519,7 @@ function PlanCard({ plan, onEdit, onDelete, onToggle }: { plan: Plan; onEdit: ()
 
         <div className="text-[11px] text-gray-500 mb-4">
           Min: <span className="text-white">${plan.min_amount.toLocaleString()}</span>
-          {plan.max_amount && <> · Max: <span className="text-white">${plan.max_amount.toLocaleString()}</span></>}
+          {plan.max_amount && <> Â· Max: <span className="text-white">${plan.max_amount.toLocaleString()}</span></>}
         </div>
 
         {/* Actions */}
@@ -779,7 +779,7 @@ function UsersTab() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      {/* Header — stacks on mobile */}
+      {/* Header â€” stacks on mobile */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl text-white font-light font-['Outfit']">User Management</h1>
         <div className="relative w-full sm:w-auto">
@@ -792,7 +792,7 @@ function UsersTab() {
         </div>
       </div>
 
-      {/* Table — horizontally scrollable on mobile */}
+      {/* Table â€” horizontally scrollable on mobile */}
       <div className="bg-[#131714] border border-white/5 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-[640px] w-full text-left border-collapse">
@@ -900,7 +900,7 @@ function UserRow({ id, name, email, balance, totalBalance, rawBalance, status, r
   return (
     <tr className="hover:bg-white/2 transition-colors">
       <td className="p-3 sm:p-4 max-w-[160px]">
-        <div className="text-[13px] text-white font-medium truncate">{name || '—'}</div>
+        <div className="text-[13px] text-white font-medium truncate">{name || 'â€”'}</div>
         <div className="text-[11px] text-gray-500 truncate">{email}</div>
       </td>
       <td className="p-3 sm:p-4 text-[13px] font-mono whitespace-nowrap">
@@ -1125,7 +1125,7 @@ function TransactionCard({ tx }: { tx: any }) {
     if (tx.type === 'deposit') {
       updateStatus(tx.id, 'approved', tx.amount);
       await sendPushToUser(
-        '✅ Deposit Approved — XHoldings',
+        'âœ… Deposit Approved â€” Fedility Holding',
         `Your deposit of ${amt} has been credited to your account.`,
         'deposit-approved'
       );
@@ -1135,7 +1135,7 @@ function TransactionCard({ tx }: { tx: any }) {
       }
       updateStatus(tx.id, 'approved');
       await sendPushToUser(
-        '💸 Withdrawal Sent — XHoldings',
+        'ðŸ’¸ Withdrawal Sent â€” Fedility Holding',
         `Your withdrawal of ${amt} has been processed and sent.`,
         'withdrawal-approved'
       );
@@ -1147,7 +1147,7 @@ function TransactionCard({ tx }: { tx: any }) {
     const amt = `$${Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${tx.asset || ''}`;
     updateStatus(tx.id, 'rejected');
     await sendPushToUser(
-      `❌ ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Rejected — XHoldings`,
+      `âŒ ${tx.type === 'deposit' ? 'Deposit' : 'Withdrawal'} Rejected â€” Fedility Holding`,
       `Your ${tx.type} of ${amt} was not approved. Please contact support.`,
       `${tx.type}-rejected`
     );
@@ -1298,7 +1298,7 @@ function TransactionCard({ tx }: { tx: any }) {
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black border border-white/5 text-gray-300 p-3 rounded-2xl text-[12px] font-mono truncate">{tx.txid || 'No address provided'}</div>
                       <button onClick={() => handleCopy(tx.txid)} className="px-4 bg-[#13c74b]/10 hover:bg-[#13c74b]/20 border border-[#13c74b]/30 text-[#13c74b] rounded-2xl text-[11px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap">
-                        {copied ? '✓ Copied' : 'Copy'}
+                        {copied ? 'âœ“ Copied' : 'Copy'}
                       </button>
                     </div>
                   </div>
@@ -1316,7 +1316,7 @@ function TransactionCard({ tx }: { tx: any }) {
                 </DialogClose>
                 <button onClick={handleApprove}
                   className="flex-1 py-3 text-[12px] uppercase tracking-widest font-bold bg-[#13c74b] hover:bg-[#10a13c] text-[#070b14] rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  ✓ Confirm Approval
+                  âœ“ Confirm Approval
                 </button>
               </div>
             </div>
@@ -1677,7 +1677,7 @@ function SecurityTab() {
   );
 }
 
-// ─── Copy Trading Tab ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Copy Trading Tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type MasterTrader = {
   id: string;
@@ -2262,3 +2262,4 @@ function TraderCard({ trader, onEdit, onDelete, onToggle, onSimulate, onFollower
     </div>
   );
 }
+

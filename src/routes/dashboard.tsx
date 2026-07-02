@@ -22,6 +22,7 @@ import {
   notifyWithdrawalRejected,
 } from "../lib/push-notifications";
 import { registerPushSubscription } from "../lib/web-push-subscription";
+import { Logo, LogoText } from "../components/Logo";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -197,10 +198,8 @@ function Dashboard() {
       {/* Desktop Sidebar (hidden on mobile) */}
       <aside className="hidden md:flex flex-col w-[280px] fixed top-0 left-0 h-screen bg-black p-6 z-50">
         <div className="flex items-center gap-3 mb-10 px-2 mt-2">
-          <div className="w-8 h-8 rounded-full border-[1.5px] border-[#13c74b] flex items-center justify-center font-bold text-[#13c74b] rotate-45 text-[10px]">
-            <div className="-rotate-45">X</div>
-          </div>
-          <span className="font-semibold text-[22px] tracking-tight text-white font-['Inter']">XHoldings</span>
+          <Logo size={28} />
+          <LogoText className="font-semibold text-[22px] tracking-tight text-white font-['Inter']" />
         </div>
         <div className="flex flex-col gap-1.5 grow">
           <button onClick={() => setActiveTab('home')} className={`flex items-center gap-4 px-4 py-3.5 rounded-full transition-colors ${activeTab === 'home' ? 'bg-[#1a221d] text-white font-bold' : 'text-gray-400 hover:text-white hover:bg-white/5 font-medium'}`}><Home className="w-[22px] h-[22px]"/> <span className="whitespace-nowrap">Portfolio</span></button>
@@ -224,10 +223,8 @@ function Dashboard() {
       {/* Top Header Mobile */}
       <header className="sticky top-0 flex md:hidden items-center justify-between px-6 py-4 bg-black/95 backdrop-blur-md z-40">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-[1.5px] border-[#13c74b] flex items-center justify-center font-bold text-[#13c74b] rotate-45 text-[10px]">
-            <div className="-rotate-45">X</div>
-          </div>
-          <span className="font-semibold text-lg tracking-tight text-white font-['Inter']">XHoldings</span>
+          <Logo size={24} />
+          <LogoText className="font-semibold text-lg tracking-tight text-white font-['Inter']" />
         </div>
         <div className="flex items-center gap-3">
           <NotificationBell />
@@ -2169,7 +2166,7 @@ function NotificationBell({ align = 'right' }: { align?: 'left' | 'right' }) {
                   <p className="text-[12px] text-gray-300 leading-snug mb-2">{notif.message}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] text-gray-600 font-medium">{formatTime(notif.created_at)}</span>
-                    <span className="text-[10px] font-bold text-[#13c74b] bg-[#13c74b]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">XHoldings</span>
+                    <span className="text-[10px] font-bold text-[#13c74b] bg-[#13c74b]/10 px-2 py-0.5 rounded-full uppercase tracking-wide">FedilityHolding</span>
                   </div>
                 </div>
               </div>

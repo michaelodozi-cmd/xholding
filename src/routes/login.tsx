@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Sun, HeadphonesIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
+import { Logo, LogoText } from "../components/Logo";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -75,10 +76,8 @@ function Login() {
       {/* Header */}
       <header className="flex items-center justify-between p-6 md:px-8 absolute top-0 left-0 right-0 z-20">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-[4px] bg-transparent border-2 border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-[12px] rotate-45">
-            <div className="-rotate-45">X</div>
-          </div>
-          <span className="font-semibold text-xl tracking-tight text-white font-['Outfit']">XHoldings</span>
+          <Logo size={26} />
+          <LogoText className="font-semibold text-xl tracking-tight text-white font-['Outfit']" />
         </Link>
         <div className="flex items-center gap-4">
         </div>
@@ -162,7 +161,7 @@ function Login() {
 
       {/* Footer */}
       <footer className="absolute bottom-6 left-6 md:left-8 z-20 hidden sm:block">
-        <span className="text-[#52665a] text-[13px] font-medium">© XHoldings {new Date().getFullYear()}</span>
+        <span className="text-[#52665a] text-[13px] font-medium">© Fedility Holding {new Date().getFullYear()}</span>
       </footer>
     </div>
   );

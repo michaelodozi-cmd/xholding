@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, ChevronRight, ShieldCheck, Zap, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Logo, LogoText } from "../components/Logo";
 
 export const Route = createFileRoute("/company")({
   component: Company,
@@ -23,10 +24,8 @@ function Company() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-8 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded bg-transparent border-2 border-[#12b744] flex items-center justify-center font-bold text-[#12b744] font-['Outfit'] text-sm rotate-45">
-                <div className="-rotate-45">X</div>
-              </div>
-              <span className="font-semibold text-2xl tracking-tight text-white font-['Outfit']">XHoldings</span>
+              <Logo size={28} />
+              <LogoText />
             </Link>
 
             <div className="hidden lg:flex items-center gap-8 ml-4">
@@ -103,7 +102,7 @@ function Company() {
               Create a business account <ArrowRight className="w-4 h-4" />
             </button>
           </Link>
-          <a href="mailto:support@xholdings.com">
+          <a href="mailto:support@Fedility Holding.com">
             <button className="px-6 py-3 bg-transparent hover:bg-white/5 text-white border border-white/10 rounded-lg font-bold text-[15px] transition-all flex items-center justify-center gap-2">
               Speak to our team
             </button>
@@ -132,7 +131,7 @@ function Company() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 uppercase font-['Outfit'] tracking-tight">Built For <br/> Every Investor Strategy</h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              From everyday retail investors to massive corporate treasuries, XHoldings provides the liquidity and yield generation needed to scale your wealth.
+              From everyday retail investors to massive corporate treasuries, Fedility Holding provides the liquidity and yield generation needed to scale your wealth.
             </p>
           </div>
 
@@ -285,7 +284,7 @@ function Company() {
             <div>
               <Zap className="w-8 h-8 text-[#12b744] mb-4" />
               <h3 className="text-xl font-bold text-white mb-3">Proof of Reserves</h3>
-              <p className="text-[#8e9a93] text-sm leading-relaxed">XHoldings maintains a strict 1:1 asset backing. We never co-mingle funds, ensuring absolute solvency regardless of market volatility.</p>
+              <p className="text-[#8e9a93] text-sm leading-relaxed">Fedility Holding maintains a strict 1:1 asset backing. We never co-mingle funds, ensuring absolute solvency regardless of market volatility.</p>
             </div>
             <div>
               <ShieldCheck className="w-8 h-8 text-[#12b744] mb-4" />
@@ -311,9 +310,9 @@ function Company() {
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex gap-1 text-[#12b744] mb-4">{"★★★★★"}</div>
+              <div className="flex gap-1 text-[#12b744] mb-4">{"â˜…â˜…â˜…â˜…â˜…"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
-                "XHoldings completely transformed my portfolio. Their fixed-yield plans provide incredible stability during market downturns, and the daily ROI is always on time."
+                "Fedility Holding completely transformed my portfolio. Their fixed-yield plans provide incredible stability during market downturns, and the daily ROI is always on time."
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
@@ -327,7 +326,7 @@ function Company() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex gap-1 text-[#12b744] mb-4">{"★★★★★"}</div>
+              <div className="flex gap-1 text-[#12b744] mb-4">{"â˜…â˜…â˜…â˜…â˜…"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
                 "The withdrawal process is flawless. Unlike traditional institutions that lock up your cash for weeks, my crypto withdrawals process almost instantly."
               </p>
@@ -343,7 +342,7 @@ function Company() {
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-              <div className="flex gap-1 text-[#12b744] mb-4">{"★★★★★"}</div>
+              <div className="flex gap-1 text-[#12b744] mb-4">{"â˜…â˜…â˜…â˜…â˜…"}</div>
               <p className="text-gray-700 leading-relaxed mb-8">
                 "I was skeptical of the high yield at first, but their transparency regarding proof of reserves and algorithmic strategies is unparalleled. Very satisfied."
               </p>
@@ -371,7 +370,7 @@ function Company() {
         <div className="max-w-[800px] mx-auto px-6 md:px-8 text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 uppercase font-['Outfit'] tracking-tight">Ready to compound <br/> your wealth?</h2>
           <p className="text-[#8e9a93] text-lg mb-10">
-            Join thousands of smart investors already building their financial future with XHoldings.
+            Join thousands of smart investors already building their financial future with Fedility Holding.
           </p>
           <Link to="/register">
             <button className="px-10 py-4 bg-[#12b744] hover:bg-[#10a13c] text-black rounded-full font-bold text-[16px] transition-all">
@@ -385,7 +384,7 @@ function Company() {
       <footer className="pt-20 pb-10 bg-black border-t border-white/5 relative z-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-[12px] text-[#8e9a93]">
-            <p>© {new Date().getFullYear()} XHoldings Inc. All rights reserved.</p>
+            <p>Â© {new Date().getFullYear()} Fedility Holding Inc. All rights reserved.</p>
             <div className="flex gap-6 mt-4 md:mt-0 font-medium">
               <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
               <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
@@ -397,3 +396,4 @@ function Company() {
     </div>
   );
 }
+

@@ -1,6 +1,6 @@
-/**
- * XHoldings Push Notification Service
- * Uses the Web Notifications API – works as a native notification on:
+﻿/**
+ * Fedility Holding Push Notification Service
+ * Uses the Web Notifications API â€“ works as a native notification on:
  *  - Windows (Chrome/Edge/Firefox)
  *  - Android (Chrome)
  *  - iOS 16.4+ when installed as PWA (Add to Home Screen)
@@ -49,15 +49,15 @@ export function sendPushNotification(payload: PushNotificationPayload): void {
     };
   } catch (_) {
     // Some browsers (e.g. Firefox) throw if called outside a user gesture.
-    // Silently swallow — the in-app notification store still works.
+    // Silently swallow â€” the in-app notification store still works.
   }
 }
 
-/** Convenience helpers for XHoldings-specific events */
+/** Convenience helpers for Fedility Holding-specific events */
 
 export function notifyDepositApproved(amount: string, asset: string) {
   sendPushNotification({
-    title: '✅ Deposit Approved — XHoldings',
+    title: 'âœ… Deposit Approved â€” Fedility Holding',
     body: `Your deposit of ${amount} ${asset} has been credited to your account.`,
     tag: 'deposit-approved',
   });
@@ -65,7 +65,7 @@ export function notifyDepositApproved(amount: string, asset: string) {
 
 export function notifyDepositRejected(amount: string, asset: string) {
   sendPushNotification({
-    title: '❌ Deposit Rejected — XHoldings',
+    title: 'âŒ Deposit Rejected â€” Fedility Holding',
     body: `Your deposit of ${amount} ${asset} was not approved. Contact support for help.`,
     tag: 'deposit-rejected',
   });
@@ -73,7 +73,7 @@ export function notifyDepositRejected(amount: string, asset: string) {
 
 export function notifyWithdrawalApproved(amount: string, asset: string) {
   sendPushNotification({
-    title: '💸 Withdrawal Sent — XHoldings',
+    title: 'ðŸ’¸ Withdrawal Sent â€” Fedility Holding',
     body: `Your withdrawal of ${amount} ${asset} has been processed and sent.`,
     tag: 'withdrawal-approved',
   });
@@ -81,7 +81,7 @@ export function notifyWithdrawalApproved(amount: string, asset: string) {
 
 export function notifyWithdrawalRejected(amount: string, asset: string) {
   sendPushNotification({
-    title: '❌ Withdrawal Rejected — XHoldings',
+    title: 'âŒ Withdrawal Rejected â€” Fedility Holding',
     body: `Your withdrawal of ${amount} ${asset} was rejected. Contact support.`,
     tag: 'withdrawal-rejected',
   });
@@ -89,8 +89,9 @@ export function notifyWithdrawalRejected(amount: string, asset: string) {
 
 export function notifyInvestmentROI(amount: string) {
   sendPushNotification({
-    title: '📈 ROI Credited — XHoldings',
+    title: 'ðŸ“ˆ ROI Credited â€” Fedility Holding',
     body: `Daily return of $${amount} has been added to your balance.`,
     tag: 'roi-credit',
   });
 }
+
