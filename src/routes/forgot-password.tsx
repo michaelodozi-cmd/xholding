@@ -21,8 +21,21 @@ function ForgotPassword() {
     setError("");
     setSuccess(false);
 
+    // Check if user account exists
+    const { data: exists, error: checkError } = await supabase.rpc('check_email_exists', { p_email: email });
+    if (!checkError && exists === false) {
+      setLoading(false);
+      setError("We couldn't find an account associated with this email address. Please check the spelling or register a new account.");
+      return;
+    }
+
+    // Always use production URL when testing locally so mobile clicks work
+    const originUrl = window.location.origin.includes("localhost") 
+      ? "https://www.thefidelityholding.com" 
+      : window.location.origin;
+
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${originUrl}/reset-password`,
     });
 
     setLoading(false);

@@ -16,6 +16,22 @@ begin
 end;
 $;
 
+-- Helper function to check if user email exists without exposing RLS
+create or replace function public.check_email_exists(p_email text)
+returns boolean
+language plpgsql
+security definer
+as $$
+begin
+  return exists (
+    select 1 from public.profiles
+    where lower(email) = lower(p_email)
+  );
+end;
+$$;
+
+grant execute on function public.check_email_exists(text) to anon, authenticated;
+
 -- ==========================================
 -- 1. Profiles Table
 -- ==========================================

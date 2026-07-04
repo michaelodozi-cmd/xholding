@@ -32,6 +32,14 @@ function Login() {
     setLoading(true);
     setError("");
 
+    // Check if user account exists
+    const { data: exists, error: checkError } = await supabase.rpc('check_email_exists', { p_email: email });
+    if (!checkError && exists === false) {
+      setLoading(false);
+      setError("This email address is not registered. Please create an account first.");
+      return;
+    }
+
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -39,7 +47,11 @@ function Login() {
 
     if (signInError) {
       setLoading(false);
-      setError(signInError.message);
+      if (signInError.message.toLowerCase().includes("invalid login credentials")) {
+        setError("Invalid email or password. If you don't have an account, please click 'Create account' below.");
+      } else {
+        setError(signInError.message);
+      }
       return;
     }
 

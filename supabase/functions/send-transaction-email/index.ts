@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
     // 3. Send via Resend or log to console
     if (shouldSend) {
       const resendApiKey = Deno.env.get("RESEND_API_KEY");
-      const senderEmail = Deno.env.get("SENDER_EMAIL") || "onboarding@resend.dev";
+      const senderEmail = Deno.env.get("SENDER_EMAIL") || "noreply@thefidelityholding.com";
       
       console.log(`Preparing notification email for ${userEmail} regarding: ${subject}`);
       
